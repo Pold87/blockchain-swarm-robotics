@@ -152,6 +152,33 @@ epuck_environment_classification.cpp.s:
 	cd /home/volker/Downloads/code/code/argos_simulations/Epuck/build && $(MAKE) -f controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/build.make controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.s
 .PHONY : epuck_environment_classification.cpp.s
 
+geth_static.o: geth_static.cpp.o
+
+.PHONY : geth_static.o
+
+# target to build an object file
+geth_static.cpp.o:
+	cd /home/volker/Downloads/code/code/argos_simulations/Epuck/build && $(MAKE) -f controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/build.make controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o
+.PHONY : geth_static.cpp.o
+
+geth_static.i: geth_static.cpp.i
+
+.PHONY : geth_static.i
+
+# target to preprocess a source file
+geth_static.cpp.i:
+	cd /home/volker/Downloads/code/code/argos_simulations/Epuck/build && $(MAKE) -f controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/build.make controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.i
+.PHONY : geth_static.cpp.i
+
+geth_static.s: geth_static.cpp.s
+
+.PHONY : geth_static.s
+
+# target to generate assembly for a file
+geth_static.cpp.s:
+	cd /home/volker/Downloads/code/code/argos_simulations/Epuck/build && $(MAKE) -f controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/build.make controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.s
+.PHONY : geth_static.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -164,6 +191,9 @@ help:
 	@echo "... epuck_environment_classification.o"
 	@echo "... epuck_environment_classification.i"
 	@echo "... epuck_environment_classification.s"
+	@echo "... geth_static.o"
+	@echo "... geth_static.i"
+	@echo "... geth_static.s"
 .PHONY : help
 
 

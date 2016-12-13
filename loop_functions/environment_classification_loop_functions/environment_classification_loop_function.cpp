@@ -1,5 +1,8 @@
+#include <iostream>
+#include <unistd.h>
 #include "environment_classification_loop_function.h"
 #include <argos3/core/utility/math/rng.h>
+#include "../../controllers/epuck_environment_classification/geth_static.h" /* Use geth from C++ */
 
 #define ALPHA_CHANNEL		         0
 #define COLOR_STRENGHT               255
@@ -21,12 +24,39 @@ m_pcFloor(NULL)
 {
 }
 
+static const int numRobots = 6;
+
+using namespace std;
 
 /************************************************* INIT ********************************************************/
 /***************************************************************************************************************/
 void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
+ 
+    
+  /*  */
+  cout << "Disconnecting everyone by killing mining thread" << endl;
 
+  CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
+  for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
+    /* Get handle to e-puck entity and controller */
+    CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
+    EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
+    std::string& address = cController.GetAddress();
+    std::string& minerAddress = cController.GetMinerAddress();
 
+    /* Distribute ether among the robots */
+    sendEther(numRobots, minerAddress, address, 2);
+    cout << "Address is: " << address;
+  }
+
+  sleep(20);
+
+  stop_mining(numRobots);
+
+  sleep(20);
+
+  kill_geth_thread(numRobots);
+    
 	incorrectParameters = false;
 	m_pcRNG = CRandom::CreateRNG("argos");
 
@@ -434,7 +464,13 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 				}
 
 				/* Set experimentFinished variable to true -> the experiment will terminate */
+				std::cout << "Consensus is reached and the experiment is FINISHED" << std::endl;
 				m_bExperimentFinished = true;
+
+				for (int i; i < numRobots; ++i){
+				  stop_mining(i);
+				}
+				
 			}
 			else  {
 				written_qualities = 0;

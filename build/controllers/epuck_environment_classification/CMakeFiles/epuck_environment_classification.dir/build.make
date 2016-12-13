@@ -81,17 +81,43 @@ controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classi
 controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o.provides.build: controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o
 
 
+controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o: controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/flags.make
+controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o: ../controllers/epuck_environment_classification/geth_static.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/volker/Downloads/code/code/argos_simulations/Epuck/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o"
+	cd /home/volker/Downloads/code/code/argos_simulations/Epuck/build/controllers/epuck_environment_classification && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o -c /home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/geth_static.cpp
+
+controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.i"
+	cd /home/volker/Downloads/code/code/argos_simulations/Epuck/build/controllers/epuck_environment_classification && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/geth_static.cpp > CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.i
+
+controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.s"
+	cd /home/volker/Downloads/code/code/argos_simulations/Epuck/build/controllers/epuck_environment_classification && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/geth_static.cpp -o CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.s
+
+controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o.requires:
+
+.PHONY : controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o.requires
+
+controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o.provides: controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o.requires
+	$(MAKE) -f controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/build.make controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o.provides.build
+.PHONY : controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o.provides
+
+controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o.provides.build: controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o
+
+
 # Object files for target epuck_environment_classification
 epuck_environment_classification_OBJECTS = \
-"CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o"
+"CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o" \
+"CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o"
 
 # External object files for target epuck_environment_classification
 epuck_environment_classification_EXTERNAL_OBJECTS =
 
 controllers/epuck_environment_classification/libepuck_environment_classification.so: controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o
+controllers/epuck_environment_classification/libepuck_environment_classification.so: controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o
 controllers/epuck_environment_classification/libepuck_environment_classification.so: controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/build.make
 controllers/epuck_environment_classification/libepuck_environment_classification.so: controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/volker/Downloads/code/code/argos_simulations/Epuck/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX shared library libepuck_environment_classification.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/volker/Downloads/code/code/argos_simulations/Epuck/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX shared library libepuck_environment_classification.so"
 	cd /home/volker/Downloads/code/code/argos_simulations/Epuck/build/controllers/epuck_environment_classification && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/epuck_environment_classification.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -100,6 +126,7 @@ controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classi
 .PHONY : controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/build
 
 controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/requires: controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o.requires
+controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/requires: controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o.requires
 
 .PHONY : controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/requires
 

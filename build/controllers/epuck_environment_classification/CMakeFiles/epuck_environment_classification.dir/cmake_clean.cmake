@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o"
+  "CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o"
   "libepuck_environment_classification.pdb"
   "libepuck_environment_classification.so"
 )

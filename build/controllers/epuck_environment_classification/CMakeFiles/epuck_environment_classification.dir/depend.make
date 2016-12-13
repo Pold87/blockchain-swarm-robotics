@@ -3,6 +3,7 @@
 
 controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o: ../controllers/epuck_environment_classification/epuck_environment_classification.cpp
 controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o: ../controllers/epuck_environment_classification/epuck_environment_classification.h
+controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o: ../controllers/epuck_environment_classification/geth_static.h
 controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o: /usr/local/include/argos3/core/config.h
 controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o: /usr/local/include/argos3/core/control_interface/ci_actuator.h
 controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o: /usr/local/include/argos3/core/control_interface/ci_controller.h
@@ -37,4 +38,6 @@ controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classi
 controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o: /usr/local/include/lua.h
 controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o: /usr/local/include/luaconf.h
 controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/epuck_environment_classification.cpp.o: /usr/local/include/lualib.h
+
+controllers/epuck_environment_classification/CMakeFiles/epuck_environment_classification.dir/geth_static.cpp.o: ../controllers/epuck_environment_classification/geth_static.cpp
 

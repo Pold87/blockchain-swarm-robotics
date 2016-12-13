@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <ctime>
 #include <iostream>
+#include <set>
 
 
 #define N_COL  3
@@ -142,6 +143,19 @@ public:
    inline Opinion & GetOpinion() {
       return opinion;
    }
+
+   inline std::string & GetAddress() {
+      return address;
+   }
+
+   inline std::string & GetMinerAddress() {
+      return minerAddress;
+   }
+
+   inline bool isMining() {
+     return mining;
+   }
+   
    inline bool IsExploring() const {
       return m_sStateData.State == SStateData::STATE_EXPLORING;
    }
@@ -149,8 +163,25 @@ public:
       return m_sStateData.State == SStateData::STATE_DIFFUSING;
    }
 
+   struct SNeighborData {
+
+     std::set<UInt8> neighbors;
+     SNeighborData();
+     
+   };
+
 private:
 
+   void InitGeth(int robotId);
+
+   void UpdateNeighbors(std::set<UInt8> newNeighbors);
+
+   void DistributeID();
+   
+   /* The neighbor data */
+   SNeighborData m_sNeighborData;
+
+   
    CCI_EPuckWheelsActuator* m_pcWheels;
    Real m_fWheelVelocity;
    CCI_EPuckRangeAndBearingActuator*  m_pcRABA;
@@ -175,6 +206,9 @@ private:
    Opinion opinion;
    Movement movement;
    int initializationValues[N_COL];
+   std::string address;
+   std::string minerAddress;
+   bool mining;
    CColor red, blue, green;                    // Add here eventual additional color AGGIUNGERECOLORI
 //   int totalCounted, countedOfThisOpinion[N_COL];  USED JUST FOR STATISTICS, no more used
 };

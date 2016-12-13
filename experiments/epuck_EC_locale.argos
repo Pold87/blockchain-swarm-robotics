@@ -36,12 +36,12 @@
 
       <params>
    
-     	<simulation_parameters g="100" 
-   	          sigma="100"
+     	<simulation_parameters g="5" 
+   	          sigma="10"
 		  turn="45"
                   lamda="100"
 		  exitFlag="true"
-		  decision_rule="1"
+		  decision_rule="3"
 		  num_pack_saved="2"
 	          percent_red="99"
 		  percent_blue="1"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
@@ -69,18 +69,18 @@
 	  save_every_quality_flag="true"
 	  save_global_stat_flag="true"
 	  radix="RADIX"
-	  number_of_robots="100"
+	  number_of_robots="6"
 	  number_of_runs="1"
           number_of_qualities="2"
-          r_0="50"
-	  b_0="50"
+          r_0="3"
+	  b_0="3"
 	  g_0="0"
 	  length_of_runs="100"
 	  g="10"
 	  sigma="10"
 	  lamda="10"
 	  turn="10"
-	  decision_rule="1"/>
+	  decision_rule="3"/>
 
   </loop_functions>
   <!-- *********************** -->
@@ -110,7 +110,7 @@
    <distribute>
       <position method="uniform" min="0.1,0.1,0" max="1.9 , 1.9, 0" />
       <orientation method="gaussian" mean="1,1,0 " std_dev="360,0,0 " />
-      <entity quantity="100" max_trials="1000">
+      <entity quantity="6" max_trials="20">
         <e-puck id="ep" >
           <controller config="epc" />
         </e-puck>
@@ -145,24 +145,24 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <visualization>
-    <qt-opengl>
+  <!-- <visualization> -->
+  <!--   <qt-opengl> -->
        
-      <camera>
-	<placement idx="0" position="-0.861442,0.985724,1.41504" look_at="-0.179255,0.992546,0.683892" up="0.731109,0.00731134,0.682221" lens_focal_length="20" />
-        <placement idx="1" position="1.94098,0.736798,0.349611" look_at="2.85255,1.04903,0.0821098" lens_focal_length="20" />
-        <placement idx="3" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
-        <placement idx="4" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
-        <placement idx="5" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
-        <placement idx="6" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
-        <placement idx="7" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
-        <placement idx="8" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
-        <placement idx="9" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
-        <placement idx="10" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
-        <placement idx="11" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
-     </camera>  
-      <!-- <user_functions label="environment_classification_qt_user_functions" /> -->
-    </qt-opengl> 
-  </visualization>
+  <!--     <camera> -->
+  <!-- 	<placement idx="0" position="-0.861442,0.985724,1.41504" look_at="-0.179255,0.992546,0.683892" up="0.731109,0.00731134,0.682221" lens_focal_length="20" /> -->
+  <!--       <placement idx="1" position="1.94098,0.736798,0.349611" look_at="2.85255,1.04903,0.0821098" lens_focal_length="20" /> -->
+  <!--       <placement idx="3" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" /> -->
+  <!--       <placement idx="4" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" /> -->
+  <!--       <placement idx="5" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" /> -->
+  <!--       <placement idx="6" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" /> -->
+  <!--       <placement idx="7" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" /> -->
+  <!--       <placement idx="8" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" /> -->
+  <!--       <placement idx="9" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" /> -->
+  <!--       <placement idx="10" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" /> -->
+  <!--       <placement idx="11" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" /> -->
+  <!--    </camera> -->
+  <!--     <\!-- <user_functions label="environment_classification_qt_user_functions" /> -\-> -->
+  <!--   </qt-opengl> -->
+  <!-- </visualization> -->
  
 </argos-configuration>

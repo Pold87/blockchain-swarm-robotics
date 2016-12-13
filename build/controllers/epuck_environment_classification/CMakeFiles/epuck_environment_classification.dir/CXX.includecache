@@ -9,6 +9,16 @@
 /home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/epuck_environment_classification.cpp
 epuck_environment_classification.h
 /home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/epuck_environment_classification.h
+geth_static.h
+/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/geth_static.h
+iostream
+-
+algorithm
+-
+sstream
+-
+unistd.h
+-
 
 /home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/epuck_environment_classification.h
 argos3/core/control_interface/ci_controller.h
@@ -48,6 +58,30 @@ stdlib.h
 ctime
 -
 iostream
+-
+set
+-
+
+/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/geth_static.cpp
+iostream
+-
+stdlib.h
+-
+unistd.h
+-
+stdio.h
+-
+stdexcept
+-
+string
+-
+sstream
+-
+fstream
+-
+
+/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/geth_static.h
+string
 -
 
 /usr/local/include/argos3/core/config.h
