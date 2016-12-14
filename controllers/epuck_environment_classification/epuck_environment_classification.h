@@ -62,15 +62,17 @@ public:
 	  };
 
 	  struct SimulationState {
-	     UInt32 decision_rule;
-	     Real percentRed, percentBlue;
-	     Real g;
-	     Real sigma;
-	     bool exitFlag;
-	     std::string radix;
-	     UInt32 numPackSaved;
-	     UInt32 status;
-	     UInt32 LAMDA, turn;
+	    UInt32 decision_rule;
+	    Real percentRed, percentBlue;
+	    Real g;
+	    Real sigma;
+	    bool exitFlag;
+	    std::string radix;
+	    std::string baseDir; /* Basedir of the controller folder */
+	    UInt32 numPackSaved;
+	    UInt32 status;
+	    UInt32 LAMDA, turn;
+	    UInt32 numRobots; /* total amount of robots in the experiment */
 	     void Init(TConfigurationNode& t_node);
 	  };
 

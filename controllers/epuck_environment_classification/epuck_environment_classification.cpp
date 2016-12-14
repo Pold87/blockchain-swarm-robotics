@@ -7,13 +7,13 @@
 
 
 #include "geth_static.h" /* Use geth from C++ */
-//#include "ethereum_rpc_json.h" /* Interact with an local Ethereum node via RPC/JSON */
 
 #include <iostream>
 
 #include <algorithm>
 #include <sstream>
 #include <unistd.h>
+#include <map>
 
 /****************************************/
 /****************************************/
@@ -21,25 +21,17 @@
 //using json = nlohmann::json;
 using namespace std;
 
-// Amount of robots
-static const uint numRobots = 6;
-
-
-const string basedir = "/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/";
-
-/* Contract address of the collective decision contract */
-string contractInterface = readStringFromFile(basedir + "interface.txt");
-const string contractName = "collectivedecision";
-
 /* The +1 is for the miner */
-string enodes[numRobots + 1];
-string coinbaseAddresses[numRobots + 1];
+
+map<int, string> enodes;
+map<int, string> coinbaseAddresses;
 
 string contractAddress = "";
 
 EPuck_Environment_Classification::SNeighborData::SNeighborData() :
   neighbors(set<UInt8>()) {}
 
+/* Replace the pattern from with to in the string str  */
 bool replace(std::string& str, const std::string& from, const std::string& to) {
     size_t start_pos = str.find(from);
     if(start_pos == std::string::npos)
@@ -53,9 +45,9 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 */
 uint Id2Int(std::string id) {
 
-  UInt32 idConversion = id[2]-'0';
+  UInt32 idConversion = id[2] - '0';
   if(id[3]!='\0')
-    idConversion = (idConversion*10) + (id[3]-'0');
+    idConversion = (idConversion * 10) + (id[3] - '0');
 
     return idConversion;
   
@@ -99,6 +91,8 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "percent_red", percentRed);
     GetNodeAttribute(t_node, "percent_blue", percentBlue);
     GetNodeAttribute(t_node, "num_pack_saved", numPackSaved);
+    GetNodeAttribute(t_node, "num_robots", numRobots);
+    GetNodeAttribute(t_node, "base_dir", baseDir);
   }
   catch(CARGoSException& ex) {
     THROW_ARGOSEXCEPTION_NESTED("Error initializing controller state parameters.", ex);
@@ -109,17 +103,17 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
 
   /* Initialize the actuators (and sensors) and the initial velocity as straight walking*/
   m_pcWheels = GetActuator<CCI_EPuckWheelsActuator>("epuck_wheels");
-  m_pcProximity = GetSensor <CCI_EPuckProximitySensor >("epuck_proximity");
-  m_pcLEDs      = GetActuator<CCI_LEDsActuator                  >("leds");
-  m_pcRABA      = GetActuator<CCI_EPuckRangeAndBearingActuator     >("epuck_range_and_bearing"    );
-  m_pcRABS      = GetSensor  <CCI_EPuckRangeAndBearingSensor       >("epuck_range_and_bearing"    );
+  m_pcProximity = GetSensor <CCI_EPuckProximitySensor>("epuck_proximity");
+  m_pcLEDs = GetActuator<CCI_LEDsActuator>("leds");
+  m_pcRABA = GetActuator<CCI_EPuckRangeAndBearingActuator>("epuck_range_and_bearing");
+  m_pcRABS = GetSensor  <CCI_EPuckRangeAndBearingSensor>("epuck_range_and_bearing");
   m_pcRNG = CRandom::CreateRNG("argos");
   m_cGoStraightAngleRange.Set(-ToRadians(m_cAlpha), ToRadians(m_cAlpha));
   GetNodeAttributeOrDefault(t_node, "velocity", m_fWheelVelocity, m_fWheelVelocity);
   simulationParams.Init(GetNode(t_node, "simulation_parameters"));
 
-  simulationParams.g=simulationParams.g*10;
-  simulationParams.sigma=simulationParams.sigma*10;
+  simulationParams.g=simulationParams.g * 10;
+  simulationParams.sigma=simulationParams.sigma * 10;
 
   /* Colours read from robots could be changed and added here! AGGIUNGERECOLORI */
   red.Set(COLOR_STRENGHT,0,0,ALPHA_CHANNEL);      // Change alphachannel has not effect visively, but changing COLOR_STRENGHT could make
@@ -131,20 +125,6 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
 
   std::string m_strOutput;
   m_strOutput = GetId();
-  //	epuckFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
-  //	epuckFile << "NSIZE"<<"\t"<<"diffTime"<< std::endl;
-
-  //	/* Statistic variables (not anymore used here but could be helpfull sometimes to catch statistics) */
-  //	for(int c = 0; c<N_COL; c++)
-  //	{
-  //		m_sStateData.numberOfExplorations[c] = 1;
-  //		m_sStateData.numberOfDiffusions[c] = 1;
-  //		m_sStateData.exportTime[c] = 0;
-  //		countedOfThisOpinion[c] = 0;
-  //		totalCounted = 0;
-  //		opinion.exportQuality[c] = 0;
-  //	}
-
 
   /* IC it's an helping variable to read others opinion */
   IC.receivedOpinion = 5;
@@ -162,9 +142,9 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
   toSend[3]=5;
   m_pcRABA->SetData(toSend);
 
-  if(simulationParams.percentRed<simulationParams.percentBlue)
-    simulationParams.percentRed=simulationParams.percentBlue;
-  simulationParams.percentRed=simulationParams.percentRed/100;
+  if(simulationParams.percentRed < simulationParams.percentBlue)
+    simulationParams.percentRed = simulationParams.percentBlue;
+  simulationParams.percentRed = simulationParams.percentRed / 100;
 
 
   /* Ethereum */
@@ -179,8 +159,6 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
   }
  
    
-  // InitGeth(robotId);
-
   geth_init(robotId);
   start_geth(robotId);
   createAccount(robotId);   
@@ -188,43 +166,39 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
   coinbaseAddresses[robotId] = getCoinbase(robotId);
   address = coinbaseAddresses[robotId];
 
-  //string ld = load_contract(robotId, contractName, contractAddress, contractInterface);
-  
-  //cout << "LD !!!: " << ld << endl;
-
   unlockAccount(robotId, "test");
   
   /* Create external miner */
   if (robotId == 0) {
 
 
-    geth_init(numRobots);
-    start_geth(numRobots);
-    createAccount(numRobots);
-    unlockAccount(numRobots, "test");
-    enodes[numRobots] = get_enode(numRobots);
-    coinbaseAddresses[numRobots] = getCoinbase(numRobots);
-    start_mining(numRobots);
+    geth_init(simulationParams.numRobots);
+    start_geth(simulationParams.numRobots);
+    createAccount(simulationParams.numRobots);
+    unlockAccount(simulationParams.numRobots, "test");
+    enodes[simulationParams.numRobots] = get_enode(simulationParams.numRobots);
+    coinbaseAddresses[simulationParams.numRobots] = getCoinbase(simulationParams.numRobots);
+    start_mining(simulationParams.numRobots);
     sleep(1); /* Mine some stuff and send ETH to robots */
     
     /* Deploy contract */
-    string deploy = basedir + "deploy_contract.txt";
-    string txHashRaw = exec_geth_cmd(numRobots, "loadScript(\"" + deploy + "\")");
+    string deploy = simulationParams.baseDir + "deploy_contract.txt";
+    string txHashRaw = exec_geth_cmd(simulationParams.numRobots, "loadScript(\"" + deploy + "\")");
     cout << "txHashRaw: " << txHashRaw << endl; 
     string txHash;
     std::istringstream f(txHashRaw);
     std::getline(f, txHash);
     sleep(15);
-    contractAddress = getContractAddress(numRobots, txHash);
+    contractAddress = getContractAddress(simulationParams.numRobots, txHash);
 
     cout << "Address is " << contractAddress << endl;
 
     //stop_mining(robotId);
   }
 
-  minerAddress = coinbaseAddresses[numRobots];
+  minerAddress = coinbaseAddresses[simulationParams.numRobots];
 
-  add_peer(robotId, enodes[numRobots]);
+  add_peer(robotId, enodes[simulationParams.numRobots]);
  
   
 }
@@ -282,8 +256,6 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<UInt8> newNeighbors) 
     remove_peer(robotId, enodes[i]);
   }
   cout << endl;
-
-
     
   cout << "Robot " << robotId << " Adding neighbors: ";
 
@@ -572,7 +544,7 @@ void EPuck_Environment_Classification::Diffusing() {
       /* Send opinion via Ethereum */
 
       if (opinion.actualOpinion == 0) {
-	string cmd = basedir + "vote0.txt";
+	string cmd = simulationParams.baseDir + "vote0.txt";
 	string command = readStringFromFile(cmd);
 
 	replace(command, "CONTRACTADDRESS", contractAddress);
@@ -581,7 +553,7 @@ void EPuck_Environment_Classification::Diffusing() {
       
 	
       } else if (opinion.actualOpinion == 2) {
-	string cmd = basedir + "vote1.txt";
+	string cmd = simulationParams.baseDir + "vote1.txt";
 	string command = readStringFromFile(cmd);
 
 	replace(command, "CONTRACTADDRESS", contractAddress);
@@ -805,13 +777,13 @@ void EPuck_Environment_Classification::MajorityRule(){
   //for( UInt32 i = 0; i<3; i++)
   // opinion.actualOpinion = FindMaxOpinionReceived(numberOpinionsReceived, opinion.actualOpinion);
   int robotId = Id2Int(GetId());
-  string command_red = readStringFromFile(basedir + "get_red_votes.txt");
+  string command_red = readStringFromFile(simulationParams.baseDir + "get_red_votes.txt");
   replace(command_red, "CONTRACTADDRESS", contractAddress);
   string voteResult_red = exec_geth_cmd(robotId, command_red);
   int vote_r = atoi(voteResult_red.c_str());
   //cout << "Robot: " << robotId << ": The number of red opinions is " << voteResult_red << endl;
 
-  string command_green = readStringFromFile(basedir + "get_green_votes.txt");
+  string command_green = readStringFromFile(simulationParams.baseDir + "get_green_votes.txt");
   replace(command_green, "CONTRACTADDRESS", contractAddress);
   string voteResult_green = exec_geth_cmd(robotId, command_green);
   int vote_g = atoi(voteResult_green.c_str());
