@@ -1,0 +1,21 @@
+[1;32m[INFO] Loaded library "[0m[1;32m/home/vstrobel/argos3-dist/lib/argos3/libargos3plugin_simulator_pointmass3d.so[0m[1;32m"[0m
+[1;32m[INFO] Loaded library "[0m[1;32m/home/vstrobel/argos3-dist/lib/argos3/libargos3plugin_simulator_epuck.so[0m[1;32m"[0m
+[1;32m[INFO] Loaded library "[0m[1;32m/home/vstrobel/argos3-dist/lib/argos3/libargos3plugin_simulator_spiri.so[0m[1;32m"[0m
+[1;32m[INFO] Loaded library "[0m[1;32m/home/vstrobel/argos3-dist/lib/argos3/libargos3plugin_simulator_genericrobot.so[0m[1;32m"[0m
+[1;32m[INFO] Loaded library "[0m[1;32m/home/vstrobel/argos3-dist/lib/argos3/libargos3plugin_simulator_media.so[0m[1;32m"[0m
+[1;32m[INFO] Loaded library "[0m[1;32m/home/vstrobel/argos3-dist/lib/argos3/libargos3plugin_simulator_dynamics2d.so[0m[1;32m"[0m
+[1;32m[INFO] Loaded library "[0m[1;32m/home/vstrobel/argos3-dist/lib/argos3/libargos3plugin_simulator_footbot.so[0m[1;32m"[0m
+[1;32m[INFO] Loaded library "[0m[1;32m/home/vstrobel/argos3-dist/lib/argos3/libargos3plugin_simulator_entities.so[0m[1;32m"[0m
+[1;32m[INFO] Loaded library "[0m[1;32m/home/vstrobel/argos3-dist/lib/argos3/libargos3core_simulator.so[0m[1;32m"[0m
+[1;32m[INFO] Loaded library "[0m[1;32m/home/vstrobel/argos3-dist/lib/argos3/libargos3plugin_simulator_eyebot.so[0m[1;32m"[0m
+[1;32m[INFO] Not using threads[0m
+[1;32m[INFO] Using random seed = [0m[1;32m23[0m
+[1;32m[INFO] Using simulation clock tick = [0m[1;32m0.1[0m
+[1;32m[INFO] Total experiment length in clock ticks = [0m[1;32munlimited[0m
+[1;32m[INFO] Loaded library "[0m[1;32m./build/controllers/epuck_environment_classification/libepuck_environment_classification.so[0m[1;32m"[0m
+[1;32m[INFO] Loaded library "[0m[1;32m./build/loop_functions/environment_classification_loop_functions/libenvironment_classification_loop_functions.so[0m[1;32m"[0m
+Calling geth_init for robot 0
+Starting geth for robot 0
+Running command geth --verbosity "1" --networkid 2 --nodiscover  --ipcpath ~/Documents/eth_data/data0/geth.ipc --rpc --rpcaddr 0.0.0.0 --rpccorsdomain "*" --rpcport 8100 --datadir ~/Documents/eth_data/data0/ --port 31000&
+DEBUG  -- getCoinbase (robot 0): "0x097fa1b2561579b9ec2df50358a7397d3bc80f92"
+

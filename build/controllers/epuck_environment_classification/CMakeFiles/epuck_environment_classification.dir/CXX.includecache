@@ -6,11 +6,11 @@
 
 #IncludeRegexTransform: 
 
-/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/epuck_environment_classification.cpp
+/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/epuck_environment_classification.cpp
 epuck_environment_classification.h
-/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/epuck_environment_classification.h
+/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/epuck_environment_classification.h
 geth_static.h
-/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/geth_static.h
+/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/geth_static.h
 iostream
 -
 algorithm
@@ -22,7 +22,7 @@ unistd.h
 map
 -
 
-/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/epuck_environment_classification.h
+/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/epuck_environment_classification.h
 argos3/core/control_interface/ci_controller.h
 -
 argos3/core/utility/configuration/argos_configuration.h
@@ -64,7 +64,7 @@ iostream
 set
 -
 
-/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/geth_static.cpp
+/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/geth_static.cpp
 iostream
 -
 stdlib.h
@@ -82,13 +82,13 @@ sstream
 fstream
 -
 
-/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/geth_static.h
+/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/geth_static.h
 string
 -
 
-/usr/local/include/argos3/core/config.h
+/home/vstrobel/argos3-dist/include/argos3/core/config.h
 
-/usr/local/include/argos3/core/control_interface/ci_actuator.h
+/home/vstrobel/argos3-dist/include/argos3/core/control_interface/ci_actuator.h
 argos3/core/config.h
 -
 argos3/core/utility/datatypes/datatypes.h
@@ -104,7 +104,7 @@ lualib.h
 lauxlib.h
 -
 
-/usr/local/include/argos3/core/control_interface/ci_controller.h
+/home/vstrobel/argos3-dist/include/argos3/core/control_interface/ci_controller.h
 argos3/core/utility/configuration/base_configurable_resource.h
 -
 argos3/core/utility/datatypes/datatypes.h
@@ -124,7 +124,7 @@ cxxabi.h
 typeinfo
 -
 
-/usr/local/include/argos3/core/control_interface/ci_sensor.h
+/home/vstrobel/argos3-dist/include/argos3/core/control_interface/ci_sensor.h
 argos3/core/config.h
 -
 argos3/core/utility/datatypes/datatypes.h
@@ -140,7 +140,7 @@ lualib.h
 lauxlib.h
 -
 
-/usr/local/include/argos3/core/utility/configuration/argos_configuration.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/configuration/argos_configuration.h
 argos3/core/utility/datatypes/datatypes.h
 -
 argos3/core/utility/configuration/argos_exception.h
@@ -150,19 +150,19 @@ argos3/core/utility/configuration/tinyxml/ticpp.h
 string
 -
 
-/usr/local/include/argos3/core/utility/configuration/argos_exception.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/configuration/argos_exception.h
 stdexcept
 -
 sstream
 -
 
-/usr/local/include/argos3/core/utility/configuration/base_configurable_resource.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/configuration/base_configurable_resource.h
 argos3/core/utility/configuration/argos_configuration.h
 -
 
-/usr/local/include/argos3/core/utility/configuration/tinyxml/ticpp.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/configuration/tinyxml/ticpp.h
 tinyxml.h
-/usr/local/include/argos3/core/utility/configuration/tinyxml/tinyxml.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/configuration/tinyxml/tinyxml.h
 sstream
 -
 vector
@@ -174,17 +174,17 @@ exception
 typeinfo
 -
 
-/usr/local/include/argos3/core/utility/configuration/tinyxml/ticpprc.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/configuration/tinyxml/ticpprc.h
 vector
 -
 
-/usr/local/include/argos3/core/utility/configuration/tinyxml/tinystr.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/configuration/tinyxml/tinystr.h
 assert.h
 -
 string.h
 -
 
-/usr/local/include/argos3/core/utility/configuration/tinyxml/tinyxml.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/configuration/tinyxml/tinyxml.h
 ctype.h
 -
 stdio.h
@@ -202,11 +202,11 @@ iostream
 sstream
 -
 tinystr.h
-/usr/local/include/argos3/core/utility/configuration/tinyxml/tinystr.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/configuration/tinyxml/tinystr.h
 ticpprc.h
-/usr/local/include/argos3/core/utility/configuration/tinyxml/ticpprc.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/configuration/tinyxml/ticpprc.h
 
-/usr/local/include/argos3/core/utility/datatypes/color.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/datatypes/color.h
 argos3/core/utility/datatypes/datatypes.h
 -
 argos3/core/utility/string_utilities.h
@@ -216,17 +216,17 @@ string.h
 iostream
 -
 
-/usr/local/include/argos3/core/utility/datatypes/datatypes.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/datatypes/datatypes.h
 argos3/core/config.h
 -
 iostream
 -
 
-/usr/local/include/argos3/core/utility/logging/argos_colored_text.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/logging/argos_colored_text.h
 argos3/core/utility/datatypes/datatypes.h
 -
 
-/usr/local/include/argos3/core/utility/logging/argos_log.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/logging/argos_log.h
 argos3/core/config.h
 -
 iomanip
@@ -254,7 +254,7 @@ vector
 argos3/core/utility/logging/argos_colored_text.h
 -
 
-/usr/local/include/argos3/core/utility/math/angles.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/math/angles.h
 argos3/core/utility/datatypes/datatypes.h
 -
 argos3/core/utility/math/general.h
@@ -264,7 +264,7 @@ argos3/core/utility/math/range.h
 cmath
 -
 
-/usr/local/include/argos3/core/utility/math/general.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/math/general.h
 argos3/core/utility/datatypes/datatypes.h
 -
 vector
@@ -274,7 +274,7 @@ utility
 cmath
 -
 
-/usr/local/include/argos3/core/utility/math/range.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/math/range.h
 argos3/core/utility/datatypes/datatypes.h
 -
 argos3/core/utility/string_utilities.h
@@ -284,7 +284,7 @@ argos3/core/utility/configuration/argos_exception.h
 iostream
 -
 
-/usr/local/include/argos3/core/utility/math/rng.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/math/rng.h
 argos3/core/utility/math/angles.h
 -
 argos3/core/utility/math/range.h
@@ -292,7 +292,7 @@ argos3/core/utility/math/range.h
 map
 -
 
-/usr/local/include/argos3/core/utility/math/vector2.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/math/vector2.h
 argos3/core/utility/math/general.h
 -
 argos3/core/utility/math/angles.h
@@ -304,7 +304,7 @@ iostream
 cmath
 -
 
-/usr/local/include/argos3/core/utility/plugins/factory.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/plugins/factory.h
 argos3/core/utility/configuration/argos_exception.h
 -
 map
@@ -318,9 +318,9 @@ cstdlib
 argos3/core/utility/plugins/factory_impl.h
 -
 
-/usr/local/include/argos3/core/utility/plugins/factory_impl.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/plugins/factory_impl.h
 
-/usr/local/include/argos3/core/utility/string_utilities.h
+/home/vstrobel/argos3-dist/include/argos3/core/utility/string_utilities.h
 argos3/core/utility/configuration/argos_exception.h
 -
 argos3/core/utility/datatypes/datatypes.h
@@ -332,11 +332,11 @@ vector
 sstream
 -
 
-/usr/local/include/argos3/plugins/robots/e-puck/control_interface/ci_epuck_ground_sensor.h
+/home/vstrobel/argos3-dist/include/argos3/plugins/robots/e-puck/control_interface/ci_epuck_ground_sensor.h
 argos3/core/control_interface/ci_sensor.h
 -
 
-/usr/local/include/argos3/plugins/robots/e-puck/control_interface/ci_epuck_proximity_sensor.h
+/home/vstrobel/argos3-dist/include/argos3/plugins/robots/e-puck/control_interface/ci_epuck_proximity_sensor.h
 argos3/core/utility/math/angles.h
 -
 argos3/core/control_interface/ci_sensor.h
@@ -344,11 +344,11 @@ argos3/core/control_interface/ci_sensor.h
 argos3/core/config.h
 -
 
-/usr/local/include/argos3/plugins/robots/e-puck/control_interface/ci_epuck_range_and_bearing_actuator.h
+/home/vstrobel/argos3-dist/include/argos3/plugins/robots/e-puck/control_interface/ci_epuck_range_and_bearing_actuator.h
 argos3/core/control_interface/ci_actuator.h
 -
 
-/usr/local/include/argos3/plugins/robots/e-puck/control_interface/ci_epuck_range_and_bearing_sensor.h
+/home/vstrobel/argos3-dist/include/argos3/plugins/robots/e-puck/control_interface/ci_epuck_range_and_bearing_sensor.h
 argos3/core/utility/math/angles.h
 -
 argos3/core/control_interface/ci_sensor.h
@@ -358,49 +358,19 @@ vector
 iostream
 -
 
-/usr/local/include/argos3/plugins/robots/e-puck/control_interface/ci_epuck_wheels_actuator.h
+/home/vstrobel/argos3-dist/include/argos3/plugins/robots/e-puck/control_interface/ci_epuck_wheels_actuator.h
 argos3/core/control_interface/ci_actuator.h
 -
 argos3/core/utility/logging/argos_log.h
 -
 
-/usr/local/include/argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h
+/home/vstrobel/argos3-dist/include/argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h
 argos3/core/control_interface/ci_actuator.h
 -
 
-/usr/local/include/argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h
+/home/vstrobel/argos3-dist/include/argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h
 argos3/core/control_interface/ci_actuator.h
 -
 argos3/core/utility/datatypes/color.h
 -
-
-/usr/local/include/lauxlib.h
-stddef.h
--
-stdio.h
--
-lua.h
-/usr/local/include/lua.h
-
-/usr/local/include/lua.h
-stdarg.h
--
-stddef.h
--
-luaconf.h
-/usr/local/include/luaconf.h
-
-/usr/local/include/luaconf.h
-limits.h
--
-stddef.h
--
-stdint.h
--
-assert.h
--
-
-/usr/local/include/lualib.h
-lua.h
-/usr/local/include/lua.h
 

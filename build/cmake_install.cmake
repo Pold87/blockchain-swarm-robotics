@@ -1,4 +1,4 @@
-# Install script for directory: /home/volker/Downloads/code/code/argos_simulations/Epuck
+# Install script for directory: /home/vstrobel/Documents/argdavide
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -29,13 +29,13 @@ endif()
 
 # Install shared libraries without execute permission?
 if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
-  set(CMAKE_INSTALL_SO_NO_EXE "1")
+  set(CMAKE_INSTALL_SO_NO_EXE "0")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/volker/Downloads/code/code/argos_simulations/Epuck/build/controllers/cmake_install.cmake")
-  include("/home/volker/Downloads/code/code/argos_simulations/Epuck/build/loop_functions/cmake_install.cmake")
+  include("/home/vstrobel/Documents/argdavide/build/controllers/cmake_install.cmake")
+  include("/home/vstrobel/Documents/argdavide/build/loop_functions/cmake_install.cmake")
 
 endif()
 
@@ -47,5 +47,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/volker/Downloads/code/code/argos_simulations/Epuck/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/vstrobel/Documents/argdavide/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

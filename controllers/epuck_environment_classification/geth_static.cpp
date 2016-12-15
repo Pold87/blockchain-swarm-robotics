@@ -47,8 +47,8 @@ string exec_geth_cmd(int i, string command){
   
   std::string fullCommand = fullCommandStream.str();
 
-  //    if (DEBUG)
-  //      cout << "exec_geth_cmd: " << fullCommand << endl;
+  if (DEBUG)
+    cout << "exec_geth_cmd: " << fullCommand << endl;
   
   string res = exec(fullCommand.c_str());
 
@@ -79,7 +79,7 @@ void geth_init(int i) {
   
   ostringstream fullCommandStream;
 
-  fullCommandStream << "geth --verbosity 0" << " --datadir " << str_datadir << " init " << genesis;
+  fullCommandStream << "geth --verbosity 4" << " --datadir " << str_datadir << " init " << genesis;
 
   string commandStream = fullCommandStream.str();
   
@@ -116,7 +116,7 @@ void start_geth(int i) {
 
   cout << "Starting geth for robot " << i << endl;
   
-  string base_command = "geth --verbosity \"1\" --networkid 2 --nodiscover ";
+  string base_command = "geth --verbosity \"4\" --networkid 2 --nodiscover ";
 
   std::ostringstream datadirStream;
   datadirStream << "~/Documents/eth_data/data" << i << + "/";
@@ -165,7 +165,7 @@ void start_geth(int i) {
 
 /* Start the mining process for robot i */
 string start_mining(int i) {
-  string cmd = "miner.start()";
+  string cmd = "miner.start(1)";
   string res = exec_geth_cmd(i, cmd);
   return res;
 

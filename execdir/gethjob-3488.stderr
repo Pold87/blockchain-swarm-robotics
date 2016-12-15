@@ -1,0 +1,3 @@
+geth: no process killed
+I1214 17:52:14.077192 cmd/utils/flags.go:615] WARNING: No etherbase set and no accounts found as default
+I1214 17:52:14.137124 ethdb/database.go:176] closed db:/home/vstrobel/Documents/eth_data/data0/geth/chaindata

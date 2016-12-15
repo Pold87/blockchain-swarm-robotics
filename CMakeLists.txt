@@ -8,7 +8,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 
 # Find the ARGoS package
 find_package(PkgConfig)
-find_package(Lua51 REQUIRED) 
+#find_package(Lua51 REQUIRED) 
 pkg_check_modules(ARGOS REQUIRED argos3_simulator)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ARGOS_PREFIX}/share/argos3/cmake)
 message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
