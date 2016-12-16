@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include <ctime>
 #include <iostream>
-#include <set>
 
 
 #define N_COL  3
@@ -165,6 +164,10 @@ public:
       return m_sStateData.State == SStateData::STATE_DIFFUSING;
    }
 
+   inline void setContractAddress(std::string contractAddr) {
+     contractAddress = contractAddr;
+   }
+
    struct SNeighborData {
 
      std::set<UInt8> neighbors;
@@ -210,6 +213,7 @@ private:
    int initializationValues[N_COL];
    std::string address;
    std::string minerAddress;
+   std::string contractAddress;
    bool mining;
    CColor red, blue, green;                    // Add here eventual additional color AGGIUNGERECOLORI
 //   int totalCounted, countedOfThisOpinion[N_COL];  USED JUST FOR STATISTICS, no more used

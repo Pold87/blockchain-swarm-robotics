@@ -17,6 +17,19 @@ const int rpc_base_port = 8100;
 const int ipc_base_port = 31000;
 
 
+/*
+  Convert a robot Id (fbxxx) to an integer (xxx)
+*/
+uint Id2Int(std::string id) {
+
+  uint idConversion = id[2] - '0';
+  if(id[3]!='\0')
+    idConversion = (idConversion * 10) + (id[3] - '0');
+
+    return idConversion;
+  
+}
+
 // Execute command line program and return string result
 
 std::string exec(const char* cmd) {
@@ -79,7 +92,7 @@ void geth_init(int i) {
   
   ostringstream fullCommandStream;
 
-  fullCommandStream << "geth --verbosity 4" << " --datadir " << str_datadir << " init " << genesis;
+  fullCommandStream << "geth --verbosity 2" << " --datadir " << str_datadir << " init " << genesis;
 
   string commandStream = fullCommandStream.str();
   
@@ -116,7 +129,7 @@ void start_geth(int i) {
 
   cout << "Starting geth for robot " << i << endl;
   
-  string base_command = "geth --verbosity \"4\" --networkid 2 --nodiscover ";
+  string base_command = "geth --verbosity \"2\" --networkid 2 --nodiscover ";
 
   std::ostringstream datadirStream;
   datadirStream << "~/Documents/eth_data/data" << i << + "/";
@@ -163,10 +176,14 @@ void start_geth(int i) {
  
 }
 
-/* Start the mining process for robot i */
-string start_mining(int i) {
-  string cmd = "miner.start(1)";
+/* Start the mining process for robot i using t threads */
+string start_mining(int i, int t) {
+
+  std::ostringstream fullCommandStream;
+  fullCommandStream << "miner.start(" << t << ")";
+  string cmd = fullCommandStream.str();
   string res = exec_geth_cmd(i, cmd);
+
   return res;
 
   
@@ -203,6 +220,9 @@ string add_peer(int i, string enode) {
   fullCommandStream << "admin.addPeer(" << enode << ")";
   string cmd = fullCommandStream.str();
   string res = exec_geth_cmd(i, cmd);
+
+  if (DEBUG)
+    cout << "add_peer: enode is " << enode << "result is" << res << endl;
 
   return res;
 }
@@ -288,6 +308,12 @@ std::string getContractAddress(int i, std::string txHash) {
   if (DEBUG)
     cout << "DEBUG -- getContractAddress: " << res << endl;
     
+  if (res.find("undefined") != string::npos) {
+    cout << "Contract address not specified! Exiting" << endl;
+    exec("killall geth");
+    throw;
+  }
+
   return res;
 }
 
@@ -333,5 +359,48 @@ std::string kill_geth_thread(int i) {
     cout << "DEBUG -- kill_geth_thread: " << res << endl;  
   
   return res;
+  
+}
+
+/* Deploy contract using robot number i and return the transaction hash */
+std::string deploy_contract(int i, string contractPath) {
+  
+  int maxtrials = 25; /* Maximum number of trials for creating this
+			contract until the script is killed */
+  
+  for (int trials = 0; trials < maxtrials; ++trials) {
+
+    if (DEBUG)
+      cout << "Trials is: " << trials << endl;
+
+    string txHashRaw = exec_geth_cmd(i, "loadScript(\"" + contractPath + "\")");
+    cout << "txHashRaw: " << txHashRaw << endl; 
+    string txHash;
+    std::istringstream f(txHashRaw);
+    std::getline(f, txHash);
+
+    cout << "txHash: " << txHash << endl; 
+
+    /* If a transaction hash was generated, i.e., neither true nor false were found */
+    if (txHash.find("true") == string::npos && txHash.find("false") == string::npos) {
+	return txHash;
+      }
+    }  
+
+  /* If the maximum number of trials is reached */
+  cout << "Maximum number of trials is reached!" << endl;
+  exec("killall geth");
+  throw;
+}
+ 
+/* Check account balance of robot i (in wei)*/
+int check_balance(int i) {
+  string cmd = "eth.getBalance(eth.coinbase)";
+  string res = exec_geth_cmd(i, cmd);
+  
+  int balance = atoi(res.c_str());
+
+  return balance;
+
   
 }

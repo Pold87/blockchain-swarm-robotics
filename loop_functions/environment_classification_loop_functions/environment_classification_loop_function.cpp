@@ -11,6 +11,9 @@
 #define N_COL					     3
 #define ARENA_SIZE_X				 1.9f
 #define ARENA_SIZE_Y				 1.9f
+
+#define DEBUGLOOP true
+
 /****************************************/
 /****************************************/
 CEnvironmentClassificationLoopFunctions::CEnvironmentClassificationLoopFunctions() :
@@ -24,38 +27,13 @@ m_pcFloor(NULL)
 {
 }
 
-static const int numRobots = 6;
+static const int minerId = 100;
 
 using namespace std;
 
 /************************************************* INIT ********************************************************/
 /***************************************************************************************************************/
 void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
- 
-    
-  /*  */
-  cout << "Disconnecting everyone by killing mining thread" << endl;
-
-  CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
-  for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
-    /* Get handle to e-puck entity and controller */
-    CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
-    EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
-    std::string& address = cController.GetAddress();
-    std::string& minerAddress = cController.GetMinerAddress();
-
-    /* Distribute ether among the robots */
-    sendEther(numRobots, minerAddress, address, 2);
-    cout << "Address is: " << address;
-  }
-
-  sleep(20);
-
-  stop_mining(numRobots);
-
-  sleep(20);
-
-  kill_geth_thread(numRobots);
     
 	incorrectParameters = false;
 	m_pcRNG = CRandom::CreateRNG("argos");
@@ -98,11 +76,103 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 		GetNodeAttribute(tEnvironment, "save_every_robot_flag", oneRobotFileFlag);
 		GetNodeAttribute(tEnvironment, "save_global_stat_flag", globalStatFileFlag);
 		GetNodeAttribute(tEnvironment, "radix", passedRadix);
+		GetNodeAttribute(tEnvironment, "base_dir_loop", baseDirLoop);
 
 	}
 	catch(CARGoSException& ex) {
 		THROW_ARGOSEXCEPTION_NESTED("Error parsing loop functions!", ex);
 	}
+
+	/* Ethereum */
+	
+	geth_init(minerId);
+	start_geth(minerId);
+	createAccount(minerId);
+	unlockAccount(minerId, "test");
+	start_mining(minerId, 12);	
+	
+
+	/* Deploy contract */  
+
+	string contractPath = baseDirLoop + "deploy_contract.txt";
+	string txHash = deploy_contract(minerId, contractPath);
+
+	sleep(15); 
+	std::string contractAddress = getContractAddress(minerId, txHash);
+  
+	cout << "Address is " << contractAddress << endl;
+    
+
+	
+
+	CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
+	for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
+
+	  /* Get handle to e-puck entity and controller */
+	  CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
+	  EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
+	  std::string& address = cController.GetAddress();
+	  std::string minerAddress = getCoinbase(minerId);
+	  std::string id = cController.GetId();
+	  int robotId = Id2Int(id);
+
+    /* Set the smart contract address for the robot */
+    cController.setContractAddress(contractAddress);
+
+    /* Make sure that the robot is connected */
+    string e = get_enode(robotId);
+    add_peer(minerId, e);
+
+    /* Distribute ether among the robots */
+    sendEther(minerId, minerAddress, address, 2);
+    cout << "Address is: " << address;
+  }
+
+
+  sleep(30); 
+
+  /* Check that all robots received their ether */
+
+  int maxTime = 60; /* Macximum amount of time per robot to wait until
+		       they received their ether */
+
+  for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
+
+    /* Get handle to e-puck entity and controller */
+    CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
+    EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
+
+    std::string id = cController.GetId();
+    int robotId = Id2Int(id);
+
+    for (int t = 0; t < maxTime; ++t) {
+      int balance = check_balance(robotId);
+
+      if (DEBUGLOOP)
+	cout << "Checking account balance. It is " << balance << " and the time step is " << t << std::endl; 
+
+      if (balance != 0)
+	break; /* Robot received something */
+
+      sleep(1); /* Wait for a second and check balance again */
+
+      if (t == maxTime - 1) {
+	cout << "CEnvironmentClassificationLoopFunctions::Init: Maximum time reached for waiting that each robots receives its ether.Exiting." << std::endl;
+	exec("killall geth");
+	throw;
+      }
+    } 
+
+  }
+
+  cout << "Disconnecting everyone by killing mining thread" << endl;
+  stop_mining(minerId);
+
+  sleep(60); /* Wait until all robots have the same blockchain .TODO:
+		Ensure that using a function */
+
+  kill_geth_thread(minerId);
+
 
 	/* Translating percentages in numbers */
 	if(using_percentage)
@@ -467,9 +537,8 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 				std::cout << "Consensus is reached and the experiment is FINISHED" << std::endl;
 				m_bExperimentFinished = true;
 
-				for (int i; i < numRobots; ++i){
-				  stop_mining(i);
-				}
+				exec("killall geth");
+
 				
 			}
 			else  {

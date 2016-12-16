@@ -147,6 +147,9 @@ private:
 	UInt32 g;
 	UInt32 sigma;
 	UInt32 decisionRule;
+
+	std::string baseDirLoop;
+
 };
 
 

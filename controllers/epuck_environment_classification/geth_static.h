@@ -1,5 +1,7 @@
 #include <string>
 
+uint Id2Int(std::string id);
+
 std::string exec_geth_cmd(int i, std::string command);
 
 // Execute a command line command and return the result as string
@@ -26,8 +28,8 @@ std::string add_peer(int i, std::string enode);
 // Remove a peer (specified via the enode) from robot i
 std::string remove_peer(int i, std::string enode);
 
-// Start mining (robot i)
-std::string start_mining(int i);
+// Start mining (robot i) using t threads
+std::string start_mining(int i, int t);
 
 // Stop mining (robot i)
 std::string stop_mining(int i);
@@ -54,3 +56,10 @@ std::string readEntireFile(std::string fileName);
 
 /* Kill geth thread based on robot number i */
 std::string kill_geth_thread(int i);
+
+
+/* Deploy contract using robot number i */
+std::string deploy_contract(int i, std::string contractPath);
+
+/* Check account balance of robot i (in wei)*/
+int check_balance(int i);

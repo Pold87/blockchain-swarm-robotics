@@ -18,15 +18,10 @@
 /****************************************/
 /****************************************/
 
-//using json = nlohmann::json;
 using namespace std;
-
-/* The +1 is for the miner */
 
 map<int, string> enodes;
 map<int, string> coinbaseAddresses;
-
-string contractAddress = "";
 
 EPuck_Environment_Classification::SNeighborData::SNeighborData() :
   neighbors(set<UInt8>()) {}
@@ -39,20 +34,6 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
     str.replace(start_pos, from.length(), to);
     return true;
 }
-
-/*
-  Convert a robot Id (fbxxx) to an integer (xxx)
-*/
-uint Id2Int(std::string id) {
-
-  UInt32 idConversion = id[2] - '0';
-  if(id[3]!='\0')
-    idConversion = (idConversion * 10) + (id[3] - '0');
-
-    return idConversion;
-  
-}
-
 
 EPuck_Environment_Classification::EPuck_Environment_Classification() :
   m_pcWheels (NULL),
@@ -91,7 +72,6 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "percent_red", percentRed);
     GetNodeAttribute(t_node, "percent_blue", percentBlue);
     GetNodeAttribute(t_node, "num_pack_saved", numPackSaved);
-    GetNodeAttribute(t_node, "num_robots", numRobots);
     GetNodeAttribute(t_node, "base_dir", baseDir);
   }
   catch(CARGoSException& ex) {
@@ -167,40 +147,7 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
   address = coinbaseAddresses[robotId];
 
   unlockAccount(robotId, "test");
-  
-  /* Create external miner */
-  if (robotId == 0) {
-
-
-    geth_init(simulationParams.numRobots);
-    start_geth(simulationParams.numRobots);
-    createAccount(simulationParams.numRobots);
-    unlockAccount(simulationParams.numRobots, "test");
-    enodes[simulationParams.numRobots] = get_enode(simulationParams.numRobots);
-    coinbaseAddresses[simulationParams.numRobots] = getCoinbase(simulationParams.numRobots);
-    start_mining(simulationParams.numRobots);
-    sleep(1); /* Mine some stuff and send ETH to robots */
-    
-    /* Deploy contract */
-    string deploy = simulationParams.baseDir + "deploy_contract.txt";
-    string txHashRaw = exec_geth_cmd(simulationParams.numRobots, "loadScript(\"" + deploy + "\")");
-    cout << "txHashRaw: " << txHashRaw << endl; 
-    string txHash;
-    std::istringstream f(txHashRaw);
-    std::getline(f, txHash);
-    sleep(15);
-    contractAddress = getContractAddress(simulationParams.numRobots, txHash);
-
-    cout << "Address is " << contractAddress << endl;
-
-    //stop_mining(robotId);
-  }
-
-  minerAddress = coinbaseAddresses[simulationParams.numRobots];
-
-  add_peer(robotId, enodes[simulationParams.numRobots]);
  
-  
 }
 
 
@@ -442,7 +389,7 @@ void EPuck_Environment_Classification::Diffusing() {
 	  if (!mining) {
 	    cout << " START MINING -- robot" << robotId << endl;
 	    mining = true;
-	    start_mining(robotId);     
+	    start_mining(robotId, 8);     
 	  }
 	  
 	  /* Every received data is stored in IC variable (helping var). Each IC variable will be
