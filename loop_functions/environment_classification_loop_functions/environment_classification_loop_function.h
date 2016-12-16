@@ -57,7 +57,7 @@ public:
 	inline UInt32 GetGrid(UInt32 i) {
 		return grid[i];
 	}
-
+ 
 	virtual void Reset();
 	virtual bool IsExperimentFinished();
 	virtual void PreStep();
@@ -68,6 +68,12 @@ public:
 	virtual void MoveRobotsAwayFromArena(UInt32 opinionsToAssign[]);
 	virtual void AssignNewStateAndPosition();
 private:
+
+	virtual void InitEthereum();
+	virtual void setContractAddressAndDistributeEther(std::string contractAddress, std::string minerAddress);
+	virtual void CheckEtherReceived();
+	virtual void fillSettings(TConfigurationNode& tEnvironment);
+	
 	/* Variable of the environment, help variables and experiment finished signal */
 	CRange<Real> zeroOne;
 	CRange<Real> bigRange;

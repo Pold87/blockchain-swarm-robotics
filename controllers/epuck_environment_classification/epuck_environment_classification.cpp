@@ -92,8 +92,8 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
   GetNodeAttributeOrDefault(t_node, "velocity", m_fWheelVelocity, m_fWheelVelocity);
   simulationParams.Init(GetNode(t_node, "simulation_parameters"));
 
-  simulationParams.g=simulationParams.g * 10;
-  simulationParams.sigma=simulationParams.sigma * 10;
+  simulationParams.g = simulationParams.g * 10;
+  simulationParams.sigma = simulationParams.sigma * 10;
 
   /* Colours read from robots could be changed and added here! AGGIUNGERECOLORI */
   red.Set(COLOR_STRENGHT,0,0,ALPHA_CHANNEL);      // Change alphachannel has not effect visively, but changing COLOR_STRENGHT could make
@@ -665,38 +665,6 @@ void EPuck_Environment_Classification::DirectComparison(){
   }
 }
 
-/* Randomly trust in one sensed opinion: receivedOpinions it's an array containing all the sensed opinions
- * relatively to the last diffusing state listening. With MajorityRule, a robot counts the opinions and uses
- * the more present one. 
- */
-// void EPuck_Environment_Classification::MajorityRule(){
-
-//   UInt32 numberOpinionsReceived[N_COL];
-//   std::vector<informationCollected> opinionsValuated;  // Set of information collected in every diffusing states
-//   IC.receivedOpinion=opinion.actualOpinion;
-
-//   size_t size = receivedOpinions.size();
-//   if(receivedOpinions.size()>simulationParams.numPackSaved){
-//     for(size_t j=0; j<simulationParams.numPackSaved; j++){
-//       opinionsValuated.push_back(receivedOpinions[size-1-j]);
-//     }
-//   }
-//   else
-//     for(size_t j=0; j<receivedOpinions.size(); j++)
-//       opinionsValuated.push_back(receivedOpinions[j]);
-//   opinionsValuated.push_back(IC);
-//   /* Setting majority array to 0 */
-//   for ( UInt32 c = 0; c < N_COL; c++ )
-//     numberOpinionsReceived[c] = 0;
-
-//   /* For each received opinion, increment the correspondent cell. numberOpinionsReceived it's simply a contator for each color */
-//   for ( size_t i = 0; i<opinionsValuated.size(); i++ )
-//     numberOpinionsReceived[opinionsValuated[i].receivedOpinion]++;
-
-//   for( UInt32 i = 0; i<3; i++)
-//     opinion.actualOpinion = FindMaxOpinionReceived(numberOpinionsReceived, opinion.actualOpinion);
-// }
-
 void EPuck_Environment_Classification::MajorityRule(){
 
   UInt32 numberOpinionsReceived[N_COL];
@@ -727,31 +695,31 @@ void EPuck_Environment_Classification::MajorityRule(){
   string command_red = readStringFromFile(simulationParams.baseDir + "get_red_votes.txt");
   replace(command_red, "CONTRACTADDRESS", contractAddress);
   string voteResult_red = exec_geth_cmd(robotId, command_red);
-  int vote_r = atoi(voteResult_red.c_str());
+  int vote_red = atoi(voteResult_red.c_str());
   //cout << "Robot: " << robotId << ": The number of red opinions is " << voteResult_red << endl;
 
-  string command_green = readStringFromFile(simulationParams.baseDir + "get_green_votes.txt");
-  replace(command_green, "CONTRACTADDRESS", contractAddress);
-  string voteResult_green = exec_geth_cmd(robotId, command_green);
-  int vote_g = atoi(voteResult_green.c_str());
+  string command_blue = readStringFromFile(simulationParams.baseDir + "get_blue_votes.txt");
+  replace(command_blue, "CONTRACTADDRESS", contractAddress);
+  string voteResult_blue = exec_geth_cmd(robotId, command_blue);
+  int vote_blue = atoi(voteResult_blue.c_str());
   //cout << "Robot: " << robotId << ": The number of green opinions is " << voteResult_green << endl;
 
-  if (vote_r > vote_g) {
+  if (vote_red > vote_blue) {
     opinion.actualOpinion = 0;
-        cout << "MAJORITY VOTING: " << "black is: "  << vote_r << " white is: " << vote_g << " -> Choosing black" << endl;
-  } else if (vote_r < vote_g) {
+        cout << "MAJORITY VOTING: " << "black is: "  << vote_red << " white is: " << vote_blue << " -> Choosing black" << endl;
+  } else if (vote_red < vote_blue) {
     opinion.actualOpinion = 2;
-    cout << "MAJORITY VOTING: " << "black is: "  << vote_r << " white is: " << vote_g << " -> Choosing white" << endl;
+    cout << "MAJORITY VOTING: " << "black is: "  << vote_red << " white is: " << vote_blue << " -> Choosing white" << endl;
   } else {
     /* Get a random opinion  */
     int x = rand() % 2;
     cout << "MAJORITY VOTING: " << "Choosing random" << endl;
     if (x == 0) {
-          cout << "MAJORITY VOTING: " << "black is: "  << vote_r << " white is: " << vote_g << " -> Choosing black" << endl;
+          cout << "MAJORITY VOTING: " << "black is: "  << vote_red << " white is: " << vote_blue << " -> Choosing black" << endl;
       opinion.actualOpinion = 0;
     } else {
       opinion.actualOpinion = 2;
-      cout << "MAJORITY VOTING: " << "black is: "  << vote_r << " white is: " << vote_g << " -> Choosing white" << endl;
+      cout << "MAJORITY VOTING: " << "black is: "  << vote_red << " white is: " << vote_blue << " -> Choosing white" << endl;
     }
   }
 }

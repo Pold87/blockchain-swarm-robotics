@@ -27,116 +27,64 @@ m_pcFloor(NULL)
 {
 }
 
-static const int minerId = 100;
+static const int minerId = 100; /* ID of the miner (TODO: set in config file) */
+static const int maxTime = 60; /* Maximum amount of time per robot to wait until
+		       they received their ether */
+
 
 using namespace std;
 
 /************************************************* INIT ********************************************************/
 /***************************************************************************************************************/
-void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
-    
-	incorrectParameters = false;
-	m_pcRNG = CRandom::CreateRNG("argos");
 
-	/* Setting variables according with the parameters of the configuration file (XML) */
-	TConfigurationNode& tEnvironment = GetNode(t_node, "cells");
-	try
-	{
-		/* Retrieving information about arena */
-		GetNodeAttribute(tEnvironment, "number_of_red_cells", colorOfCell[0]);
-		GetNodeAttribute(tEnvironment, "number_of_green_cells", colorOfCell[1]);
-		GetNodeAttribute(tEnvironment, "number_of_blue_cells",colorOfCell[2]);
-		GetNodeAttribute(tEnvironment, "percent_red", percentageOfColors[0]);
-		GetNodeAttribute(tEnvironment, "percent_green", percentageOfColors[1]);
-		GetNodeAttribute(tEnvironment, "percent_blue", percentageOfColors[2]);
-		GetNodeAttribute(tEnvironment, "using_percentage", using_percentage);
-		GetNodeAttribute(tEnvironment, "exit", exitFlag);
-
-		/* Retrieving information about initial state of robots */
-		GetNodeAttribute(tEnvironment, "r_0", initialOpinions[0]);
-		GetNodeAttribute(tEnvironment, "g_0", initialOpinions[1]);
-		GetNodeAttribute(tEnvironment, "b_0", initialOpinions[2]);
-		GetNodeAttribute(tEnvironment, "number_of_robots", n_robots);
-		GetNodeAttribute(tEnvironment, "number_of_qualities", number_of_qualities);
-
-		/* Retrieving information about simulation paramaters */
-		GetNodeAttribute(tEnvironment, "g", g);
-		GetNodeAttribute(tEnvironment, "sigma", sigma);
-		GetNodeAttribute(tEnvironment, "lamda", LAMDA);
-		GetNodeAttribute(tEnvironment, "turn", turn);
-		GetNodeAttribute(tEnvironment, "decision_rule", decisionRule);
-		//		GetNodeAttribute(tEnvironment, "decision_rule", 1&); // TODO: Volker: change back 
-		GetNodeAttribute(tEnvironment, "number_of_runs", number_of_runs);
-
-		/* Retrieving information about how to catch and where to save statistics */
-		GetNodeAttribute(tEnvironment, "save_every_ticks", timeStep);
-		GetNodeAttribute(tEnvironment, "save_every_ticks_flag", everyTicksFileFlag);
-		GetNodeAttribute(tEnvironment, "save_every_run_flag", runsFileFlag);
-		GetNodeAttribute(tEnvironment, "save_every_quality_flag", qualityFileFlag);
-		GetNodeAttribute(tEnvironment, "save_every_robot_flag", oneRobotFileFlag);
-		GetNodeAttribute(tEnvironment, "save_global_stat_flag", globalStatFileFlag);
-		GetNodeAttribute(tEnvironment, "radix", passedRadix);
-		GetNodeAttribute(tEnvironment, "base_dir_loop", baseDirLoop);
-
-	}
-	catch(CARGoSException& ex) {
-		THROW_ARGOSEXCEPTION_NESTED("Error parsing loop functions!", ex);
-	}
-
-	/* Ethereum */
-	
-	geth_init(minerId);
-	start_geth(minerId);
-	createAccount(minerId);
-	unlockAccount(minerId, "test");
-	start_mining(minerId, 12);	
-	
-
-	/* Deploy contract */  
-
-	string contractPath = baseDirLoop + "deploy_contract.txt";
-	string txHash = deploy_contract(minerId, contractPath);
-
-	sleep(15); 
-	std::string contractAddress = getContractAddress(minerId, txHash);
-  
-	cout << "Address is " << contractAddress << endl;
-    
-
-	
-
-	CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
-	for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
-
-	  /* Get handle to e-puck entity and controller */
-	  CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
-	  EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
-	  std::string& address = cController.GetAddress();
-	  std::string minerAddress = getCoinbase(minerId);
-	  std::string id = cController.GetId();
-	  int robotId = Id2Int(id);
-
-    /* Set the smart contract address for the robot */
-    cController.setContractAddress(contractAddress);
-
-    /* Make sure that the robot is connected */
-    string e = get_enode(robotId);
-    add_peer(minerId, e);
-
-    /* Distribute ether among the robots */
-    sendEther(minerId, minerAddress, address, 2);
-    cout << "Address is: " << address;
+void CEnvironmentClassificationLoopFunctions::fillSettings(TConfigurationNode& tEnvironment) {
+  try
+    {
+      /* Retrieving information about arena */
+      GetNodeAttribute(tEnvironment, "number_of_red_cells", colorOfCell[0]);
+      GetNodeAttribute(tEnvironment, "number_of_green_cells", colorOfCell[1]);
+      GetNodeAttribute(tEnvironment, "number_of_blue_cells",colorOfCell[2]);
+      GetNodeAttribute(tEnvironment, "percent_red", percentageOfColors[0]);
+      GetNodeAttribute(tEnvironment, "percent_green", percentageOfColors[1]);
+      GetNodeAttribute(tEnvironment, "percent_blue", percentageOfColors[2]);
+      GetNodeAttribute(tEnvironment, "using_percentage", using_percentage);
+      GetNodeAttribute(tEnvironment, "exit", exitFlag);
+      
+      /* Retrieving information about initial state of robots */
+      GetNodeAttribute(tEnvironment, "r_0", initialOpinions[0]);
+      GetNodeAttribute(tEnvironment, "g_0", initialOpinions[1]);
+      GetNodeAttribute(tEnvironment, "b_0", initialOpinions[2]);
+      GetNodeAttribute(tEnvironment, "number_of_robots", n_robots);
+      GetNodeAttribute(tEnvironment, "number_of_qualities", number_of_qualities);
+      
+      /* Retrieving information about simulation paramaters */
+      GetNodeAttribute(tEnvironment, "g", g);
+      GetNodeAttribute(tEnvironment, "sigma", sigma);
+      GetNodeAttribute(tEnvironment, "lamda", LAMDA);
+      GetNodeAttribute(tEnvironment, "turn", turn);
+      GetNodeAttribute(tEnvironment, "decision_rule", decisionRule);
+      //		GetNodeAttribute(tEnvironment, "decision_rule", 1&); // TODO: Volker: change back 
+      GetNodeAttribute(tEnvironment, "number_of_runs", number_of_runs);
+      
+      /* Retrieving information about how to catch and where to save statistics */
+      GetNodeAttribute(tEnvironment, "save_every_ticks", timeStep);
+      GetNodeAttribute(tEnvironment, "save_every_ticks_flag", everyTicksFileFlag);
+      GetNodeAttribute(tEnvironment, "save_every_run_flag", runsFileFlag);
+      GetNodeAttribute(tEnvironment, "save_every_quality_flag", qualityFileFlag);
+      GetNodeAttribute(tEnvironment, "save_every_robot_flag", oneRobotFileFlag);
+      GetNodeAttribute(tEnvironment, "save_global_stat_flag", globalStatFileFlag);
+      GetNodeAttribute(tEnvironment, "radix", passedRadix);
+      GetNodeAttribute(tEnvironment, "base_dir_loop", baseDirLoop);
+      
+    }
+  catch(CARGoSException& ex) {
+    THROW_ARGOSEXCEPTION_NESTED("Error parsing loop functions!", ex);
   }
+}
 
+void CEnvironmentClassificationLoopFunctions::CheckEtherReceived() {
 
-  sleep(30); 
-
-  /* Check that all robots received their ether */
-
-  int maxTime = 60; /* Macximum amount of time per robot to wait until
-		       they received their ether */
-
-  for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
+  for(CSpace::TMapPerType::iterator it = m_cEpuck.begin(); it != m_cEpuck.end(); ++it) {
 
     /* Get handle to e-puck entity and controller */
     CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
@@ -162,8 +110,66 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 	throw;
       }
     } 
-
   }
+}
+
+void CEnvironmentClassificationLoopFunctions::setContractAddressAndDistributeEther(std::string contractAddress, std::string minerAddress) {
+  CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
+	for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
+
+	  /* Get handle to e-puck entity and controller */
+	  CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
+	  EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
+
+	  std::string& address = cController.GetAddress();
+	  std::string id = cController.GetId();
+	  int robotId = Id2Int(id);
+
+    /* Set the smart contract address for the robot */
+    cController.setContractAddress(contractAddress);
+
+    /* Make sure that the robot is connected */
+    string e = get_enode(robotId);
+    add_peer(minerId, e);
+
+    /* Distribute ether among the robots */
+    sendEther(minerId, minerAddress, address, 2);
+    cout << "Sent ether to address: " << address;
+  }
+  
+}
+
+/* Set up the miner, deploy the smart contract, etc. */
+void CEnvironmentClassificationLoopFunctions::InitEthereum() {
+
+  /* Initialize the miner */
+  geth_init(minerId);
+  start_geth(minerId);
+  createAccount(minerId);
+  unlockAccount(minerId, "test");
+  start_mining(minerId, 12);	
+  
+
+  /* Deploy contract */  
+
+  string contractPath = baseDirLoop + "deploy_contract.txt";
+  string txHash = deploy_contract(minerId, contractPath);
+
+  sleep(15); 
+  std::string contractAddress = getContractAddress(minerId, txHash);
+
+  if (DEBUG)
+    cout << "Address of deployed contract is " << contractAddress << endl;
+
+  std::string minerAddress = getCoinbase(minerId);
+
+  /* Set the address of the deployed contract in each robot */
+  setContractAddressAndDistributeEther();
+ 	
+  sleep(15); 
+
+  /* Check that all robots received their ether */
+  checkEtherReceived();
 
   cout << "Disconnecting everyone by killing mining thread" << endl;
   stop_mining(minerId);
@@ -173,6 +179,20 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 
   kill_geth_thread(minerId);
 
+  
+}
+
+void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
+    
+	incorrectParameters = false;
+	m_pcRNG = CRandom::CreateRNG("argos");
+
+	/* Setting variables according with the parameters of the configuration file (XML) */
+	TConfigurationNode& tEnvironment = GetNode(t_node, "cells");
+	fillSettings(tEnvironment);
+
+	/* Initialize miner, distribute Ethereum, and more */
+	void InitEthereum();
 
 	/* Translating percentages in numbers */
 	if(using_percentage)
