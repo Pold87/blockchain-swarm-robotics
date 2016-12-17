@@ -42,9 +42,9 @@
 			       exitFlag="true"
 			       decision_rule="3"
 			       num_pack_saved="2"
-			       percent_red="PERCENT_RED"
-			       base_dir="BASEDIR"
-			       percent_blue="PERCENT_BLUE"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
+			       percent_red="80"
+			       base_dir="/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/"
+			       percent_blue="20"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
 							  1 = Voter model; 2 = Direct comparison; 3 = Majority Rule-->
  
       </params>
@@ -54,13 +54,13 @@
                   label="environment_classification_loop_functions">
 
   <cells  number_of_red_cells="0"
-	  base_dir_loop="BASEDIR"
+	  base_dir_loop="/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/"
           number_of_green_cells="0"
 	  number_of_blue_cells="0"
 	  using_percentage="true"
-          percent_red="PERCENT_RED"
+          percent_red="80"
 	  exit="true"            
-	  percent_blue="PERCENT_BLUE"
+	  percent_blue="20"
 	  percent_green="0"
 	  save_every_ticks="1"
 	  save_every_ticks_flag="true"
@@ -68,12 +68,12 @@
 	  save_every_robot_flag="true"
 	  save_every_quality_flag="true"
 	  save_global_stat_flag="true"
-	  radix="RADIX"
-	  number_of_robots="NUMROBOTS"
+	  radix="1"
+	  number_of_robots="4"
 	  number_of_runs="1"
           number_of_qualities="2"
-          r_0="R0"
-	  b_0="B0"
+          r_0="2"
+	  b_0="2"
 	  g_0="0"
 	  length_of_runs="0"
 	  g="2"
@@ -110,7 +110,7 @@
    <distribute>
       <position method="uniform" min="0.1,0.1,0" max="1.9 , 1.9, 0" />
       <orientation method="gaussian" mean="1,1,0 " std_dev="360,0,0 " />
-      <entity quantity="NUMROBOTS" max_trials="20">
+      <entity quantity="4" max_trials="20">
         <e-puck id="ep" >
           <controller config="epc" />
         </e-puck>
