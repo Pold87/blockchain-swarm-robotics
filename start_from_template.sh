@@ -3,10 +3,10 @@ OUTFILE='experiments/epuck.argos'
 #BASEDIR='/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/'
 BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
 RADIX="volker_trial"
-NUMROBOTS=12
+NUMROBOTS=10
 R0=$(expr $NUMROBOTS / 2)
 B0=$(expr $NUMROBOTS / 2)
-PERCENT_RED=80
+PERCENT_RED=60
 PERCENT_BLUE=$(expr 100 - $PERCENT_RED)
 
 REPETITIONS=10

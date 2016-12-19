@@ -84,6 +84,8 @@ void CEnvironmentClassificationLoopFunctions::fillSettings(TConfigurationNode& t
 
 void CEnvironmentClassificationLoopFunctions::CheckEtherReceived() {
 
+  CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
+
   for(CSpace::TMapPerType::iterator it = m_cEpuck.begin(); it != m_cEpuck.end(); ++it) {
 
     /* Get handle to e-puck entity and controller */
@@ -142,12 +144,14 @@ void CEnvironmentClassificationLoopFunctions::setContractAddressAndDistributeEth
 /* Set up the miner, deploy the smart contract, etc. */
 void CEnvironmentClassificationLoopFunctions::InitEthereum() {
 
+  cout << "Initializing miner" << endl;
+
   /* Initialize the miner */
   geth_init(minerId);
   start_geth(minerId);
   createAccount(minerId);
   unlockAccount(minerId, "test");
-  start_mining(minerId, 12);	
+  start_mining(minerId, 4);	
   
 
   /* Deploy contract */  
@@ -158,21 +162,23 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
   sleep(15); 
   std::string contractAddress = getContractAddress(minerId, txHash);
 
-  if (DEBUG)
+  if (DEBUGLOOP)
     cout << "Address of deployed contract is " << contractAddress << endl;
 
   std::string minerAddress = getCoinbase(minerId);
 
   /* Set the address of the deployed contract in each robot */
-  setContractAddressAndDistributeEther();
+  setContractAddressAndDistributeEther(contractAddress, minerAddress);
  	
   sleep(15); 
 
   /* Check that all robots received their ether */
-  checkEtherReceived();
+  CheckEtherReceived();
 
   cout << "Disconnecting everyone by killing mining thread" << endl;
   stop_mining(minerId);
+
+  cout << "Sleeping for 60 seconds now" << endl;
 
   sleep(60); /* Wait until all robots have the same blockchain .TODO:
 		Ensure that using a function */
@@ -183,16 +189,21 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
 }
 
 void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
+
+  cout  << "Initializing loop function" << endl;
+
+  TConfigurationNode& tEnvironment = GetNode(t_node, "cells");
+  fillSettings(tEnvironment);
+
+
+  /* Initialize miner, distribute Ethereum, and more */
+  InitEthereum();
+
     
-	incorrectParameters = false;
-	m_pcRNG = CRandom::CreateRNG("argos");
+  incorrectParameters = false;
+  m_pcRNG = CRandom::CreateRNG("argos");
 
 	/* Setting variables according with the parameters of the configuration file (XML) */
-	TConfigurationNode& tEnvironment = GetNode(t_node, "cells");
-	fillSettings(tEnvironment);
-
-	/* Initialize miner, distribute Ethereum, and more */
-	void InitEthereum();
 
 	/* Translating percentages in numbers */
 	if(using_percentage)

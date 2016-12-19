@@ -7,7 +7,7 @@
 #include <sstream>
 #include <fstream>
 
-#define DEBUG true
+#define DEBUG false
 
 using namespace std;
 
@@ -15,7 +15,7 @@ string datadir_base =  "~/Documents/eth_data/data";
 
 const int rpc_base_port = 8100;
 const int ipc_base_port = 31000;
-
+const int maxtrials = 40;
 
 /*
   Convert a robot Id (fbxxx) to an integer (xxx)
@@ -364,10 +364,7 @@ std::string kill_geth_thread(int i) {
 
 /* Deploy contract using robot number i and return the transaction hash */
 std::string deploy_contract(int i, string contractPath) {
-  
-  int maxtrials = 25; /* Maximum number of trials for creating this
-			contract until the script is killed */
-  
+    
   for (int trials = 0; trials < maxtrials; ++trials) {
 
     if (DEBUG)

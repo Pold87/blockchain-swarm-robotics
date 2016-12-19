@@ -129,8 +129,6 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
 
   /* Ethereum */
 
-	
-  /* Write enode information to global array */
   int robotId = Id2Int(GetId());
 
   if (robotId == 0) {
@@ -174,46 +172,44 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<UInt8> newNeighbors) 
   		      std::inserter(neighborsToAdd, neighborsToAdd.end()));
  
   
-  cout << "Robot " << robotId << " Old neighbors: ";
+  //cout << "Robot " << robotId << " Old neighbors: ";
 
   std::set<UInt8>::iterator it;
   for (it = m_sNeighborData.neighbors.begin(); it != m_sNeighborData.neighbors.end(); ++it) {
   //for (size_t i = 0; i < m_sNeighborData.neighbors.size(); ++i) {
   //for (auto i : m_sNeighborData.neighbors) {
     UInt8 i = *it;
-    cout << i << " ";
+    //cout << i << " ";
   }
-  cout << endl;
+  //cout << endl;
 
-  cout << "Robot " << robotId << " New neighbors: ";
+  //cout << "Robot " << robotId << " New neighbors: ";
   for (it = newNeighbors.begin(); it != newNeighbors.end(); ++it) {
   //  for (auto i : newNeighbors) {
     UInt8 i = *it;
-    cout << i << " ";
+    //cout << i << " ";
   }
-  cout << endl;
-
+  //cout << endl;
   
-  cout << "Robot " << robotId << " Removing neighbors: ";
+  //cout << "Robot " << robotId << " Removing neighbors: ";
 
   for (it = neighborsToRemove.begin(); it != neighborsToRemove.end(); ++it) {
     //for (auto i : neighborsToRemove) {
     UInt8 i = *it;
-    cout << i << " ";
+    //cout << i << " ";
     remove_peer(robotId, enodes[i]);
   }
   cout << endl;
     
-  cout << "Robot " << robotId << " Adding neighbors: ";
+  //cout << "Robot " << robotId << " Adding neighbors: ";
 
   for (it = neighborsToAdd.begin(); it != neighborsToAdd.end(); ++it) {
   // for (auto i : neighborsToAdd) {
     UInt8 i = *it;
-    cout << i << " ";
+    //cout << i << " ";
     add_peer(robotId, enodes[i]);
   }
-  cout << endl;
-
+  //cout << endl;
   
   //Update neighbor array
   m_sNeighborData.neighbors = newNeighbors;
@@ -227,14 +223,18 @@ void EPuck_Environment_Classification::ControlStep() {
 
   int robotId = Id2Int(GetId());
   
+  if (!mining) {
+    cout << " START MINING -- robot" << robotId << endl;
+    mining = true;
+    start_mining(robotId, 1);     
+  }
+
   /* Turn leds according with actualOpinion */
   TurnLeds();
 
 	
   /* Move robots following randomWalk */
   Move();
-
-	
 
   /* Two different behaviours, depending on if they are diffusing or exploring */
   switch(m_sStateData.State) {
@@ -249,6 +249,67 @@ void EPuck_Environment_Classification::ControlStep() {
     break;
   }
   }
+
+
+
+
+
+
+	  /* Every received data is stored in IC variable (helping var). Each IC variable will be
+	   * inserted in receivedOpinions array if has not been sensed yet and it's not a 0,0,0 one.
+	   * It will be used to choose the next opinion, basing on decision rules. After a decision
+	   * has been taken this array will be emptied for the next diffusing state. */
+	  const CCI_EPuckRangeAndBearingSensor::TPackets& tPackets = m_pcRABS->GetPackets();
+
+	  set<UInt8> currentNeighbors;
+	  
+	  for(size_t i = 0; i < tPackets.size() ; ++i) {
+
+	    bool saved = false;   // saved = variable to not save opinions twice: if saved == true -> don't save the datas
+
+	    /*
+	     * IC = Helping variable for sensed opinions, if the received opinion is 5 then not save it (5 is the default value
+	     * of the RAB actuators, if you receive 5 then the sender robot wasn't ready to send a new opinion
+	     */
+	    IC.receivedOpinion = tPackets[i]->Data[0];
+	    if(IC.receivedOpinion == 5)
+	      saved = true;
+
+	    IC.senderID = tPackets[i]->Data[3];
+
+	    /* Update Ethereum neighbors */
+	    /* TODO: this is wrong! If there is no neighbors it does not get updated accordingly */
+	    currentNeighbors.insert(IC.senderID);
+
+	    /* Loop for sense quality value: quality has been sent using 3 cells of RAB datas,
+	       so here it will converted in a Real number */
+	    IC.receivedQuality=0;
+	    for ( UInt32 j = 1; j<3 ; ++j)
+	      IC.receivedQuality = IC.receivedQuality*100 + tPackets[i]->Data[j];
+	    IC.receivedQuality = (Real) IC.receivedQuality / 10000;
+
+	    /* If the incoming value has already been listened then not save it */
+	    for(UInt32 j = 0; j < receivedOpinions.size(); ++j)
+	      if(receivedOpinions[j].senderID == IC.senderID)
+		saved = true;
+
+	    /*
+	     * Don't want to save 0,0,0 values (values sent casually before to add 555 value, probably no
+	     * more used now.
+	     */
+	    if((IC.senderID == 0) && (IC.receivedQuality==0) && (IC.receivedOpinion==0))
+	      saved = true;
+
+	    /* Save value if it has not been already saved and it's not 5,5,5 or 0,0,0 value  */
+	    if(!saved) {
+	      receivedOpinions.push_back(IC);
+	    }
+
+	  }
+
+	  UpdateNeighbors(currentNeighbors);
+
+
 
   RandomWalk();
 
@@ -345,11 +406,12 @@ void EPuck_Environment_Classification::Explore() {
    */
   else{ 
     opinion.quality = (Real)((Real)(opinion.countedCellOfActualOpinion)/(Real)(collectedData.count));
-    //
-    //		std::cout<<"Qual "<<opinion.quality<<std::endl;
-    //		std::cout<<"Op "<<opinion.actualOpinion<<std::endl;
-    //		std::cout<<"actOp "<<	opinion.countedCellOfActualOpinion <<std::endl;
-    //		std::cout<<"Count "<< collectedData.count<<std::endl;
+    
+    std::cout<<"Qual "<<opinion.quality<<std::endl;
+    std::cout<<"Op "<<opinion.actualOpinion<<std::endl;
+    std::cout<<"actOp "<<	opinion.countedCellOfActualOpinion <<std::endl;
+    std::cout<<"Count "<< collectedData.count<<std::endl;
+    
     opinion.countedCellOfActualOpinion = 0;
     receivedOpinions.clear();
     collectedData.count = 1;
@@ -365,8 +427,12 @@ void EPuck_Environment_Classification::Explore() {
      */
 
     m_sStateData.remainingDiffusingTime = Ceil(m_pcRNG->Exponential((Real)simulationParams.g*(Real)opinion.quality)+30);
+
+    cout << "Remaining diffusing time is: " << m_sStateData.remainingDiffusingTime << " and opinion is " << opinion.actualOpinion << endl;
+
     if(simulationParams.decision_rule==0)
       m_sStateData.remainingDiffusingTime = (m_pcRNG->Exponential(((Real)simulationParams.g)*((Real)simulationParams.percentRed)))+30;
+
     m_sStateData.diffusingDurationTime = m_sStateData.remainingDiffusingTime;
   }
 }
@@ -385,66 +451,7 @@ void EPuck_Environment_Classification::Diffusing() {
        * and diffusing his own opinion, quality and ID */
       if(  m_sStateData.remainingDiffusingTime < 30 )
 	{
-
-	  if (!mining) {
-	    cout << " START MINING -- robot" << robotId << endl;
-	    mining = true;
-	    start_mining(robotId, 8);     
-	  }
 	  
-	  /* Every received data is stored in IC variable (helping var). Each IC variable will be
-	   * inserted in receivedOpinions array if has not been sensed yet and it's not a 0,0,0 one.
-	   * It will be used to choose the next opinion, basing on decision rules. After a decision
-	   * has been taken this array will be emptied for the next diffusing state. */
-	  const CCI_EPuckRangeAndBearingSensor::TPackets& tPackets = m_pcRABS->GetPackets();
-
-	  set<UInt8> currentNeighbors;
-	  
-	  for(size_t i = 0; i < tPackets.size() ; ++i) {
-
-	    bool saved = false;   // saved = variable to not save opinions twice: if saved == true -> don't save the datas
-
-	    /*
-	     * IC = Helping variable for sensed opinions, if the received opinion is 5 then not save it (5 is the default value
-	     * of the RAB actuators, if you receive 5 then the sender robot wasn't ready to send a new opinion
-	     */
-	    IC.receivedOpinion = tPackets[i]->Data[0];
-	    if(IC.receivedOpinion == 5)
-	      saved = true;
-
-	    IC.senderID = tPackets[i]->Data[3];
-
-	    /* Update Ethereum neighbors */
-	    /* TODO: this is wrong! If there is no neighbors it does not get updated accordingly */
-	    currentNeighbors.insert(IC.senderID);
-
-	    /* Loop for sense quality value: quality has been sent using 3 cells of RAB datas,
-	       so here it will converted in a Real number */
-	    IC.receivedQuality=0;
-	    for ( UInt32 j = 1; j<3 ; ++j)
-	      IC.receivedQuality = IC.receivedQuality*100 + tPackets[i]->Data[j];
-	    IC.receivedQuality = (Real) IC.receivedQuality / 10000;
-
-	    /* If the incoming value has already been listened then not save it */
-	    for(UInt32 j = 0; j < receivedOpinions.size(); ++j)
-	      if(receivedOpinions[j].senderID == IC.senderID)
-		saved = true;
-
-	    /*
-	     * Don't want to save 0,0,0 values (values sent casually before to add 555 value, probably no
-	     * more used now.
-	     */
-	    if((IC.senderID == 0) && (IC.receivedQuality==0) && (IC.receivedOpinion==0))
-	      saved = true;
-
-	    /* Save value if it has not been already saved and it's not 5,5,5 or 0,0,0 value  */
-	    if(!saved) {
-	      receivedOpinions.push_back(IC);
-	    }
-
-	  }
-
-	  UpdateNeighbors(currentNeighbors);
 	  
 	}
 
@@ -456,6 +463,8 @@ void EPuck_Environment_Classification::Diffusing() {
        * quality and ID. toSend it's the variable of TData type used from Epuck RAB to send datas. We will
        * prepare this variable before to send it. It has 4 Byte of datas
        */
+      
+
       CCI_EPuckRangeAndBearingActuator::TData toSend;
 
       /* First Byte used for the opinion of the robot */
@@ -495,6 +504,7 @@ void EPuck_Environment_Classification::Diffusing() {
 	string command = readStringFromFile(cmd);
 
 	replace(command, "CONTRACTADDRESS", contractAddress);
+
 	string voteResult = exec_geth_cmd(robotId, command);
 	cout << voteResult << endl;
       
@@ -504,6 +514,7 @@ void EPuck_Environment_Classification::Diffusing() {
 	string command = readStringFromFile(cmd);
 
 	replace(command, "CONTRACTADDRESS", contractAddress);
+
 	string voteResult = exec_geth_cmd(robotId, command);
 	cout << voteResult << endl;
       
@@ -518,13 +529,13 @@ void EPuck_Environment_Classification::Diffusing() {
   else // Time to change to exploration state
     {
       
-      cout << robotId << " STOP MINING" << endl;
-      stop_mining(robotId);
+      //cout << robotId << " STOP MINING" << endl;
+      //stop_mining(robotId);
 
-      cout << robotId << " REMOVE ALL NEIGHBORS" << endl;
+      //cout << robotId << " REMOVE ALL NEIGHBORS" << endl;
 
-      set<UInt8> currentNeighbors;
-      UpdateNeighbors(currentNeighbors);
+      //set<UInt8> currentNeighbors;
+      //UpdateNeighbors(currentNeighbors);
       
       /* Reset exponential random diffusing time */
       UInt32 write = m_sStateData.diffusingDurationTime;
@@ -669,7 +680,7 @@ void EPuck_Environment_Classification::MajorityRule(){
 
   UInt32 numberOpinionsReceived[N_COL];
   std::vector<informationCollected> opinionsValuated;  // Set of information collected in every diffusing states
-  IC.receivedOpinion=opinion.actualOpinion;
+  IC.receivedOpinion = opinion.actualOpinion;
 
   size_t size = receivedOpinions.size();
   if(receivedOpinions.size()>simulationParams.numPackSaved){
