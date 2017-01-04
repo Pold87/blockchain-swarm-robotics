@@ -8,8 +8,9 @@ X <- read.table(outfile, header=T)
 X["allRed"] <- X["exploringRed"] + X["diffusingRed"]
 X["allBlue"] <- X["exploringBlue"] + X["diffusingBlue"]
 
+pdf('rplot.pdf')
 plot(1:nrow(X), X$allRed, type='l', col='red', ylim = c(0, 12),
      xlab="Time (t)", ylab="Number of robots")
 lines(1:nrow(X), X$allBlue, type='l', col='blue')
-
+dev.off()
 
