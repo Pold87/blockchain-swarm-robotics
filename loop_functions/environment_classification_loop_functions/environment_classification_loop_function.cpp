@@ -159,7 +159,7 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
   string contractPath = baseDirLoop + "deploy_contract.txt";
   string txHash = deploy_contract(minerId, contractPath);
 
-  sleep(15); 
+  sleep(25); 
   std::string contractAddress = getContractAddress(minerId, txHash);
 
   if (DEBUGLOOP)
