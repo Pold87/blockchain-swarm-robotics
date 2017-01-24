@@ -73,6 +73,7 @@ void CEnvironmentClassificationLoopFunctions::fillSettings(TConfigurationNode& t
       GetNodeAttribute(tEnvironment, "save_every_quality_flag", qualityFileFlag);
       GetNodeAttribute(tEnvironment, "save_every_robot_flag", oneRobotFileFlag);
       GetNodeAttribute(tEnvironment, "save_global_stat_flag", globalStatFileFlag);
+      GetNodeAttribute(tEnvironment, "save_blockchain_flag", blockChainFileFlag);
       GetNodeAttribute(tEnvironment, "radix", passedRadix);
       GetNodeAttribute(tEnvironment, "base_dir_loop", baseDirLoop);
       
@@ -323,7 +324,39 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 			m_strOutput = passedRadix +".RUN"+nRuns;
 			everyTicksFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 			everyTicksFile << "clock\texploringRed\tdiffusingRed\texploringGreen\tdiffusingGreen\texploringBlue\tdiffusingBlue\t" << std::endl;
+
 		}
+
+		/* Blockchain Statistics */
+		if(blockChainFileFlag) {
+
+		  std::stringstream ss;
+		  ss << number_of_runs;
+		  std::string nRuns = ss.str();
+		  m_strOutput = passedRadix +"-blockchain.RUN" + nRuns;
+
+		  blockChainFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
+		  blockChainFile << "clock";
+
+		  /* For all robots */
+
+		  CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
+		  
+		  for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
+
+		    CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
+		    EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
+		    
+		    std::string id = cController.GetId();		    
+
+		    blockChainFile << "\t" << "robot" << id;
+
+		  }
+
+		  blockChainFile << std::endl;
+
+		}
+
 
 		/*
 		 * File saving the the exit time and the number of robots (per opinion) after every run has been executed
@@ -697,15 +730,42 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 			consensousReached = c;
 
 	/* EVERYTICKSFILE: Write this statistics only if the file is open and it's the right timeStep (multiple of timeStep) */
-	if ( ! (GetSpace().GetSimulationClock() % timeStep) )
-		if (everyTicksFile.is_open())
-		{
-			everyTicksFile << (GetSpace().GetSimulationClock())/10 << "\t";
-			for ( UInt32 c = 0; c < N_COL; c++ )
-				everyTicksFile << robotsInExplorationCounter[c] << "\t\t" << robotsInDiffusionCounter[c]  << "\t\t";
-			everyTicksFile << std::endl;
-		}
-	 everyTicksFile << (GetSpace().GetSimulationClock())/10 <<std::endl;
+	if ( ! (GetSpace().GetSimulationClock() % timeStep) ) {
+	  if (everyTicksFile.is_open())
+	    {
+	      everyTicksFile << (GetSpace().GetSimulationClock())/10 << "\t";
+	      for ( UInt32 c = 0; c < N_COL; c++ )
+		everyTicksFile << robotsInExplorationCounter[c] << "\t\t" << robotsInDiffusionCounter[c]  << "\t\t";
+	      everyTicksFile << std::endl;
+	    }
+
+	  /* Save blockchain length */
+	  if (blockChainFile.is_open())
+	    {
+	      blockChainFile << (GetSpace().GetSimulationClock()) / 10;
+
+		  /* For all robots */
+
+		  CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
+
+		  for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
+
+		    CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
+		    EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
+		    
+		    std::string id = cController.GetId();		    
+		    int robotId = Id2Int(id);
+
+		    blockChainFile << "\t" << getBlockChainLength(robotId);
+
+		  }
+
+	      blockChainFile << std::endl;
+	    }
+	  
+	}
+
+
 }
 
 

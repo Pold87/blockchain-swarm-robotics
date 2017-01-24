@@ -261,7 +261,7 @@ void EPuck_Environment_Classification::ControlStep() {
 	   * has been taken this array will be emptied for the next diffusing state. */
 	  const CCI_EPuckRangeAndBearingSensor::TPackets& tPackets = m_pcRABS->GetPackets();
 
-	  set<UInt8> currentNeighbors;
+	  //	  set<UInt8> currentNeighbors;
 	  
 	  for(size_t i = 0; i < tPackets.size() ; ++i) {
 
@@ -279,7 +279,7 @@ void EPuck_Environment_Classification::ControlStep() {
 
 	    /* Update Ethereum neighbors */
 	    /* TODO: this is wrong! If there is no neighbors it does not get updated accordingly */
-	    currentNeighbors.insert(IC.senderID);
+	    //	    currentNeighbors.insert(IC.senderID);
 
 	    /* Loop for sense quality value: quality has been sent using 3 cells of RAB datas,
 	       so here it will converted in a Real number */
@@ -307,8 +307,14 @@ void EPuck_Environment_Classification::ControlStep() {
 
 	  }
 
-	  UpdateNeighbors(currentNeighbors);
+	  
+	  set<UInt8> currentNeighbors;
 
+	  for (UInt8 i = 1; i <= 10; i++) {
+	    currentNeighbors.insert(i);
+	  }
+
+	  UpdateNeighbors(currentNeighbors);
 
 
   RandomWalk();

@@ -98,6 +98,7 @@ private:
 	std::ofstream globalStatFile;		// Flag: write global stats: time of exploring, diffusings,counted cells... true->write
 	std::ofstream everyQualityFile;		// Flag: every robot writes his quality and his opinion, after each exploration state
 	std::ofstream oneRobotFile;			// Flag: just robot "ff0" (always present) writes his qualities after each exp. state
+	std::ofstream blockChainFile;			// Flag: Write blockchain information to file
 
 	/* Flags to decide if save or not the files */
 	bool everyTicksFileFlag;
@@ -105,6 +106,7 @@ private:
 	bool qualityFileFlag;
 	bool globalStatFileFlag;
 	bool oneRobotFileFlag;
+	bool blockChainFileFlag;
 
 	/* Counters for the number of robots in each state for every colour */
 	UInt32 robotsInExplorationCounter[N_COL], robotsInDiffusionCounter[N_COL];

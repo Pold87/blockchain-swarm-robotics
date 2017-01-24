@@ -321,7 +321,7 @@ std::string getContractAddress(int i, std::string txHash) {
 std::string unlockAccount(int i, std::string pw) {
     std::ostringstream fullCommandStream;
 
-  fullCommandStream << "personal.unlockAccount(eth.coinbase, \"" << pw << "\", 7200)";
+  fullCommandStream << "personal.unlockAccount(eth.coinbase, \"" << pw << "\", 50000)";
   
   string cmd = fullCommandStream.str();
   string res = exec_geth_cmd(i, cmd);
@@ -401,3 +401,16 @@ int check_balance(int i) {
 
   
 }
+
+// Get blockchain length of robot i
+int getBlockChainLength(int i) {
+  
+  string cmd = "eth.blockNumber";
+  string res = exec_geth_cmd(i, cmd);
+  
+  int blockNumber = atoi(res.c_str());
+
+  return blockNumber;
+
+}
+

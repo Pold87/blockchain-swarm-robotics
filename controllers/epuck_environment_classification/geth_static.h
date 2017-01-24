@@ -40,6 +40,9 @@ std::string readStringFromFile(std::string fileName);
 // Get coinbase address of robot i
 std::string getCoinbase(int i);
 
+// Get blockchain length of robot i
+int getBlockChainLength(int i);
+
 // Send ether from robot i to address addr
 std::string sendEther(int i, std::string from, std::string to, int v);
 
@@ -56,7 +59,6 @@ std::string readEntireFile(std::string fileName);
 
 /* Kill geth thread based on robot number i */
 std::string kill_geth_thread(int i);
-
 
 /* Deploy contract using robot number i */
 std::string deploy_contract(int i, std::string contractPath);
