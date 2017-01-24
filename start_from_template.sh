@@ -1,9 +1,9 @@
 TEMPLATE='experiments/epuck_EC_locale_template.argos'
 OUTFILE='experiments/epuck.argos'
-#BASEDIR='/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/'
-BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
+BASEDIR='/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/'
+#BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
 RADIX="volker_trial_new"
-NUMROBOTS=10
+NUMROBOTS=2
 R0=$(expr $NUMROBOTS / 2)
 B0=$(expr $NUMROBOTS / 2)
 PERCENT_RED=48
