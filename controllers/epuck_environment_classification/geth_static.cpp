@@ -395,7 +395,7 @@ std::string smartContractInterface(int i, string interface, string contractAddre
 
 
    string res = exec_geth_cmd(i, fullCommand);
-   cout << res << endl;
+   cout << "Result received from SC is: " << res << endl;
 
 
    return res;
