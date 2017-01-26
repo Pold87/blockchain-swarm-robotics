@@ -2,6 +2,8 @@
 
 uint Id2Int(std::string id);
 
+bool replace(std::string& str, const std::string& from, const std::string& to);
+
 std::string exec_geth_cmd(int i, std::string command);
 
 // Execute a command line command and return the result as string
@@ -49,6 +51,9 @@ std::string sendEther(int i, std::string from, std::string to, int v);
 // Create an interface to a contract for robot i
 std::string load_contract(int i, std::string contractName, std::string contractAddress, std::string contractInterface);
 
+// Interact with a generic smart contract
+std::string smartContractInterface(int i, std::string interface, std::string contractAddress, std::string func, int args[], int argc);
+
 /* Unlock account */
 std::string unlockAccount(int i, std::string pw);
 
@@ -61,7 +66,7 @@ std::string readEntireFile(std::string fileName);
 std::string kill_geth_thread(int i);
 
 /* Deploy contract using robot number i */
-std::string deploy_contract(int i, std::string contractPath);
+std::string deploy_contract(int i, std::string interfacePath, std::string dataPath, std::string templatePath);
 
 /* Check account balance of robot i (in wei)*/
 int check_balance(int i);

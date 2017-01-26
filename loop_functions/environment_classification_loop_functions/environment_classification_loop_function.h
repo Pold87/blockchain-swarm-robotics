@@ -157,6 +157,7 @@ private:
 	UInt32 decisionRule;
 
 	std::string baseDirLoop;
+	std::string dataDir;
 
 };
 

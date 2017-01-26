@@ -22,17 +22,19 @@ using namespace std;
 
 map<int, string> enodes;
 map<int, string> coinbaseAddresses;
+string interface; // Smart contract interface
+
 
 EPuck_Environment_Classification::SNeighborData::SNeighborData() :
   neighbors(set<UInt8>()) {}
 
-/* Replace the pattern from with to in the string str  */
-bool replace(std::string& str, const std::string& from, const std::string& to) {
-    size_t start_pos = str.find(from);
-    if(start_pos == std::string::npos)
-        return false;
-    str.replace(start_pos, from.length(), to);
-    return true;
+
+/* Convert a number to a string */
+template <typename T> std::string NumberToString ( T Number )
+{
+  std::ostringstream ss;
+  ss << Number;
+  return ss.str();
 }
 
 EPuck_Environment_Classification::EPuck_Environment_Classification() :
@@ -73,6 +75,7 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "percent_blue", percentBlue);
     GetNodeAttribute(t_node, "num_pack_saved", numPackSaved);
     GetNodeAttribute(t_node, "base_dir", baseDir);
+    GetNodeAttribute(t_node, "interface_path", interfacePath);
   }
   catch(CARGoSException& ex) {
     THROW_ARGOSEXCEPTION_NESTED("Error initializing controller state parameters.", ex);
@@ -134,6 +137,7 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
   if (robotId == 0) {
     system("killall geth");     
     system("rm -rf ~/Documents/eth_data/*");     
+    interface = readStringFromFile(simulationParams.baseDir + simulationParams.interfacePath);
   }
  
    
@@ -422,6 +426,23 @@ void EPuck_Environment_Classification::Explore() {
     collectedData.count = 1;
     m_sStateData.State = SStateData::STATE_DIFFUSING;
 
+
+    // Vote if direct modulation
+    if (simulationParams.decision_rule == 2) {
+      cout << "Direct Modulation" << std::endl;
+      string contractAddressNoSpace = contractAddress;
+
+      contractAddressNoSpace.erase(std::remove(contractAddressNoSpace.begin(), 
+					       contractAddressNoSpace.end(), '\n'),
+				   contractAddressNoSpace.end());
+
+
+      uint opinionInt = (uint) (opinion.quality * 100);
+      int args[2] = {opinion.actualOpinion / 2, opinionInt};
+      string voteResult = smartContractInterface(robotId, interface, contractAddressNoSpace, "vote", args, 2);
+      }
+
+
     /* Assigning a new exploration time, for the next exploration state */
     m_sStateData.remainingExplorationTime = Ceil(m_pcRNG->Exponential((Real)simulationParams.sigma));
     m_sStateData.explorDurationTime = m_sStateData.remainingExplorationTime;
@@ -435,7 +456,8 @@ void EPuck_Environment_Classification::Explore() {
 
     cout << "Remaining diffusing time is: " << m_sStateData.remainingDiffusingTime << " and opinion is " << opinion.actualOpinion << endl;
 
-    if(simulationParams.decision_rule==0)
+    /* TODO: simulationParams.decision_rule==2 added by volker check if correct!!! */
+    if(simulationParams.decision_rule==0 || simulationParams.decision_rule==2)
       m_sStateData.remainingDiffusingTime = (m_pcRNG->Exponential(((Real)simulationParams.g)*((Real)simulationParams.percentRed)))+30;
 
     m_sStateData.diffusingDurationTime = m_sStateData.remainingDiffusingTime;
@@ -504,32 +526,23 @@ void EPuck_Environment_Classification::Diffusing() {
 
       /* Send opinion via Ethereum */
 
-      if (opinion.actualOpinion == 0) {
-	string cmd = simulationParams.baseDir + "vote0.txt";
-	string command = readStringFromFile(cmd);
 
-	replace(command, "CONTRACTADDRESS", contractAddress);
+      if (simulationParams.decision_rule == 3) {
+      string contractAddressNoSpace = contractAddress;
 
-	string voteResult = exec_geth_cmd(robotId, command);
-	cout << voteResult << endl;
-      
-	
-      } else if (opinion.actualOpinion == 2) {
-	string cmd = simulationParams.baseDir + "vote1.txt";
-	string command = readStringFromFile(cmd);
+      contractAddressNoSpace.erase(std::remove(contractAddressNoSpace.begin(), 
+					       contractAddressNoSpace.end(), '\n'),
+				   contractAddressNoSpace.end());
 
-	replace(command, "CONTRACTADDRESS", contractAddress);
 
-	string voteResult = exec_geth_cmd(robotId, command);
-	cout << voteResult << endl;
-      
+      uint opinionInt = (uint) (opinion.quality * 100);
+      int args[2] = {opinion.actualOpinion / 2, opinionInt};
+      string voteResult = smartContractInterface(robotId, interface, contractAddressNoSpace, "vote", args, 2);
       }
       
-      //      std::ostringstream fullCommandStream;
-      //fullCommandStream << basedir << "vote" << opinion.actualOpinion << ".txt";
-      //string cmd = fullCommandStream.str();
-
       m_sStateData.remainingDiffusingTime--;
+
+
     }
   else // Time to change to exploration state
     {
@@ -584,25 +597,21 @@ void EPuck_Environment_Classification::Diffusing() {
 void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
 {
 
-  switch(decision_rule) {
+  int robotId = Id2Int(GetId());
 
-  case 0: {
-    NotWeightedDirectComparison();
-    break;
-  }
-  case 1: {
-    VoterModel();
-    break;
-  }
-  case 2: {
-    DirectComparison();
-    break;
-  }
-  case 3: {
-    MajorityRule();
-    break;
-  }
-  }
+  string contractAddressNoSpace = contractAddress;
+
+  contractAddressNoSpace.erase(std::remove(contractAddressNoSpace.begin(), 
+					   contractAddressNoSpace.end(), '\n'),
+			       contractAddressNoSpace.end());
+
+
+  uint opinionInt = (uint) (opinion.quality * 100);
+  int args[4] = {decision_rule, opinion.actualOpinion / 2, opinionInt, simulationParams.numPackSaved};
+  string sNewOpinion = smartContractInterface(robotId, interface, contractAddressNoSpace, "applyStrategy", args, 4);
+  int newOpinion = atoi(sNewOpinion.c_str());
+  opinion.actualOpinion = newOpinion * 2; // Is implemented as 0 and 1 in the smart contract
+  
 }
 
 void EPuck_Environment_Classification::NotWeightedDirectComparison(){
@@ -707,51 +716,8 @@ void EPuck_Environment_Classification::MajorityRule(){
 
   //for( UInt32 i = 0; i<3; i++)
   // opinion.actualOpinion = FindMaxOpinionReceived(numberOpinionsReceived, opinion.actualOpinion);
-  int robotId = Id2Int(GetId());
 
-  string commandApplyStrategy = readStringFromFile(simulationParams.baseDir + "applyStrategy.txt");
-  replace(commandApplyStrategy, "CONTRACTADDRESS", contractAddress);
-  replace(commandApplyStrategy, "CURRENT_OPINION", opinion.actualOpinion / 2); // Is implemented as 0 and 1 in the smart contract
-  replace(commandApplyStrategy, "NUM_PACK_SAVED", numPackSaved);
-  string sNewOpinion = exec_geth_cmd(robotId, commandApplyStrategy);
-  int newOpinion = atoi(sNewOpinion.c_str());
-  opinion.actualOpinion = newOpinion * 2; // Is implemented as 0 and 1 in the smart contract
 }
-
-
-
-
-//MajorityOpinionOuttakes:
-  // string command_red = readStringFromFile(simulationParams.baseDir + "get_red_votes.txt");
-  // replace(command_red, "CONTRACTADDRESS", contractAddress);
-  // string voteResult_red = exec_geth_cmd(robotId, command_red);
-  // int vote_red = atoi(voteResult_red.c_str());
-  // //cout << "Robot: " << robotId << ": The number of red opinions is " << voteResult_red << endl;
-
-  // string command_blue = readStringFromFile(simulationParams.baseDir + "get_blue_votes.txt");
-  // replace(command_blue, "CONTRACTADDRESS", contractAddress);
-  // string voteResult_blue = exec_geth_cmd(robotId, command_blue);
-  // int vote_blue = atoi(voteResult_blue.c_str());
-  // //cout << "Robot: " << robotId << ": The number of green opinions is " << voteResult_green << endl;
-
-  // if (vote_red > vote_blue) {
-  //   opinion.actualOpinion = 0;
-  //       cout << "MAJORITY VOTING: " << "black is: "  << vote_red << " white is: " << vote_blue << " -> Choosing black" << endl;
-  // } else if (vote_red < vote_blue) {
-  //   opinion.actualOpinion = 2;
-  //   cout << "MAJORITY VOTING: " << "black is: "  << vote_red << " white is: " << vote_blue << " -> Choosing white" << endl;
-  // } else {
-  //   /* Get a random opinion  */
-  //   int x = rand() % 2;
-  //   cout << "MAJORITY VOTING: " << "Choosing random" << endl;
-  //   if (x == 0) {
-  //         cout << "MAJORITY VOTING: " << "black is: "  << vote_red << " white is: " << vote_blue << " -> Choosing black" << endl;
-  //     opinion.actualOpinion = 0;
-  //   } else {
-  //     opinion.actualOpinion = 2;
-  //     cout << "MAJORITY VOTING: " << "black is: "  << vote_red << " white is: " << vote_blue << " -> Choosing white" << endl;
-  //   }
-  }
 
 
 UInt32 EPuck_Environment_Classification::FindMaxOpinionReceived(UInt32 numberOpinionsReceived[], UInt32 actualOpinion){

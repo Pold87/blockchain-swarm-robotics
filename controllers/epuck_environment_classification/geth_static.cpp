@@ -15,7 +15,7 @@ string datadir_base =  "~/Documents/eth_data/data";
 
 const int rpc_base_port = 8100;
 const int ipc_base_port = 31000;
-const int maxtrials = 40;
+const int maxtrials = 180;
 
 /*
   Convert a robot Id (fbxxx) to an integer (xxx)
@@ -29,6 +29,17 @@ uint Id2Int(std::string id) {
     return idConversion;
   
 }
+
+
+/* Replace the pattern from with to in the string str  */
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+    size_t start_pos = str.find(from);
+    if(start_pos == std::string::npos)
+        return false;
+    str.replace(start_pos, from.length(), to);
+    return true;
+}
+
 
 // Execute command line program and return string result
 
@@ -362,15 +373,62 @@ std::string kill_geth_thread(int i) {
   
 }
 
+std::string smartContractInterface(int i, string interface, string contractAddress,
+ 				  string func, int args[], int argc) {
+  
+
+   ostringstream fullCommandStream;
+
+   fullCommandStream << "var cC = web3.eth.contract(" << interface << ");var c = cC.at(" << contractAddress << ");c." << func << "(";
+
+
+   for(int k = 0; k < argc; k++) {
+     fullCommandStream << args[k] << ",";  
+   }
+
+   fullCommandStream << "{from: eth.coinbase});";
+   
+  
+   std::string fullCommand = fullCommandStream.str();
+
+   cout << fullCommand << std::endl;
+
+
+   string res = exec_geth_cmd(i, fullCommand);
+   cout << res << endl;
+
+
+   return res;
+
+
+ }
+
 /* Deploy contract using robot number i and return the transaction hash */
-std::string deploy_contract(int i, string contractPath) {
-    
+std::string deploy_contract(int i, string interfacePath, string dataPath, string templatePath) {
+
+  // Get smart contract interface
+  string interface = readStringFromFile(interfacePath);
+  string data = readStringFromFile(dataPath);
+  data = "0x" + data; // Make data hexadecimal
+  string contractTemplate = readStringFromFile(templatePath);
+
+  replace(contractTemplate, "INTERFACE", interface);
+  replace(contractTemplate, "DATA", data);
+
+  string tmpPath = "tmp.txt";
+
+  std::ofstream out(tmpPath.c_str());
+  out << contractTemplate;
+  out.close();
+
+  cout << contractTemplate << std::endl;
+
   for (int trials = 0; trials < maxtrials; ++trials) {
 
     if (DEBUG)
       cout << "Trials is: " << trials << endl;
 
-    string txHashRaw = exec_geth_cmd(i, "loadScript(\"" + contractPath + "\")");
+    string txHashRaw = exec_geth_cmd(i, "loadScript(\"" + tmpPath + "\")");
     cout << "txHashRaw: " << txHashRaw << endl; 
     string txHash;
     std::istringstream f(txHashRaw);
@@ -388,7 +446,36 @@ std::string deploy_contract(int i, string contractPath) {
   cout << "Maximum number of trials is reached!" << endl;
   exec("killall geth");
   throw;
+
 }
+
+// /* Deploy contract using robot number i and return the transaction hash */
+// std::string deploy_contract(int i, string contractPath) {
+    
+//   for (int trials = 0; trials < maxtrials; ++trials) {
+
+//     if (DEBUG)
+//       cout << "Trials is: " << trials << endl;
+
+//     string txHashRaw = exec_geth_cmd(i, "loadScript(\"" + contractPath + "\")");
+//     cout << "txHashRaw: " << txHashRaw << endl; 
+//     string txHash;
+//     std::istringstream f(txHashRaw);
+//     std::getline(f, txHash);
+
+//     cout << "txHash: " << txHash << endl; 
+
+//     /* If a transaction hash was generated, i.e., neither true nor false were found */
+//     if (txHash.find("true") == string::npos && txHash.find("false") == string::npos) {
+// 	return txHash;
+//       }
+//     }  
+
+//   /* If the maximum number of trials is reached */
+//   cout << "Maximum number of trials is reached!" << endl;
+//   exec("killall geth");
+//   throw;
+// }
  
 /* Check account balance of robot i (in wei)*/
 int check_balance(int i) {

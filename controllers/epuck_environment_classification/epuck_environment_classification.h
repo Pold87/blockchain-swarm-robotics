@@ -68,6 +68,7 @@ public:
 	    bool exitFlag;
 	    std::string radix;
 	    std::string baseDir; /* Basedir of the controller folder */
+	    std::string interfacePath;
 	    UInt32 numPackSaved;
 	    UInt32 status;
 	    UInt32 LAMDA, turn;

@@ -76,6 +76,7 @@ void CEnvironmentClassificationLoopFunctions::fillSettings(TConfigurationNode& t
       GetNodeAttribute(tEnvironment, "save_blockchain_flag", blockChainFileFlag);
       GetNodeAttribute(tEnvironment, "radix", passedRadix);
       GetNodeAttribute(tEnvironment, "base_dir_loop", baseDirLoop);
+      GetNodeAttribute(tEnvironment, "data_dir", dataDir);
       
     }
   catch(CARGoSException& ex) {
@@ -157,8 +158,11 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
 
   /* Deploy contract */  
 
-  string contractPath = baseDirLoop + "deploy_contract.txt";
-  string txHash = deploy_contract(minerId, contractPath);
+  //  string contractPath = baseDirLoop + "deploy_contract.txt";
+  string interfacePath = baseDirLoop + "interface.txt";
+  string dataPath = baseDirLoop + "data.txt";
+  string templatePath = baseDirLoop + "contractTemplate.txt";
+  string txHash = deploy_contract(minerId, interfacePath, dataPath, templatePath);
 
   sleep(25); 
   std::string contractAddress = getContractAddress(minerId, txHash);
@@ -321,7 +325,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 			std::stringstream ss;
 			ss << number_of_runs;
 			std::string nRuns = ss.str();
-			m_strOutput = passedRadix +".RUN"+nRuns;
+			m_strOutput = dataDir + passedRadix +".RUN"+nRuns;
 			everyTicksFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 			everyTicksFile << "clock\texploringRed\tdiffusingRed\texploringGreen\tdiffusingGreen\texploringBlue\tdiffusingBlue\t" << std::endl;
 
@@ -333,7 +337,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 		  std::stringstream ss;
 		  ss << number_of_runs;
 		  std::string nRuns = ss.str();
-		  m_strOutput = passedRadix +"-blockchain.RUN" + nRuns;
+		  m_strOutput = dataDir + passedRadix +"-blockchain.RUN" + nRuns;
 
 		  blockChainFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 		  blockChainFile << "clock";
@@ -362,7 +366,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 		 * File saving the the exit time and the number of robots (per opinion) after every run has been executed
 		 */
 		if(runsFileFlag){
-			m_strOutput = passedRadix+".RUNS";
+			m_strOutput = dataDir + passedRadix+".RUNS";
 			runsFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 			runsFile << "Runs\t\tExitTime\tReds\t\tGreens\t\tBlues" << std::endl;
 		}
@@ -372,19 +376,19 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 		 * (the quality and the   actualOpinion are the definitive ones)
 		 */
 		if(qualityFileFlag){
-			m_strOutput = passedRadix + ".qualitiesFile";
+			m_strOutput = dataDir + passedRadix + ".qualitiesFile";
 			everyQualityFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 			everyQualityFile << "Q\tOP" << std::endl;
 		}
 
 		/* File saving all the statistics (times, counted cells and qualities) after the whole experiment is finished */
 		if(globalStatFileFlag){
-			m_strOutput = passedRadix + ".globalStatistics";
+			m_strOutput = dataDir + passedRadix + ".globalStatistics";
 			globalStatFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 			globalStatFile << "TEX\tTC\tTDR\tQR\tCR\tTDG\tQG\tCG\tTDB\tQB\tCB\t" << std::endl;
 		}
 		if(oneRobotFileFlag){
-			m_strOutput = passedRadix + ".oneRobotFile";
+			m_strOutput = dataDir + passedRadix + ".oneRobotFile";
 			oneRobotFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 		}
 

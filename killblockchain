@@ -1,0 +1,3 @@
+kill $1
+killall argos3
+killall geth
