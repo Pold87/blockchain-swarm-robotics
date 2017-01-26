@@ -227,12 +227,6 @@ void EPuck_Environment_Classification::ControlStep() {
 
   int robotId = Id2Int(GetId());
   
-  if (!mining) {
-    cout << " START MINING -- robot" << robotId << endl;
-    mining = true;
-    start_mining(robotId, 1);     
-  }
-
   /* Turn leds according with actualOpinion */
   TurnLeds();
 
@@ -244,11 +238,26 @@ void EPuck_Environment_Classification::ControlStep() {
   switch(m_sStateData.State) {
 
   case SStateData::STATE_EXPLORING: {
+
+    if (mining) {
+      cout << " STOP MINING -- robot" << robotId << endl;
+      mining = false;
+      stop_mining(robotId);     
+  }
+
+    
     Explore();
     break;
   }
 
   case SStateData::STATE_DIFFUSING: {
+
+    if (!mining) {
+      cout << " START MINING -- robot" << robotId << endl;
+      mining = true;
+      start_mining(robotId, 1);     
+  }
+    
     Diffusing();
     break;
   }
@@ -428,8 +437,8 @@ void EPuck_Environment_Classification::Explore() {
 
 
     // Vote if direct modulation
-    if (simulationParams.decision_rule == 2) {
-      cout << "Direct Modulation" << std::endl;
+    if (simulationParams.decision_rule == 2 || simulationParams.decision_rule == 3) {
+      cout << "Direct Modulation OR Majority Voting" << std::endl;
       string contractAddressNoSpace = contractAddress;
 
       contractAddressNoSpace.erase(std::remove(contractAddressNoSpace.begin(), 
@@ -438,6 +447,7 @@ void EPuck_Environment_Classification::Explore() {
 
 
       uint opinionInt = (uint) (opinion.quality * 100);
+      cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
       int args[2] = {opinion.actualOpinion / 2, opinionInt};
       string voteResult = smartContractInterface(robotId, interface, contractAddressNoSpace, "vote", args, 2);
       }
@@ -527,18 +537,18 @@ void EPuck_Environment_Classification::Diffusing() {
       /* Send opinion via Ethereum */
 
 
-      if (simulationParams.decision_rule == 3) {
-      string contractAddressNoSpace = contractAddress;
+      // if (simulationParams.decision_rule == 3) {
+      // string contractAddressNoSpace = contractAddress;
 
-      contractAddressNoSpace.erase(std::remove(contractAddressNoSpace.begin(), 
-					       contractAddressNoSpace.end(), '\n'),
-				   contractAddressNoSpace.end());
+      // contractAddressNoSpace.erase(std::remove(contractAddressNoSpace.begin(), 
+      // 					       contractAddressNoSpace.end(), '\n'),
+      // 				   contractAddressNoSpace.end());
 
 
-      uint opinionInt = (uint) (opinion.quality * 100);
-      int args[2] = {opinion.actualOpinion / 2, opinionInt};
-      string voteResult = smartContractInterface(robotId, interface, contractAddressNoSpace, "vote", args, 2);
-      }
+      // uint opinionInt = (uint) (opinion.quality * 100);
+      // int args[2] = {opinion.actualOpinion / 2, opinionInt};
+      // string voteResult = smartContractInterface(robotId, interface, contractAddressNoSpace, "vote", args, 2);
+      // }
       
       m_sStateData.remainingDiffusingTime--;
 
