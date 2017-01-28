@@ -450,6 +450,15 @@ void EPuck_Environment_Classification::Explore() {
       cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
       int args[2] = {opinion.actualOpinion / 2, opinionInt};
       string voteResult = smartContractInterface(robotId, interface, contractAddressNoSpace, "vote", args, 2);
+
+      int args2[0] = {};
+      
+      // For debugging
+      string numWhite = smartContractInterface(robotId, interface, contractAddressNoSpace, "whiteVotes", args2, 0);
+      string numBlack = smartContractInterface(robotId, interface, contractAddressNoSpace, "blackVotes", args2, 0);
+
+      cout << "Num white votes is: " << numWhite << "Num Black votes is: " << numBlack << endl;
+      
       }
 
 
