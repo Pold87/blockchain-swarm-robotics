@@ -327,7 +327,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 			std::string nRuns = ss.str();
 			m_strOutput = dataDir + passedRadix +".RUN"+nRuns;
 			everyTicksFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
-			everyTicksFile << "clock\texploringRed\tdiffusingRed\texploringGreen\tdiffusingGreen\texploringBlue\tdiffusingBlue\t" << std::endl;
+			everyTicksFile << "clock\texploringWhite\tdiffusingWhite\texploringGreen\tdiffusingGreen\texploringBlack\tdiffusingBlack\t" << std::endl;
 
 		}
 
@@ -368,7 +368,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 		if(runsFileFlag){
 			m_strOutput = dataDir + passedRadix+".RUNS";
 			runsFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
-			runsFile << "Runs\t\tExitTime\tReds\t\tGreens\t\tBlues" << std::endl;
+			runsFile << "Runs\t\tExitTime\tWhites\t\tGreens\t\tBlacks" << std::endl;
 		}
 
 		/*

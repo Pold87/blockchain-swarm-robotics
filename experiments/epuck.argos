@@ -8,7 +8,7 @@
    
     <system threads="0" />
 
-    <experiment length="0"
+    <experiment length="500"
                 ticks_per_second="10"
                 random_seed="23" />
 
@@ -40,12 +40,12 @@
 			       turn="45"
 			       lamda="100"
 			       exitFlag="true"
-			       decision_rule="3"
+			       decision_rule="2"
 			       num_pack_saved="5"
-			       percent_red="100"
+			       percent_red="56"
 			       base_dir="/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/"
 			       interface_path="interface.txt"
-			       percent_blue="0"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
+			       percent_blue="44"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
 							  1 = Voter model; 2 = Direct comparison; 3 = Majority Rule-->
  
       </params>
@@ -56,13 +56,13 @@
 
   <cells  number_of_red_cells="0"
 	  base_dir_loop="/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/"
-	  data_dir="verysimilar-rev/"
+	  data_dir="directmodulation/"
           number_of_green_cells="0"
 	  number_of_blue_cells="0"
 	  using_percentage="true"
-          percent_red="100"
+          percent_red="56"
 	  exit="true"            
-	  percent_blue="0"
+	  percent_blue="44"
 	  percent_green="0"
 	  save_every_ticks="10"
 	  save_every_ticks_flag="true"
@@ -71,7 +71,7 @@
 	  save_every_robot_flag="true"
 	  save_every_quality_flag="true"
 	  save_global_stat_flag="true"
-	  radix="volker_num10_red100_blue01"
+	  radix="volker_num10_black56_white444"
 	  number_of_robots="10"
 	  number_of_runs="1"
           number_of_qualities="2"
@@ -83,7 +83,7 @@
 	  sigma="10"
 	  lamda="100"
 	  turn="45"
-	  decision_rule="3"/>
+	  decision_rule="2"/>
 
   </loop_functions>
   <!-- *********************** -->
