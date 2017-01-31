@@ -71,7 +71,7 @@
 	  save_every_robot_flag="true"
 	  save_every_quality_flag="true"
 	  save_global_stat_flag="true"
-	  radix="volker_num10_black52_white481"
+	  radix="volker_num10_black52_white482"
 	  number_of_robots="10"
 	  number_of_runs="1"
           number_of_qualities="2"

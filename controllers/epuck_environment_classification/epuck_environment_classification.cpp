@@ -253,7 +253,7 @@ void EPuck_Environment_Classification::ControlStep() {
       cout << " STOP MINING -- robot" << robotId << endl;
       mining = false;
       stop_mining(robotId);     
-  }
+    }
 
     
     Explore();
@@ -266,70 +266,71 @@ void EPuck_Environment_Classification::ControlStep() {
       cout << " START MINING -- robot" << robotId << endl;
       mining = true;
       start_mining(robotId, 1);     
-  }
+
+    }
+      
+    
+    /* Every received data is stored in IC variable (helping var). Each IC variable will be
+     * inserted in receivedOpinions array if has not been sensed yet and it's not a 0,0,0 one.
+     * It will be used to choose the next opinion, basing on decision rules. After a decision
+     * has been taken this array will be emptied for the next diffusing state. */
+    const CCI_EPuckRangeAndBearingSensor::TPackets& tPackets = m_pcRABS->GetPackets();
+    
+    set<UInt8> currentNeighbors;
+    
+    for(size_t i = 0; i < tPackets.size() ; ++i) {
+      
+      bool saved = false;   // saved = variable to not save opinions twice: if saved == true -> don't save the datas
+      
+      /*
+       * IC = Helping variable for sensed opinions, if the received opinion is 5 then not save it (5 is the default value
+       * of the RAB actuators, if you receive 5 then the sender robot wasn't ready to send a new opinion
+       */
+      IC.receivedOpinion = tPackets[i]->Data[0];
+      if(IC.receivedOpinion == 5)
+	saved = true;
+      
+      IC.senderID = tPackets[i]->Data[3];
+      
+      /* Update Ethereum neighbors */
+      /* TODO: this is wrong! If there is no neighbors it does not get updated accordingly */
+      currentNeighbors.insert(IC.senderID);
+      
+      /* Loop for sense quality value: quality has been sent using 3 cells of RAB datas,
+	 so here it will converted in a Real number */
+      IC.receivedQuality=0;
+      for ( UInt32 j = 1; j<3 ; ++j)
+	IC.receivedQuality = IC.receivedQuality*100 + tPackets[i]->Data[j];
+      IC.receivedQuality = (Real) IC.receivedQuality / 10000;
+      
+      /* If the incoming value has already been listened then not save it */
+      for(UInt32 j = 0; j < receivedOpinions.size(); ++j)
+	if(receivedOpinions[j].senderID == IC.senderID)
+	  saved = true;
+      
+      /*
+       * Don't want to save 0,0,0 values (values sent casually before to add 555 value, probably no
+       * more used now.
+       */
+      if((IC.senderID == 0) && (IC.receivedQuality==0) && (IC.receivedOpinion==0))
+	saved = true;
+      
+      /* Save value if it has not been already saved and it's not 5,5,5 or 0,0,0 value  */
+      if(!saved) {
+	receivedOpinions.push_back(IC);
+      }
+      
+    }
+    
+    UpdateNeighbors(currentNeighbors);
+    
     
     Diffusing();
     break;
   }
-  }
-
-
-
-
-	  /* Every received data is stored in IC variable (helping var). Each IC variable will be
-	   * inserted in receivedOpinions array if has not been sensed yet and it's not a 0,0,0 one.
-	   * It will be used to choose the next opinion, basing on decision rules. After a decision
-	   * has been taken this array will be emptied for the next diffusing state. */
-	  const CCI_EPuckRangeAndBearingSensor::TPackets& tPackets = m_pcRABS->GetPackets();
-
-	  set<UInt8> currentNeighbors;
-		  
-	  for(size_t i = 0; i < tPackets.size() ; ++i) {
-
-	    bool saved = false;   // saved = variable to not save opinions twice: if saved == true -> don't save the datas
-
-	    /*
-	     * IC = Helping variable for sensed opinions, if the received opinion is 5 then not save it (5 is the default value
-	     * of the RAB actuators, if you receive 5 then the sender robot wasn't ready to send a new opinion
-	     */
-	    IC.receivedOpinion = tPackets[i]->Data[0];
-	    if(IC.receivedOpinion == 5)
-	      saved = true;
-
-	    IC.senderID = tPackets[i]->Data[3];
-
-	    /* Update Ethereum neighbors */
-	    /* TODO: this is wrong! If there is no neighbors it does not get updated accordingly */
-	    currentNeighbors.insert(IC.senderID);
-
-	    /* Loop for sense quality value: quality has been sent using 3 cells of RAB datas,
-	       so here it will converted in a Real number */
-	    IC.receivedQuality=0;
-	    for ( UInt32 j = 1; j<3 ; ++j)
-	      IC.receivedQuality = IC.receivedQuality*100 + tPackets[i]->Data[j];
-	    IC.receivedQuality = (Real) IC.receivedQuality / 10000;
-
-	    /* If the incoming value has already been listened then not save it */
-	    for(UInt32 j = 0; j < receivedOpinions.size(); ++j)
-	      if(receivedOpinions[j].senderID == IC.senderID)
-		saved = true;
-
-	    /*
-	     * Don't want to save 0,0,0 values (values sent casually before to add 555 value, probably no
-	     * more used now.
-	     */
-	    if((IC.senderID == 0) && (IC.receivedQuality==0) && (IC.receivedOpinion==0))
-	      saved = true;
-
-	    /* Save value if it has not been already saved and it's not 5,5,5 or 0,0,0 value  */
-	    if(!saved) {
-	      receivedOpinions.push_back(IC);
-	    }
-
-	  }
-
-
-
+  
+  
+  
   RandomWalk();
 
   /**** OBSTACLE AVOIDANCE ****/
