@@ -1,0 +1,165 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+   
+    <system threads="0" />
+
+
+    <experiment length="LENGTH"
+                ticks_per_second="10"
+                random_seed="SEED" />
+
+  </framework>
+
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+<controllers>
+
+    <epuck_environment_classification_controller id="epc"
+     library="/home/dbrambilla/svn/Epuck/build/controllers/epuck_environment_classification/libepuck_environment_classification.so">
+     
+      <actuators>
+        <epuck_wheels implementation="default" />
+        <leds implementation="default" medium="leds" />
+        <epuck_range_and_bearing implementation="medium" medium="rab" range="0.8f" />
+      </actuators>
+      <sensors>
+        <!--epuck_motor_ground implementation="rot_z_only" /-->
+        <epuck_range_and_bearing implementation="medium" medium="rab" />
+        <epuck_proximity implementation="default" show_rays="false" />
+      </sensors>
+
+      <params>
+   
+     	 <simulation_parameters g="PAR_G" 
+   	          sigma="SIGMA"
+		  turn="TURN"
+                  lamda="LAMDA"
+		  exitFlag="EXITFL"
+		  decision_rule="DECISION_RULE"
+		  radix="RADIX"
+		  num_pack_saved="NPACKSAV"
+	          percent_red="P_C_R"
+		  percent_blue="PERCENT_BLUE"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
+							           1 = Voter model; 2 = Direct comparison; 3 = Majority Rule-->
+ 
+      </params>
+    </epuck_environment_classification_controller>
+  </controllers>
+
+  <loop_functions  library="/home/dbrambilla/svn/Epuck/build/loop_functions/environment_classification_loop_functions/libenvironment_classification_loop_functions.so"
+                  label="environment_classification_loop_functions">
+
+  <cells  number_of_red_cells="RED_CELLS"
+          number_of_green_cells="GREEN_CELLS"
+	  number_of_blue_cells="BLUE_CELLS"
+	  using_percentage="NOT_USING_NUMBER"
+          percent_red="P_C_R"
+	  percent_blue="PERCENT_BLUE"
+	  percent_green="VERDE_PROPORTION"
+	  save_every_ticks="INTERVAL_CATCH" save_every_ticks_flag="TICKS_SAVE" save_every_run_flag="EVERY_RUN" save_every_robot_flag="WRITEQ" save_every_quality_flag="QUALITY_FILE" save_global_stat_flag="GLOBALFI"
+	  radix="RADIX"
+	  number_of_robots="SWARM_SIZE"
+	  number_of_runs="RUNS"
+          number_of_qualities="NUMQUAL"
+          r_0="INITIAL_RED_OPINION"
+	  b_0="INITIAL_BLUE_OPINION"
+	  g_0="INITIAL_gREEN_OPINION"
+	  length_of_runs="R_M_L"
+	  g="PAR_G"
+	  sigma="SIGMA"
+	  lamda="LAMDA"
+	  turn="TURN"
+	  decision_rule="DECISION_RULE"
+	  exit="EXITFL"/>
+
+  </loop_functions>
+  <!-- *********************** -->
+  <!-- * Arena configuration * -->
+  <!-- *********************** -->
+  
+  <!-- Real arena size is 10.3 * 5.15. We put 10.45 * 5.45 because of the walls but the real 
+       usable arena for the robots is 10.3*5.-->
+   <arena size="2.1, 2.1, 1" center="1,1,0">
+     <floor id="floor"
+           source="loop_functions"
+           pixels_per_meter="50" />
+    <!-- Place four boxes in a rectangle to delimit the arena -->
+    <box id="wall_north" size="2 ,0.025,0.08" movable="false">
+      <body position="1,2.0075,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_south" size="2,0.025,0.08" movable="false">
+      <body position="1,0.0075,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_east" size="0.025,2,0.08" movable="false">
+      <body position="2.0075,1,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_west" size="0.025,2,0.08" movable="false">
+      <body position="0.0075,1 ,0" orientation="0,0,0" />
+    </box>
+
+   <distribute>
+      <position method="uniform" min="0.1,0.1,0" max="1.9 , 1.9, 0" />
+      <orientation method="gaussian" mean="1,1,0 " std_dev="360,0,0 " />
+      <entity quantity="SWARM_SIZE" max_trials="100">
+        <e-puck id="ep" >
+          <controller config="epc" />
+        </e-puck>
+      </entity>
+    </distribute>
+
+
+  </arena>
+
+  <!-- ******************* -->
+  <!-- * Physics engines * -->
+  <!-- ******************* -->
+
+  <physics_engines>
+    <!--
+        Use a 2D dynamics engine.
+    -->
+    <dynamics2d id="dyn2d" />
+  </physics_engines>
+
+  <!-- ********* -->
+  <!-- * Media * -->
+  <!-- ********* -->
+
+ 
+  <media>
+    <range_and_bearing id="rab" />
+    <led id="leds" />
+  </media>
+  <!-- ****************** -->
+
+  <!-- ****************** -->
+  <!-- * Visualization * -->
+  <!-- ****************** -->
+  <!-- visualization>
+    <qt-opengl>
+       
+     <camera>
+        <placement idx="0" position="5.19,2.595,7.9" look_at="5.19,2.595,0" lens_focal_length="20" />
+        <placement idx="1" position="1.94098,0.736798,0.349611" look_at="2.85255,1.04903,0.0821098" lens_focal_length="20" />
+        <placement idx="2" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
+        <placement idx="3" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
+        <placement idx="4" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
+        <placement idx="5" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
+        <placement idx="6" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
+        <placement idx="7" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
+        <placement idx="8" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
+        <placement idx="9" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
+        <placement idx="10" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
+        <placement idx="11" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
+     </camera>  
+     <user_functions library="build/loop_functions/first_loop_functions/libfirst_loop_functions" label="first_qt_user_functions" />
+    </qt-opengl> 
+  </visualization-->
+ 
+</argos-configuration>
