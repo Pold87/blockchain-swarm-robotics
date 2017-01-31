@@ -2,14 +2,15 @@ TEMPLATE='experiments/epuck_EC_locale_template.argos'
 OUTFILE='experiments/epuck.argos'
 #BASEDIR='/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/'
 BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
-DATADIR='directmodulation/'
+DATADIR='opiniontest/'
 #NUMROBOTS=(6 10 14 18 22 26 30)
 NUMROBOTS=(10)
 REPETITIONS=10
 
 #PERCENT_REDS=(52 56 60 64 68 72 76)
 #PERCENT_REDS=(36)
-PERCENT_BLACKS=(52 56 60 64 68 72 76)
+#PERCENT_BLACKS=(52 56 60 64 68 72 76)
+PERCENT_BLACKS=(0)
 
 mkdir $DATADIR
 

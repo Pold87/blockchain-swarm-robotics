@@ -7,6 +7,7 @@
 
 
 #include "geth_static.h" /* Use geth from C++ */
+#include "restclient-cpp/restclient.h"
 
 #include <iostream>
 
@@ -15,7 +16,7 @@
 #include <unistd.h>
 #include <map>
 
-#include "restclient-cpp/restclient.h"
+//#include "restclient-cpp/restclient.h"
 
 /****************************************/
 /****************************************/
@@ -802,6 +803,45 @@ void EPuck_Environment_Classification::TurnLeds(){
     break;
   }
   }
+}
+
+/* This function sends a voting transaction to other Ethereum
+   processes without the need of connecting to their processes */
+std::string voteJSON(int robotId, int opinion, int quality);
+std::string voteJSON(int robotId, int opinion, int quality) {
+
+
+  json j, params;
+
+  j["jsonrpc"] = "2.0";
+  j["method"] = "eth_sendTransaction";
+  j["id"] = 2;
+
+  params["from"] = addresses.at(robot + 1); 
+  params["to"] = contractAddress;
+
+  params["data"] = finalizeFunc;
+
+  j["params"] = {params};
+  
+  // explicit conversion (serialization) of the JSON object to string
+  std::string s = j.dump();
+
+  // initialize RestClient
+  RestClient::init();
+  
+  RestClient::Response r = RestClient::post("http://localhost:8545",
+					    "text/json",
+					    s);
+  
+  std::cout << s;
+  std::cout << r.body;
+
+  // deinit RestClient. After calling this you have to call RestClient::init()
+  // again before you can use it
+  RestClient::disable();
+  
+
 }
 
 void EPuck_Environment_Classification::fromLoopFunctionRes(){

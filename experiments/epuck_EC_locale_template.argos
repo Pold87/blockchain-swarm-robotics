@@ -41,7 +41,7 @@
 			       lamda="100"
 			       exitFlag="true"
 			       decision_rule="2"
-			       num_pack_saved="5"
+			       num_pack_saved="2"
 			       percent_red="PERCENT_RED"
 			       base_dir="BASEDIR"
 			       interface_path="interface.txt"
