@@ -156,7 +156,7 @@ void sendOpinion(uint robot, uint opinion) {
   params["from"] = addresses.at(robot + 1); 
   params["to"] = contractAddress;
 
-  params["data"] = constructData(opinion);
+  params["data"] = constructata(opinion);
 
   //  j["params"] = {params, "latest"};
   j["params"] = {params};
