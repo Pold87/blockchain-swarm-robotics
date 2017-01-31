@@ -15,7 +15,6 @@
 #include <unistd.h>
 #include <map>
 
-#include "restclient-cpp/restclient.h"
 
 /****************************************/
 /****************************************/
