@@ -147,6 +147,8 @@ private:
 	UInt32 g;
 	UInt32 sigma;
 	UInt32 decision_rule;
+
+	std::string dataDir;
 };
 
 
