@@ -456,6 +456,18 @@ void EPuck_Environment_Classification::Explore() {
       //int args[2] = {1, opinionInt};
       string voteResult = smartContractInterface(robotId, interface, contractAddressNoSpace, "vote", args, 2);
 
+
+      std::string rawTx = getRawTransaction(robotId, voteResult);
+      /* Debug just use robot 4 and 5 */
+      std::string newTxHash4 = sendRawTransaction(4, rawTx);
+      std::string newTxHash5 = sendRawTransaction(5, rawTx);
+
+      cout << "Raw transaction is: " << rawTx << endl;
+      cout << "txoriginal is: " << voteResult << endl;
+      cout << "tx4 is: " << newTxHash4 << endl;
+      cout << "tx5 is: " << newTxHash5 << endl;
+
+      
       int args2[0] = {};
       
       // For debugging

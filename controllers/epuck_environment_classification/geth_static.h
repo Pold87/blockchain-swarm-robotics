@@ -72,6 +72,10 @@ std::string deploy_contract(int i, std::string interfacePath, std::string dataPa
 int check_balance(int i);
 
 
-/* Sign a transaction and return the raw transaction */
+/* Get the raw transaction based on the tx hash */
+std::string getRawTransaction(int i, std::string txHash);
 
 /* Send raw transaction and include it in the tx pool */
+std::string sendRawTransaction(int i, std::string rawTx);
+
+

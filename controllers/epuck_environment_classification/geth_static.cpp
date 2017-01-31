@@ -501,10 +501,25 @@ int getBlockChainLength(int i) {
 
 }
 
+/* Get the raw transaction based on the tx hash */
+std::string getRawTransaction(int i, std::string txHash) {
 
-/* Sign a transaction and return the raw transaction */
-std::string signRawTransaction(int i)
+  string cmd = "eth.getRawTransaction(" + txHash + ")";
+  
+  string rawTx = exec_geth_cmd(i, cmd);
+  
+  return rawTx;
+
+}
 
 
 /* Send raw transaction and include it in the tx pool */
+std::string sendRawTransaction(int i, std::string rawTx) {
 
+  string cmd = "eth.sendRawTransaction(" + rawTx + ")";
+
+  string txHash = exec_geth_cmd(i, cmd);
+  
+  return txHash;
+
+}
