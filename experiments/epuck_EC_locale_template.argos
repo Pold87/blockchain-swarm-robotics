@@ -8,7 +8,7 @@
    
     <system threads="0" />
 
-    <experiment length="0"
+    <experiment length="500"
                 ticks_per_second="10"
                 random_seed="23" />
 
@@ -35,13 +35,13 @@
 
       <params>
    
-     	<simulation_parameters g="5" 
+     	<simulation_parameters g="10" 
    			       sigma="10"
 			       turn="45"
 			       lamda="100"
 			       exitFlag="true"
 			       decision_rule="2"
-			       num_pack_saved="2"
+			       num_pack_saved="5"
 			       percent_red="PERCENT_RED"
 			       base_dir="BASEDIR"
 			       interface_path="interface.txt"
