@@ -70,3 +70,8 @@ std::string deploy_contract(int i, std::string interfacePath, std::string dataPa
 
 /* Check account balance of robot i (in wei)*/
 int check_balance(int i);
+
+
+/* Sign a transaction and return the raw transaction */
+
+/* Send raw transaction and include it in the tx pool */

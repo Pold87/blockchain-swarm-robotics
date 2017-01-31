@@ -501,3 +501,10 @@ int getBlockChainLength(int i) {
 
 }
 
+
+/* Sign a transaction and return the raw transaction */
+std::string signRawTransaction(int i)
+
+
+/* Send raw transaction and include it in the tx pool */
+
