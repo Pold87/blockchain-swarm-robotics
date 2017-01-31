@@ -15,6 +15,8 @@
 #include <unistd.h>
 #include <map>
 
+#include "restclient-cpp/restclient.h"
+
 /****************************************/
 /****************************************/
 
@@ -239,6 +241,15 @@ void EPuck_Environment_Classification::ControlStep() {
 
   case SStateData::STATE_EXPLORING: {
 
+    /* If one wants to have a fully connected network */
+    set<UInt8> currentNeighbors;
+    
+    //for (UInt8 i = 1; i <= 10; i++) {
+    //  currentNeighbors.insert(i);
+    //}
+    UpdateNeighbors(currentNeighbors);
+
+
     if (mining) {
       cout << " STOP MINING -- robot" << robotId << endl;
       mining = false;
@@ -318,15 +329,6 @@ void EPuck_Environment_Classification::ControlStep() {
 
 	  }
 
-	  
-	  /* If one wants to have a fully connected network */
-	  //set<UInt8> currentNeighbors;
-
-	  //for (UInt8 i = 1; i <= 10; i++) {
-	  //  currentNeighbors.insert(i);
-	  //}
-
-	  UpdateNeighbors(currentNeighbors);
 
 
   RandomWalk();
@@ -500,7 +502,7 @@ void EPuck_Environment_Classification::Diffusing() {
        * and diffusing his own opinion, quality and ID */
       if(  m_sStateData.remainingDiffusingTime < 30 )
 	{
-	  
+	  /* Listen to other opinions */
 	  
 	}
 
