@@ -386,7 +386,7 @@ std::string smartContractInterface(int i, string interface, string contractAddre
      fullCommandStream << args[k] << ",";  
    }
 
-   fullCommandStream << "{from: eth.coinbase, gas: '1000000'});";
+   fullCommandStream << "{from: eth.coinbase, gas: '10000000'});";
    
   
    std::string fullCommand = fullCommandStream.str();
