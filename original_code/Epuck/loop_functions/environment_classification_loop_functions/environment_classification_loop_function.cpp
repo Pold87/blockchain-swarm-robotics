@@ -56,7 +56,6 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 		GetNodeAttribute(tEnvironment, "sigma", sigma);
 		GetNodeAttribute(tEnvironment, "lamda", LAMDA);
 		GetNodeAttribute(tEnvironment, "turn", turn);
-		GetNodeAttribute(tEnvironment, "decision_rule", decisionRule);
 		GetNodeAttribute(tEnvironment, "number_of_runs", number_of_runs);
 
 		/* Retrieving information about how to catch and where to save statistics */
@@ -67,6 +66,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 		GetNodeAttribute(tEnvironment, "save_every_robot_flag", oneRobotFileFlag);
 		GetNodeAttribute(tEnvironment, "save_global_stat_flag", globalStatFileFlag);
 		GetNodeAttribute(tEnvironment, "radix", passedRadix);
+		GetNodeAttribute(tEnvironment, "data_dir", dataDir);
 
 	}
 	catch(CARGoSException& ex) {
@@ -188,18 +188,19 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 			std::stringstream ss;
 			ss << number_of_runs;
 			std::string nRuns = ss.str();
-			m_strOutput = passedRadix +".RUN"+nRuns;
+			m_strOutput = dataDir + passedRadix +".RUN"+nRuns;
 			everyTicksFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
-			everyTicksFile << "clock\texploringRed\tdiffusingRed\texploringGreen\tdiffusingGreen\texploringBlue\tdiffusingBlue\t" << std::endl;
+			everyTicksFile << "clock\texploringWhite\tdiffusingWhite\texploringGreen\tdiffusingGreen\texploringBlack\tdiffusingBlack\t" << std::endl;
+
 		}
 
 		/*
 		 * File saving the the exit time and the number of robots (per opinion) after every run has been executed
 		 */
 		if(runsFileFlag){
-			m_strOutput = passedRadix+".RUNS";
+			m_strOutput = dataDir + passedRadix+".RUNS";
 			runsFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
-			runsFile << "Runs\t\tExitTime\tReds\t\tGreens\t\tBlues" << std::endl;
+			runsFile << "Runs\t\tExitTime\tWhites\t\tGreens\t\tBlacks" << std::endl;
 		}
 
 		/*
@@ -207,19 +208,19 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 		 * (the quality and the   actualOpinion are the definitive ones)
 		 */
 		if(qualityFileFlag){
-			m_strOutput = passedRadix + ".qualitiesFile";
+			m_strOutput = dataDir + passedRadix + ".qualitiesFile";
 			everyQualityFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 			everyQualityFile << "Q\tOP" << std::endl;
 		}
 
 		/* File saving all the statistics (times, counted cells and qualities) after the whole experiment is finished */
 		if(globalStatFileFlag){
-			m_strOutput = passedRadix + ".globalStatistics";
+			m_strOutput = dataDir + passedRadix + ".globalStatistics";
 			globalStatFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 			globalStatFile << "TEX\tTC\tTDR\tQR\tCR\tTDG\tQG\tCG\tTDB\tQB\tCB\t" << std::endl;
 		}
 		if(oneRobotFileFlag){
-			m_strOutput = passedRadix + ".oneRobotFile";
+			m_strOutput = dataDir + passedRadix + ".oneRobotFile";
 			oneRobotFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 		}
 
@@ -322,7 +323,7 @@ void CEnvironmentClassificationLoopFunctions::MoveRobotsAwayFromArena(UInt32 opi
 	for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it) {
 		CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
 		EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
-		CQuaternion cNewOrientation = cEpuck. GetEmbodiedEntity().GetOrientation();
+		CQuaternion cNewOrientation = cEpuck.GetEmbodiedEntity().GetOriginAnchor().Orientation;
 		CVector3 cNewPosition = CVector3(1.0f, 1.0f, 0.1f);
 		cEpuck.GetEmbodiedEntity().MoveTo(cNewPosition, cNewOrientation, false);
 		EPuck_Environment_Classification::Opinion& opinion = cController.GetOpinion();
@@ -342,7 +343,7 @@ void CEnvironmentClassificationLoopFunctions::AssignNewStateAndPosition() {
 	{
 		CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
 		EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
-		CQuaternion cNewOrientation = cEpuck. GetEmbodiedEntity().GetOrientation();
+		CQuaternion cNewOrientation = cEpuck. GetEmbodiedEntity().GetOriginAnchor().Orientation;
 
 		/* Generating Uniformly distribuited x and y coordinates for the new position of the robot */
 		Real xp = m_pcRNG->Uniform(arenaSizeRangeX);
@@ -530,8 +531,8 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 		EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
 
 
-		Real x = cEpuck. GetEmbodiedEntity().GetPosition().GetX(); // X coordinate of the robot
-		Real y = cEpuck. GetEmbodiedEntity().GetPosition().GetY(); // Y coordinate of the robot
+		Real x = cEpuck. GetEmbodiedEntity().GetOriginAnchor().Position.GetX(); // X coordinate of the robot
+		Real y = cEpuck. GetEmbodiedEntity().GetOriginAnchor().Position.GetY(); // Y coordinate of the robot
 
 		CVector2 cPos;
 		cPos.Set(x,y);						// Vector position of the robot

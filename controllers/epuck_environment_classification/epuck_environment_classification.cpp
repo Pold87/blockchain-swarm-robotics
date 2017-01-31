@@ -329,7 +329,7 @@ void EPuck_Environment_Classification::ControlStep() {
     break;
   }
   
-  
+  }
   
   RandomWalk();
 
@@ -354,7 +354,6 @@ void EPuck_Environment_Classification::ControlStep() {
       m_pcWheels->SetLinearVelocity(0.0f, m_fWheelVelocity);
     }
   }
-
 }
 
 /************************************************** RANDOM WALK ************************************************/
