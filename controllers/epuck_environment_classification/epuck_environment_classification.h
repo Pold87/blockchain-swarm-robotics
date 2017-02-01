@@ -215,6 +215,7 @@ private:
    std::string address;
    std::string minerAddress;
    std::string contractAddress;
+   std::string rawTx;
    bool mining;
    CColor red, blue, green;                    // Add here eventual additional color AGGIUNGERECOLORI
 //   int totalCounted, countedOfThisOpinion[N_COL];  USED JUST FOR STATISTICS, no more used

@@ -1,4 +1,4 @@
-/* Include the controller definition */
+/* Include the controller definit*io*itn */
 #include "epuck_environment_classification.h"
 
 #define ALPHA_CHANNEL		     0
@@ -181,16 +181,11 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<UInt8> newNeighbors) 
 
   std::set<UInt8>::iterator it;
   for (it = m_sNeighborData.neighbors.begin(); it != m_sNeighborData.neighbors.end(); ++it) {
-  //for (size_t i = 0; i < m_sNeighborData.neighbors.size(); ++i) {
-  //for (auto i : m_sNeighborData.neighbors) {
     UInt8 i = *it;
-    //cout << i << " ";
   }
-  //cout << endl;
 
   //cout << "Robot " << robotId << " New neighbors: ";
   for (it = newNeighbors.begin(); it != newNeighbors.end(); ++it) {
-  //  for (auto i : newNeighbors) {
     UInt8 i = *it;
     //cout << i << " ";
   }
@@ -199,7 +194,6 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<UInt8> newNeighbors) 
   //cout << "Robot " << robotId << " Removing neighbors: ";
 
   for (it = neighborsToRemove.begin(); it != neighborsToRemove.end(); ++it) {
-    //for (auto i : neighborsToRemove) {
     UInt8 i = *it;
     //cout << i << " ";
     remove_peer(robotId, enodes[i]);
@@ -209,7 +203,6 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<UInt8> newNeighbors) 
   //cout << "Robot " << robotId << " Adding neighbors: ";
 
   for (it = neighborsToAdd.begin(); it != neighborsToAdd.end(); ++it) {
-  // for (auto i : neighborsToAdd) {
     UInt8 i = *it;
     //cout << i << " ";
     add_peer(robotId, enodes[i]);
@@ -243,6 +236,7 @@ void EPuck_Environment_Classification::ControlStep() {
     /* If one wants to have a fully connected network */
     set<UInt8> currentNeighbors;
     
+    // Fully connected
     //for (UInt8 i = 1; i <= 10; i++) {
     //  currentNeighbors.insert(i);
     //}
@@ -261,69 +255,6 @@ void EPuck_Environment_Classification::ControlStep() {
   }
 
   case SStateData::STATE_DIFFUSING: {
-
-    if (!mining) {
-      cout << " START MINING -- robot" << robotId << endl;
-      mining = true;
-      start_mining(robotId, 1);     
-
-    }
-      
-    
-    /* Every received data is stored in IC variable (helping var). Each IC variable will be
-     * inserted in receivedOpinions array if has not been sensed yet and it's not a 0,0,0 one.
-     * It will be used to choose the next opinion, basing on decision rules. After a decision
-     * has been taken this array will be emptied for the next diffusing state. */
-    const CCI_EPuckRangeAndBearingSensor::TPackets& tPackets = m_pcRABS->GetPackets();
-    
-    set<UInt8> currentNeighbors;
-    
-    for(size_t i = 0; i < tPackets.size() ; ++i) {
-      
-      bool saved = false;   // saved = variable to not save opinions twice: if saved == true -> don't save the datas
-      
-      /*
-       * IC = Helping variable for sensed opinions, if the received opinion is 5 then not save it (5 is the default value
-       * of the RAB actuators, if you receive 5 then the sender robot wasn't ready to send a new opinion
-       */
-      IC.receivedOpinion = tPackets[i]->Data[0];
-      if(IC.receivedOpinion == 5)
-	saved = true;
-      
-      IC.senderID = tPackets[i]->Data[3];
-      
-      /* Update Ethereum neighbors */
-      /* TODO: this is wrong! If there is no neighbors it does not get updated accordingly */
-      currentNeighbors.insert(IC.senderID);
-      
-      /* Loop for sense quality value: quality has been sent using 3 cells of RAB datas,
-	 so here it will converted in a Real number */
-      IC.receivedQuality=0;
-      for ( UInt32 j = 1; j<3 ; ++j)
-	IC.receivedQuality = IC.receivedQuality*100 + tPackets[i]->Data[j];
-      IC.receivedQuality = (Real) IC.receivedQuality / 10000;
-      
-      /* If the incoming value has already been listened then not save it */
-      for(UInt32 j = 0; j < receivedOpinions.size(); ++j)
-	if(receivedOpinions[j].senderID == IC.senderID)
-	  saved = true;
-      
-      /*
-       * Don't want to save 0,0,0 values (values sent casually before to add 555 value, probably no
-       * more used now.
-       */
-      if((IC.senderID == 0) && (IC.receivedQuality==0) && (IC.receivedOpinion==0))
-	saved = true;
-      
-      /* Save value if it has not been already saved and it's not 5,5,5 or 0,0,0 value  */
-      if(!saved) {
-	receivedOpinions.push_back(IC);
-      }
-      
-    }
-    
-    UpdateNeighbors(currentNeighbors);
-    
     
     Diffusing();
     break;
@@ -447,29 +378,18 @@ void EPuck_Environment_Classification::Explore() {
 				   contractAddressNoSpace.end());
 
 
-      uint opinionInt = (uint) (opinion.quality * 100);
+      uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
       cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
-      int args[2] = {opinion.actualOpinion / 2, opinionInt};
-      
-      // DEBUGGING: always vote for 1
-      //int args[2] = {1, opinionInt};
+      int args[2] = {opinion.actualOpinion / 2, opinionInt}; 
       string voteResult = smartContractInterface(robotId, interface, contractAddressNoSpace, "vote", args, 2);
-
-
-      std::string rawTx = getRawTransaction(robotId, voteResult);
-      /* Debug just use robot 4 and 5 */
-      std::string newTxHash4 = sendRawTransaction(4, rawTx);
-      std::string newTxHash5 = sendRawTransaction(5, rawTx);
-
-      cout << "Raw transaction is: " << rawTx << endl;
-      cout << "txoriginal is: " << voteResult << endl;
-      cout << "tx4 is: " << newTxHash4 << endl;
-      cout << "tx5 is: " << newTxHash5 << endl;
-
+      
+      /* Save the transaction as raw transaciton in the robot's
+	 memory */
+      rawTx = getRawTransaction(robotId, voteResult);
       
       int args2[0] = {};
       
-      // For debugging
+      // For debugging (show amoujt of white and black votes)
       string numWhite = smartContractInterface(robotId, interface, contractAddressNoSpace, "whiteVotes", args2, 0);
       string numBlack = smartContractInterface(robotId, interface, contractAddressNoSpace, "blackVotes", args2, 0);
 
@@ -509,11 +429,38 @@ void EPuck_Environment_Classification::Diffusing() {
   /* remainingDiffusingTime>0 means that is still time to perform diffusing state */
   if (m_sStateData.remainingDiffusingTime > 0)
     {
+
+
+      /* Every received data is stored in IC variable (helping var). Each IC variable will be
+       * inserted in receivedOpinions array if has not been sensed yet and it's not a 0,0,0 one.
+       * It will be used to choose the next opinion, basing on decision rules. After a decision
+       * has been taken this array will be emptied for the next diffusing state. */
+      const CCI_EPuckRangeAndBearingSensor::TPackets& tPackets = m_pcRABS->GetPackets();
+      
+      set<UInt8> currentNeighbors;
+      
+      for(size_t i = 0; i < tPackets.size() ; ++i) {
+            
+	IC.senderID = tPackets[i]->Data[3];
+      
+	/* Update Ethereum neighbors */
+	currentNeighbors.insert(IC.senderID);   
+      
+    } 
+
+
       /* In the 3 lasts seconds (30 ticks) the robot starts listening other opinions
        * and diffusing his own opinion, quality and ID */
       if(  m_sStateData.remainingDiffusingTime < 30 )
 	{
 	  /* Listen to other opinions */
+	  UpdateNeighbors(currentNeighbors);
+
+	  if (!mining) {
+	    cout << " START MINING -- robot" << robotId << endl;
+	    mining = true;
+	    start_mining(robotId, 1);     	    
+	  }    
 	  
 	}
 
@@ -560,21 +507,16 @@ void EPuck_Environment_Classification::Diffusing() {
       m_pcRABA->SetData(toSend);
 
       /* Send opinion via Ethereum */
+     
+      /* Send transaction to all neighbors */
+      std::set<UInt8>::iterator it;
+      for (it = currentNeighbors.begin(); it != currentNeighbors.end(); ++it) {
+	UInt8 i = *it;
+	std::string newTxHash = sendRawTransaction(i, rawTx);
+	cout << "Robot " << i << "txHash is: " << newTxHash << endl;
+      }
 
 
-      // if (simulationParams.decision_rule == 3) {
-      // string contractAddressNoSpace = contractAddress;
-
-      // contractAddressNoSpace.erase(std::remove(contractAddressNoSpace.begin(), 
-      // 					       contractAddressNoSpace.end(), '\n'),
-      // 				   contractAddressNoSpace.end());
-
-
-      // uint opinionInt = (uint) (opinion.quality * 100);
-      // int args[2] = {opinion.actualOpinion / 2, opinionInt};
-      // string voteResult = smartContractInterface(robotId, interface, contractAddressNoSpace, "vote", args, 2);
-      // }
-      
       m_sStateData.remainingDiffusingTime--;
 
 

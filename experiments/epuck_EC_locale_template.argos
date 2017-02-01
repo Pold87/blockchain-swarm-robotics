@@ -40,7 +40,7 @@
 			       turn="45"
 			       lamda="100"
 			       exitFlag="true"
-			       decision_rule="2"
+			       decision_rule="DECISIONRULE"
 			       num_pack_saved="2"
 			       percent_red="PERCENT_RED"
 			       base_dir="BASEDIR"
@@ -83,7 +83,7 @@
 	  sigma="10"
 	  lamda="100"
 	  turn="45"
-	  decision_rule="2"/>
+	  decision_rule="DECISIONRULE"/>
 
   </loop_functions>
   <!-- *********************** -->
