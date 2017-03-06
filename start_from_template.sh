@@ -21,16 +21,12 @@ for k in "${NUMROBOTS[@]}"; do
 	PERCENT_WHITE=$(expr 100 - $PERCENT_BLACK)
 	RADIX=$(printf 'volker_num%d_black%d_white%d' $k $PERCENT_BLACK $PERCENT_WHITE)
 	
-	for i in `seq 1 $REPETITIONS`; do
-	    
-    # Create template
-	    sed -e "s|BASEDIR|$BASEDIR|g" -e "s|DATADIR|$DATADIR|g" -e "s|RADIX|$RADIX$i|g" -e "s|NUMROBOTS|$k|g" -e "s|R0|$R0|g" -e "s|B0|$B0|g" -e "s|PERCENT_RED|$PERCENT_BLACK|g" -e "s|PERCENT_BLUE|$PERCENT_WHITE|g" -e "s|DECISIONRULE|$DECISIONRULE|g" $TEMPLATE > $OUTFILE
-	    
+	# Create template
+	sed -e "s|BASEDIR|$BASEDIR|g" -e "s|DATADIR|$DATADIR|g" -e "s|RADIX|$RADIX$i|g" -e "s|NUMROBOTS|$k|g" -e "s|R0|$R0|g" -e "s|B0|$B0|g" -e "s|PERCENT_RED|$PERCENT_BLACK|g" -e "s|PERCENT_BLUE|$PERCENT_WHITE|g" -e "s|DECISIONRULE|$DECISIONRULE|g" -e "s|REPETITIONS|$REPETITIONS|g" $TEMPLATE > $OUTFILE
+	
     # Start experiment
 	    argos3 -c $OUTFILE
 	    
-	done
-	
     done
     
 done

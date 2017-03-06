@@ -3,23 +3,24 @@
 NUMROBOTS=10
 REPETITIIONS=10
 DECISIONRULE=3
-alias createtemplate="sed -e "s|BASEDIR|$BASEDIR|g" -e "s|DATADIR|$DATADIR|g" -e "s|RADIX|$RADIX$i|g" -e "s|NUMROBOTS|$k|g" -e "s|R0|$R0|g" -e "s|B0|$B0|g" -e "s|PERCENT_RED|$PERCENT_BLACK|g" -e "s|PERCENT_BLUE|$PERCENT_WHITE|g" -e "s|DECISIONRULE|$DECISIONRULE|g" $TEMPLATE > $OUTFILE"
+DATABASE=data
+alias createtemplate="sed -e "s|BASEDIR|$BASEDIR|g" -e "s|DATADIR|$DATADIR|g" -e "s|RADIX|$RADIX$i|g" -e "s|NUMROBOTS|$k|g" -e "s|R0|$R0|g" -e "s|B0|$B0|g" -e "s|PERCENT_RED|$PERCENT_BLACK|g" -e "s|PERCENT_BLUE|$PERCENT_WHITE|g" -e "s|DECISIONRULE|$DECISIONRULE|g" -e "s|REPETITIONS|$REPETITIONS|g" $TEMPLATE > $OUTFILE"
 
 
 # Experiment 1: 
 # Simple scenario, compare decision rules, corresponds to Fig. 2
 for DECISIONRULE in {1..3};
 do
-    DATADIR="simple_decision_$DECISIONRULE"
+    DATADIR="$DATABASE/exp_1_simple_decision_$DECISIONRULE"
     PERCENT_BLACKS=66
 
     for i in `seq 1 $REPETITIONS`; do
 
-    # Create template
-    createtemplate
+	# Create template
+	createtemplate
 
-    # Start experiment
-    argos3 -c $OUTFILE
+	# Start experiment
+	argos3 -c $OUTFILE
 
     done
 
@@ -29,15 +30,15 @@ done
 # Difficult scenario, compare strategies, corresponds to Fig. 3
 for DECISIONRULE in {1..3};
 do
-    DATADIR="difficult_decision_$DECISIONRULE"
+    DATADIR="$DATABASE/exp_2_difficult_decision_$DECISIONRULE"
     PERCENT_BLACKS=52
 
     for i in `seq 1 $REPETITIONS`; do
 
-    # Create template
-    createtemplate
+	# Create template
+	createtemplate
 
-    argos3 -c $OUTFILE
+	argos3 -c $OUTFILE
 
     done
 
@@ -47,7 +48,6 @@ done
 # Increase initial number E_a(0), corresponds to Fig. 4
 # For the simple setup
 PERCENT_BLACKS=66
-DATADIR="simple_"
 for B0 in `seq 0 $NUMROBOTS`; do
     for i in `seq 1 $REPETITIONS`; do
 
