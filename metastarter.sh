@@ -14,13 +14,11 @@ do
     DATADIR="$DATABASE/exp_1_simple_decision_$DECISIONRULE"
     PERCENT_BLACKS=66
 
-    for i in `seq 1 $REPETITIONS`; do
-
-	# Create template
-	createtemplate
-
-	# Start experiment
-	argos3 -c $OUTFILE
+    # Create template
+    createtemplate
+    
+    # Start experiment
+    argos3 -c $OUTFILE
 
     done
 
@@ -33,14 +31,10 @@ do
     DATADIR="$DATABASE/exp_2_difficult_decision_$DECISIONRULE"
     PERCENT_BLACKS=52
 
-    for i in `seq 1 $REPETITIONS`; do
-
-	# Create template
-	createtemplate
-
-	argos3 -c $OUTFILE
-
-    done
+    # Create template
+    createtemplate
+    
+    argos3 -c $OUTFILE
 
 done 
 
@@ -49,11 +43,9 @@ done
 # For the simple setup
 PERCENT_BLACKS=66
 for B0 in `seq 0 $NUMROBOTS`; do
-    for i in `seq 1 $REPETITIONS`; do
 
-	createtemplate
-	argos3 -c $OUTFILE
-    done
+    createtemplate
+    argos3 -c $OUTFILE
 
 done
 
@@ -69,20 +61,15 @@ done
 
 # Experiment 4:
 # Increase difficulty of the decision-making problem; compare strategies
-# Swarm with N = 20 robots
-NUMROBOTS=20
+# Swarm with N = 20 robots and N = 100 robots
 PERCENT_BLACKS=(52 56 60 64 68 72 76 80 84 88 92 96)
-for PERCENT_BLACK in "${PERCENT_BLACKS[@]}"; do
+NUMROBOTS=(20 100)
 
-    for i in `seq 1 $REPETITIONS`; do
+for k in "${NUMROBOTS[@]}"; do
+    for PERCENT_BLACK in "${PERCENT_BLACKS[@]}"; do
 
+	DATADIR="$DATABASE/exp_4_N$k_Percent$PERCENT_BLACK"
 	createtemplate
 	argos3 - $OUTFILE
-
     done
-
 done
-
-
-# Swarm with N = 100 robots
-NUMROBOTS=100
