@@ -15,7 +15,7 @@ string datadir_base =  "~/Documents/eth_data/data";
 
 const int rpc_base_port = 8100;
 const int ipc_base_port = 31000;
-const int maxtrials = 180;
+const int maxtrials = 3000;
 
 /*
   Convert a robot Id (fbxxx) to an integer (xxx)

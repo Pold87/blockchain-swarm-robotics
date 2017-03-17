@@ -8,7 +8,7 @@
    
     <system threads="0" />
 
-    <experiment length="500"
+    <experiment length="0"
                 ticks_per_second="10"
                 random_seed="23" />
 
@@ -73,12 +73,12 @@
 	  save_global_stat_flag="true"
 	  radix="RADIX"
 	  number_of_robots="NUMROBOTS"
-	  number_of_runs="REPETITIONS"
+	  number_of_runs="1"
           number_of_qualities="2"
           r_0="R0"
 	  b_0="B0"
 	  g_0="0"
-	  length_of_runs="0"
+	  length_of_runs="10"
 	  g="2"
 	  sigma="10"
 	  lamda="100"

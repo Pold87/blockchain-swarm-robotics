@@ -28,7 +28,7 @@ m_pcFloor(NULL)
 }
 
 static const int minerId = 100; /* ID of the miner (TODO: set in config file) */
-static const int maxTime = 60; /* Maximum amount of time per robot to wait until
+static const int maxTime = 1000; /* Maximum amount of time per robot to wait until
 		       they received their ether */
 
 
@@ -153,7 +153,7 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
   start_geth(minerId);
   createAccount(minerId);
   unlockAccount(minerId, "test");
-  start_mining(minerId, 4);	
+  start_mining(minerId, 12);	
   
 
   /* Deploy contract */  
@@ -402,18 +402,23 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 
 void CEnvironmentClassificationLoopFunctions::Reset() {
 
-	written_qualities = 0;
+  /* Blockchain related */
+  exec("killall geth");
+  system("rm -rf ~/Documents/eth_data/*");     
 
-	m_pcRNG->SetSeed((int)m_pcRNG->Uniform(bigRange));
-	m_pcRNG->Reset();
+  /* Simulation related */
+  written_qualities = 0;
 
-	GetSpace().SetSimulationClock(0);
-	consensousReached = N_COL;
-
-	for(size_t i = 0; i<N_COL; i++){
-		robotsInExplorationCounter[i] = 0;
+  m_pcRNG->SetSeed((int)m_pcRNG->Uniform(bigRange));
+  m_pcRNG->Reset();
+  
+  GetSpace().SetSimulationClock(0);
+  consensousReached = N_COL;
+  
+  for(size_t i = 0; i<N_COL; i++){
+    robotsInExplorationCounter[i] = 0;
 		robotsInDiffusionCounter[i] = 0;
-	}
+  }
 
 	/* Shuffling GRID vector (cells colours) to redistribuite them */
 	for (int k = 0; k < 8; k++){
