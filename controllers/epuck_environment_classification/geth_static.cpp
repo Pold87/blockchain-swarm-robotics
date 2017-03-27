@@ -386,7 +386,7 @@ std::string smartContractInterface(int i, string interface, string contractAddre
      fullCommandStream << args[k] << ",";  
    }
 
-   fullCommandStream << "{from: eth.coinbase, gas: '10000000'});";
+   fullCommandStream << "{from: eth.coinbase, gas: '1000000'});";
    
   
    std::string fullCommand = fullCommandStream.str();
@@ -522,4 +522,37 @@ std::string sendRawTransaction(int i, std::string rawTx) {
   
   return txHash;
 
+}
+
+
+// Get number of white votes
+int getWhiteVotes(int i){
+  string cmd = "whiteVotes()";
+  string res = exec_geth_cmd(i, cmd);
+  
+  int blockNumber = atoi(res.c_str());
+
+  return blockNumber;
+
+}
+
+// Get number of black votes
+int getBlackVotes(int i) {
+  string cmd = "blackVotes()";
+  string res = exec_geth_cmd(i, cmd);
+
+  int resInt = atoi(res.c_str());
+
+  return resInt;
+  
+
+}
+
+// Get last 2 votes
+int getLast2Votes(int i) {
+  string cmd = "last2Votes()";
+  string res = exec_geth_cmd(i, cmd);
+  int resInt = atoi(res.c_str());
+
+  return resInt;
 }

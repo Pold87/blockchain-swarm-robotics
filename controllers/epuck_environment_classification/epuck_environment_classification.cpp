@@ -378,11 +378,15 @@ void EPuck_Environment_Classification::Explore() {
 				   contractAddressNoSpace.end());
 
 
+      cout << "contractaddressnospace is" << contractAddressNoSpace << endl;
+
       uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
       cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
       int args[2] = {opinion.actualOpinion / 2, opinionInt}; 
       string voteResult = smartContractInterface(robotId, interface, contractAddressNoSpace, "vote", args, 2);
       
+      cout << "voteResult is " << voteResult << endl;
+
       /* Save the transaction as raw transaciton in the robot's
 	 memory */
       rawTx = getRawTransaction(robotId, voteResult);
@@ -390,8 +394,8 @@ void EPuck_Environment_Classification::Explore() {
       int args2[0] = {};
       
       // For debugging (show amount of white and black votes)
-      string numWhite = smartContractInterface(robotId, interface, contractAddressNoSpace, "whiteVotes", args2, 0);
-      string numBlack = smartContractInterface(robotId, interface, contractAddressNoSpace, "blackVotes", args2, 0);
+      string numWhite = smartContractInterface(robotId, interface, contractAddressNoSpace, "wVotes", args2, 0);
+      string numBlack = smartContractInterface(robotId, interface, contractAddressNoSpace, "bVotes", args2, 0);
 
       cout << "Num white votes is: " << numWhite << "Num Black votes is: " << numBlack << endl;
       

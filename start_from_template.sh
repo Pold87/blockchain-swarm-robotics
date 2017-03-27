@@ -3,12 +3,15 @@ OUTFILE='experiments/epuck.argos'
 #BASEDIR='/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/'
 BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
 DATADIR='data/debug/'
-NUMROBOTS=(10)
+NUMROBOTS=(2)
 REPETITIONS=10
 DECISIONRULE=2
-PERCENT_BLACKS=(0)
+PERCENT_BLACKS=(10)
+MININGDIFF=100000
 
 mkdir -p $DATADIR
+./change_difficulty.sh $MININGDIFF
+
 
 for k in "${NUMROBOTS[@]}"; do
 
@@ -25,7 +28,7 @@ for k in "${NUMROBOTS[@]}"; do
 	    RADIX=$(printf 'num%d_black%d%d' $k $PERCENT_BLACK $i)
 
 	# Create template
-	sed -e "s|BASEDIR|$BASEDIR|g" -e "s|DATADIR|$DATADIR|g" -e "s|RADIX|$RADIX|g" -e "s|NUMROBOTS|$k|g" -e "s|R0|$R0|g" -e "s|B0|$B0|g" -e "s|PERCENT_BLUE|$PERCENT_BLACK|g" -e "s|PERCENT_RED|$PERCENT_WHITE|g" -e "s|DECISIONRULE|$DECISIONRULE|g" -e "s|REPETITIONS|$REPETITIONS|g" $TEMPLATE > $OUTFILE
+	sed -e "s|BASEDIR|$BASEDIR|g" -e "s|DATADIR|$DATADIR|g" -e "s|RADIX|$RADIX|g" -e "s|NUMROBOTS|$k|g" -e "s|R0|$R0|g" -e "s|B0|$B0|g" -e "s|PERCENT_BLUE|$PERCENT_BLACK|g" -e "s|PERCENT_RED|$PERCENT_WHITE|g" -e "s|DECISIONRULE|$DECISIONRULE|g" -e "s|REPETITIONS|$REPETITIONS|g" -e "s|MININGDIFF|$MININGDIFF|g" $TEMPLATE > $OUTFILE
 	
     # Start experiment
 	argos3 -c $OUTFILE

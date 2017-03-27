@@ -83,6 +83,7 @@
 	  sigma="10"
 	  lamda="100"
 	  turn="45"
+	  miningdiff="MININGDIFF"
 	  decision_rule="DECISIONRULE"/>
 
   </loop_functions>
