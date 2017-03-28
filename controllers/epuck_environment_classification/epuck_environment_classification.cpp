@@ -368,8 +368,8 @@ void EPuck_Environment_Classification::Explore() {
     m_sStateData.State = SStateData::STATE_DIFFUSING;
 
 
-    // Vote if direct modulation
-    if (simulationParams.decision_rule == 2 || simulationParams.decision_rule == 3) {
+    // TODO: Check if needed
+    //    if (simulationParams.decision_rule == 2 || simulationParams.decision_rule == 3) {
       cout << "Direct Modulation OR Majority Voting" << std::endl;
       string contractAddressNoSpace = contractAddress;
 
@@ -378,24 +378,28 @@ void EPuck_Environment_Classification::Explore() {
 				   contractAddressNoSpace.end());
 
 
+      cout << "contractaddressnospace is" << contractAddressNoSpace << endl;
+
       uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
       cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
       int args[2] = {opinion.actualOpinion / 2, opinionInt}; 
       string voteResult = smartContractInterface(robotId, interface, contractAddressNoSpace, "vote", args, 2);
       
+      cout << "voteResult is " << voteResult << endl;
+
       /* Save the transaction as raw transaciton in the robot's
 	 memory */
       rawTx = getRawTransaction(robotId, voteResult);
       
       int args2[0] = {};
       
-      // For debugging (show amoujt of white and black votes)
-      string numWhite = smartContractInterface(robotId, interface, contractAddressNoSpace, "whiteVotes", args2, 0);
-      string numBlack = smartContractInterface(robotId, interface, contractAddressNoSpace, "blackVotes", args2, 0);
+      // For debugging (show amount of white and black votes)
+      string numWhite = smartContractInterface(robotId, interface, contractAddressNoSpace, "wVotes", args2, 0);
+      string numBlack = smartContractInterface(robotId, interface, contractAddressNoSpace, "bVotes", args2, 0);
 
       cout << "Num white votes is: " << numWhite << "Num Black votes is: " << numBlack << endl;
       
-      }
+      //      }
 
 
     /* Assigning a new exploration time, for the next exploration state */
@@ -411,9 +415,10 @@ void EPuck_Environment_Classification::Explore() {
 
     cout << "Remaining diffusing time is: " << m_sStateData.remainingDiffusingTime << " and opinion is " << opinion.actualOpinion << endl;
 
-    /* TODO: simulationParams.decision_rule==2 added by volker check if correct!!! */
-    if(simulationParams.decision_rule==0 || simulationParams.decision_rule==2)
-      m_sStateData.remainingDiffusingTime = (m_pcRNG->Exponential(((Real)simulationParams.g)*((Real)simulationParams.percentRed)))+30;
+    /* TODO: simulationParams.decision_rule==2 added by volker check if correct!!! */ 
+    // TODO: check what the decision rules mean; add back constant time for direct modulation again
+    //    if(simulationParams.decision_rule==0 || simulationParams.decision_rule==2)
+    //      m_sStateData.remainingDiffusingTime = (m_pcRNG->Exponential(((Real)simulationParams.g)*((Real)simulationParams.percentRed)))+30;
 
     m_sStateData.diffusingDurationTime = m_sStateData.remainingDiffusingTime;
   }
@@ -473,7 +478,6 @@ void EPuck_Environment_Classification::Diffusing() {
        * prepare this variable before to send it. It has 4 Byte of datas
        */
       
-
       CCI_EPuckRangeAndBearingActuator::TData toSend;
 
       /* First Byte used for the opinion of the robot */
@@ -513,6 +517,7 @@ void EPuck_Environment_Classification::Diffusing() {
       for (it = currentNeighbors.begin(); it != currentNeighbors.end(); ++it) {
 	UInt8 i = *it;
 	std::string newTxHash = sendRawTransaction(i, rawTx);
+	cout << "rawTx is" << rawTx << endl;
 	cout << "Robot " << i << "txHash is: " << newTxHash << endl;
       }
 
@@ -538,7 +543,7 @@ void EPuck_Environment_Classification::Diffusing() {
       m_sStateData.diffusingDurationTime = m_sStateData.remainingDiffusingTime;
 
       /* Direct comparison without weighted diffusing time */
-      if(simulationParams.decision_rule==0)
+      if(simulationParams.decision_rule == 0 || simulationParams.decision_rule == 2)
 	m_sStateData.remainingDiffusingTime = (m_pcRNG->Exponential(((Real)simulationParams.g)*((Real)simulationParams.percentRed)))+30;
 
 

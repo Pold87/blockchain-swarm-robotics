@@ -99,6 +99,12 @@ private:
 	std::ofstream everyQualityFile;		// Flag: every robot writes his quality and his opinion, after each exploration state
 	std::ofstream oneRobotFile;			// Flag: just robot "ff0" (always present) writes his qualities after each exp. state
 	std::ofstream blockChainFile;			// Flag: Write blockchain information to file
+	std::ofstream blockChainWhiteVotes;			// Flag: Write blockchain information to file
+
+	std::ofstream blockChainBlackVotes;			// Flag: Write blockchain information to file
+
+	std::ofstream blockChainLast2Votes;			// Flag: Write blockchain information to file
+
 
 	/* Flags to decide if save or not the files */
 	bool everyTicksFileFlag;
@@ -155,6 +161,7 @@ private:
 	UInt32 g;
 	UInt32 sigma;
 	UInt32 decisionRule;
+	UInt32 miningDiff;
 
 	std::string baseDirLoop;
 	std::string dataDir;

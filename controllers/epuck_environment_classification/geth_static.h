@@ -45,6 +45,15 @@ std::string getCoinbase(int i);
 // Get blockchain length of robot i
 int getBlockChainLength(int i);
 
+// Get number of white votes
+int getWhiteVotes(int i);
+
+// Get number of black votes
+int getBlackVotes(int i);
+
+// Get last 2 votes
+int getLast2Votes(int i);
+
 // Send ether from robot i to address addr
 std::string sendEther(int i, std::string from, std::string to, int v);
 
