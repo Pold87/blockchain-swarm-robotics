@@ -543,7 +543,7 @@ void EPuck_Environment_Classification::Diffusing() {
       m_sStateData.diffusingDurationTime = m_sStateData.remainingDiffusingTime;
 
       /* Direct comparison without weighted diffusing time */
-      if(simulationParams.decision_rule==0)
+      if(simulationParams.decision_rule == 0 || simulationParams.decision_rule == 2)
 	m_sStateData.remainingDiffusingTime = (m_pcRNG->Exponential(((Real)simulationParams.g)*((Real)simulationParams.percentRed)))+30;
 
 

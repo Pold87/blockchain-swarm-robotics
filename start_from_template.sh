@@ -3,11 +3,12 @@ OUTFILE='experiments/epuck.argos'
 #BASEDIR='/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/'
 BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
 DATADIR='data/debug/'
-NUMROBOTS=(2)
-REPETITIONS=10
+NUMROBOTS=(10)
+REPETITIONS=5
 DECISIONRULE=2
-PERCENT_BLACKS=(10)
-MININGDIFF=100000
+PERCENT_BLACKS=(0 10 20 30 40 44 48)
+MININGDIFF=1000000
+
 
 mkdir -p $DATADIR
 ./change_difficulty.sh $MININGDIFF
