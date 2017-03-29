@@ -154,6 +154,10 @@ for (k in num.robots) {
     plot.exit.prob(df$difficulty, df$exit.probs,
                    xlab="Percentage white cells", ylab="Exit probability",
                    sprintf("exit_prob_d_%d.pdf", k))
+        plot.exit.prob.gg(df,
+                       xlab="Percentage white cells", ylab="Exit probability",
+                       "exit_prob_d_fake.pdf")
+    
     }
     } else {
     ## Import fake data
