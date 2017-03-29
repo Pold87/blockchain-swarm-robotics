@@ -4,18 +4,19 @@ library(plotrix)
 ## Settings
 trials.base <- "volker"
 
-use.fake.data <- TRUE
+use.fake.data <- FALSE
 
 report.dir <- "/home/volker/Dropbox/mypapers/technical_report_collective/img/"
-data.dir <- "blockchain-run/"
+data.dir <- "../data/first_good_run/"
 fake.data.dir <- "/home/volker/Documents/bc_collective/evaluation/"
 #setwd(data.dir)
 
 max.trials <- 45
 num.robots <- 10
-ground.truth <- "Blues"
+ground.truth <- "Blacks"
 tol4qualitative=c("#4477AA", "#117733", "#DDCC77", "#CC6677")
-difficulty <- c(52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96) # Make sure to match it with metastarter.sh
+#difficulty <- c(52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96) # Make sure to match it with metastarter.sh
+difficulty <- c(0) # Make sure to match it with metastarter.sh
 
 ## Plot function
 
@@ -62,15 +63,19 @@ dev.off()
 ### EXIT PROBABILITY ###
 ########################
 
-# As a funciton of the difficulty of the task, easy and difficult setup
+# As a function of the difficulty of the task, easy and difficult setup
 
 exit.probs <- c()
 ## Exit probability: As a function of difficulties
 if (!use.fake.data) {
-for (k in c(20, 100)) {    
+for (k in num.robots) {    
     for (d in difficulty) {
-        
-        trials.name <- sprintf("%s/exp_4_N%d_Percent%d", data.dir, k, d)    
+
+        ## For metastarter.sh
+        ##trials.name <- sprintf("%s/exp_4_N%d_Percent%d", data.dir, k, d)
+
+        ## For start_from_template.sh
+        trials.name <- sprintf("%s/num%d_black%d", data.dir, k, d)    
         successes <- c()
     
         ## For all trials
@@ -136,7 +141,7 @@ df <- data.frame(num.robots, exit.probs)
     df <- read.csv(paste0(fake.data.dir, "fake_N.csv"))
 }
 
-## Save in PDF
+## Save as PDF
 plot.exit.prob(df$num.robots, df$exit.probs,
                xlab="Number of robots in the swarm", ylab="Exit probability",
                "exit_prob_N.pdf")
@@ -217,8 +222,10 @@ plot.consensus.time(df$difficulty, df$consensus.time,
 ## Consensus time: As a function of the number of robots in the swarm
 if (!use.fake.data) {
 for (i in num.robots) {
+
+    ## For metastarter.sh
+    trials.name <- sprintf("%s_init_", trials.base, i)
     
-    trials.name <- sprintf("%s_init_", trials.base, i)    
     consensus.times <- c()
     
     ## For all trials
