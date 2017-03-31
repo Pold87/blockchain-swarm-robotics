@@ -42,10 +42,10 @@
 			       exitFlag="true"
 			       decision_rule="2"
 			       num_pack_saved="2"
-			       percent_red="56"
+			       percent_red="52"
 			       base_dir="/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/"
 			       interface_path="interface.txt"
-			       percent_blue="44"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
+			       percent_blue="48"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
 							  1 = Voter model; 2 = Direct comparison; 3 = Majority Rule-->
  
       </params>
@@ -60,9 +60,9 @@
           number_of_green_cells="0"
 	  number_of_blue_cells="0"
 	  using_percentage="true"
-          percent_red="56"
+          percent_red="52"
 	  exit="true"            
-	  percent_blue="44"
+	  percent_blue="48"
 	  percent_green="0"
 	  save_every_ticks="10"
 	  save_every_ticks_flag="true"
@@ -71,7 +71,7 @@
 	  save_every_robot_flag="true"
 	  save_every_quality_flag="true"
 	  save_global_stat_flag="true"
-	  radix="num10_black443"
+	  radix="num10_black485"
 	  number_of_robots="10"
 	  number_of_runs="1"
           number_of_qualities="2"
