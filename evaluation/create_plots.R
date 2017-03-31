@@ -10,7 +10,7 @@ use.fake.data <- FALSE
 
 
 report.dir <- "/home/volker/Dropbox/mypapers/technical_report_collective/img/"
-data.dir <- "../data/first_good_run/"
+data.dir <- "../data/debug/"
 fake.data.dir <- "/home/volker/Documents/bc_collective/evaluation/"
 
 #setwd(data.dir)
@@ -19,8 +19,15 @@ max.trials <- 45
 num.robots <- 10
 ground.truth <- "Blacks"
 tol4qualitative=c("#4477AA", "#117733", "#DDCC77", "#CC6677")
-#difficulty <- c(52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96) # Make sure to match it with metastarter.sh
-difficulty <- c(0) # Make sure to match it with metastarter.sh
+difficulty <- c(0, 10, 20, 30, 40) # Make sure to match it with metastarter.sh
+
+## Determines which measures should be evaulated, e.g., if an
+## experiment was run for determining the measures (consensus time,
+## exit probability) as a function of the number of robots in the
+## swarm
+do.difficulty <- TRUE
+do.number.of.robots <- FALSE
+do.initial.amount <- FALSE
 
 
 base_breaks_x <- function(x){
@@ -112,26 +119,69 @@ legend(x="bottomright", legend=c("BC strategy"),
 dev.off() 
 }
 
+## Plot conensus time
+plot.consensus.time.gg <- function(x, y, xlab, ylab, out.name) {
+
+    ## Save to PDF
+    ## TODO
+    print(head(df))
+    df[, 'strategy'] <- as.factor(df[, 'strategy'])
+    ylim(0, 1)
+    p <- ggplot(df, aes(x=difficulty, y=consensus.time, group=strategy)) +
+        geom_line(aes(colour = strategy), size=1.1) +
+        geom_point(aes(colour = strategy, shape = strategy), size=3) +
+        theme_classic() +
+        theme(axis.text=element_text(size=14, colour="gray35"),
+              axis.title=element_text(size=14, colour="gray35"),
+              axis.title.y = element_text(angle=0, margin = margin(r = -60, t = -60)),
+              panel.border = element_blank(),
+              panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank(),
+              axis.line = element_blank(),
+              axis.ticks.length=unit(-0.25, "cm"),
+              axis.ticks = element_line(colour = 'gray35'),
+              axis.text.x = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")),
+              axis.text.y = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")))  +
+        ylab(ylab) +
+        xlab(xlab) +
+        base_breaks_x(df$difficulty) +
+        base_breaks_y(df$consensus.time)
+#        coord_fixed(ratio = 1)
+
+    p <- direct.label(p, list(dl.trans(x=x-2.5, y=y+0.4), "last.qp"))
+    ggsave(paste0(report.dir, "ggplot_consensus.pdf"))
+    }
+
+
 
 ########################
 ### EXIT PROBABILITY ###
 ########################
 
 # As a function of the difficulty of the task, easy and difficult setup
+if (do.difficulty) {
 
-exit.probs <- c()
+E.Ns <- c()
+strategies <- c(2)
+strategy <- c()
 ## Exit probability: As a function of difficulties
 if (!use.fake.data) {
-for (k in num.robots) {    
-    for (d in difficulty) {
+
+    strategy <- c()
+    
+    for (s in strategies) {
+        for (k in num.robots) {    
+            for (d in difficulty) {
 
         ## For metastarter.sh
         ##trials.name <- sprintf("%s/exp_4_N%d_Percent%d", data.dir, k, d)
 
         ## For start_from_template.sh
+        ## TODO: should include the name of the strategy in the filename
         trials.name <- sprintf("%s/num%d_black%d", data.dir, k, d)    
         successes <- c()
-    
+        strategy <- c(strategy, s)
+                
         ## For all trials
         for (i in 1:max.trials) {
             f <- paste0(trials.name, i, ".RUNS")
@@ -147,23 +197,24 @@ for (k in num.robots) {
         ## E.N is the exit probability
         print(paste("num.trials is", length(successes)))
         print(paste("The exit probability is", mean(successes)))
-        exit.probs <- c(exit.probs, mean(successes))
+        E.Ns <- c(E.Ns, mean(successes))
+            }
+        }
     }
-    df <- data.frame(difficulty, exit.probs)
+    df <- data.frame(difficulty, E.Ns, strategy)
     ## Save as PDF
-    plot.exit.prob(df$difficulty, df$exit.probs,
+    plot.exit.prob(df$difficulty, df$E.Ns,
                    xlab="Percentage white cells", ylab="Exit probability",
                    sprintf("exit_prob_d_%d.pdf", k))
         plot.exit.prob.gg(df,
                        xlab="Percentage white cells", ylab="Exit probability",
                        "exit_prob_d_fake.pdf")
     
-    }
     } else {
     ## Import fake data
     df <- read.csv(paste0(fake.data.dir, "fake_d.csv"))
     ## Save as PDF
-    plot.exit.prob(df$difficulty, df$exit.probs,
+    plot.exit.prob(df$difficulty, df$E.Ns,
                    xlab="Percentage white cells", ylab="Exit probability",
                    "exit_prob_d_fake.pdf")
         plot.exit.prob.gg(df,
@@ -171,7 +222,10 @@ for (k in num.robots) {
                        "exit_prob_d_fake.pdf")
     }
 
+}
+    
 
+if (do.number.of.robots) {
 ## Exit probability: As a function of the number of robots
 if (!use.fake.data) {
 for (i in num.robots) {
@@ -242,33 +296,51 @@ df <- data.frame(num.robots, exit.probs)
 plot.exit.prob(df$num.robots, df$exit.probs,
                xlab="Initial number of robots favoring black", ylab="Exit probability",
                "exit_prob_init.pdf")
-
+}
+    
 ######################
 ### CONSENSUS TIME ###
 ######################
 
+strategies <- c(2)
+strategy <- c()
 
 ## Consensus time: As a function of the difficulty of the task
+if (do.difficulty) {
 if (!use.fake.data) {
-for (d in difficulty) {
+
+    consensus.time <- c()
+    strategy <- c()
+    for (s in strategies) {
+        for (d in difficulty) {
+            for (k in num.robots) {    
     
-    trials.name <- sprintf("%s_red%d_blue%d", trials.base, d, 100 - d)    
-    successes <- c()
+                trials.name <- sprintf("%s/num%d_black%d", data.dir, k, d)    
+                successes <- c()
+                consensus.times <- c()
+
+                strategy <- c(strategy, s)
+                
+                ## For all trials
+                for (i in 1:max.trials) {
+                    f <- paste0(trials.name, i, ".RUNS")
+                    if (file.exists(f)) {
+                        X <- read.table(f, header=T)
+                        consensus.times <- c(consensus.times, X[1, "ExitTime"]) 
+                    }
+                }
+
+                print(paste("The consensus time is", median(consensus.times)))
+                consensus.time <- c(consensus.time, median(consensus.times))
     
-    ## For all trials
-    for (i in 1:max.trials) {
-        f <- paste0(trials.name, i, ".RUNS")
-        if (file.exists(f)) {
-            X <- read.table(f, header=T)
-            consensus.times <- c(consensus.times, X[1, clock]) 
+            }
         }
     }
 
-    print(paste("The consensus time is", median(consensus.times)))
-    consensus.time <- c(consensus.time, median(consensus.times))
-    
-}
-df <- data.frame(difficulty, consensus.time)
+    print(difficulty)
+    print(consensus.time)
+    print(strategy)
+df <- data.frame(difficulty, consensus.time, strategy)
 } else {
     ## Import fake data
     df <- read.csv(paste0(fake.data.dir, "fake_d_consensustime.csv"))
@@ -279,9 +351,21 @@ plot.consensus.time(df$difficulty, df$consensus.time,
        xlab="Percentage white cells", ylab="Consensus time",
        "consensustime_d.pdf")
 
+plot.consensus.time.gg(df$difficulty, df$consensus.time,
+       xlab="Percentage white cells", ylab="Consensus time",
+       "consensustime_d_gg.pdf")
+
+
+}
+
+
 
 ## Consensus time: As a function of the number of robots in the swarm
+if (do.number.of.robots) {
 if (!use.fake.data) {
+
+    consensus.time <- c()
+    
 for (i in num.robots) {
 
     ## For metastarter.sh
@@ -294,7 +378,7 @@ for (i in num.robots) {
         f <- paste0(trials.name, i, ".RUNS")
         if (file.exists(f)) {
             X <- read.table(f, header=T)
-            consensus.times <- c(consensus.times, X[1, clock])
+            consensus.times <- c(consensus.times, X[1, "ExitTime"])
         }
     }
     print(paste("The consensus time is", median(consensus.times)))
@@ -311,10 +395,16 @@ plot.consensus.time(df$num.robots, df$consensus.time,
        xlab="Number of robots", ylab="Consensus time",
        "consensustime_N.pdf")
 
+}
+
 
 ## Consensus time: As a function of the initial amount of robot favoring opinion black
+if (do.initial.amount) {
 if (!use.fake.data) {
-for (i in num.robots) {
+
+    consensus.time <- c()
+    
+    for (i in num.robots) {
     
     trials.name <- sprintf("%s_init_", trials.base, i)    
     consensus.times <- c()
@@ -324,7 +414,7 @@ for (i in num.robots) {
         f <- paste0(trials.name, i, ".RUNS")
         if (file.exists(f)) {
             X <- read.table(f, header=T)
-            consensus.times <- c(consensus.times, X[1, clock])
+            consensus.times <- c(consensus.times, X[1, "ExitTime"])
         }
     }
     print(paste("The consensus time is", median(consensus.times)))
@@ -340,3 +430,5 @@ df <- data.frame(num.robots, consensus.time)
 plot.consensus.time(df$num.robots, df$consensus.time,
        xlab="Initial Number of robots favoring black", ylab="Consensus time",
        "consensustime_init.pdf")
+
+}
