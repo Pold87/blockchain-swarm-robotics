@@ -366,43 +366,32 @@ void EPuck_Environment_Classification::Explore() {
     receivedOpinions.clear();
     collectedData.count = 1;
     m_sStateData.State = SStateData::STATE_DIFFUSING;
+    
 
+    cout << "contract address is" << contractAddress << endl;
 
-    // TODO: Check if needed
-    //    if (simulationParams.decision_rule == 2 || simulationParams.decision_rule == 3) {
-      cout << "Direct Modulation OR Majority Voting" << std::endl;
-      string contractAddressNoSpace = contractAddress;
-
-      contractAddressNoSpace.erase(std::remove(contractAddressNoSpace.begin(), 
-					       contractAddressNoSpace.end(), '\n'),
-				   contractAddressNoSpace.end());
-
-
-      cout << "contractaddressnospace is" << contractAddressNoSpace << endl;
-
-      uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
-      cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
-      int args[2] = {opinion.actualOpinion / 2, opinionInt}; 
-      string voteResult = smartContractInterface(robotId, interface, contractAddressNoSpace, "vote", args, 2);
-      
-      cout << "voteResult is " << voteResult << endl;
-
-      /* Save the transaction as raw transaciton in the robot's
-	 memory */
-      rawTx = getRawTransaction(robotId, voteResult);
-      
-      int args2[0] = {};
-      
-      // For debugging (show amount of white and black votes)
-      string numWhite = smartContractInterface(robotId, interface, contractAddressNoSpace, "wVotes", args2, 0);
-      string numBlack = smartContractInterface(robotId, interface, contractAddressNoSpace, "bVotes", args2, 0);
-
-      cout << "Num white votes is: " << numWhite << "Num Black votes is: " << numBlack << endl;
-      
-      //      }
-
-
+    uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
+    cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
+    int args[2] = {opinion.actualOpinion / 2, opinionInt}; 
+    string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2);
+    
+    cout << "voteResult is " << voteResult << endl;
+    
+    /* Save the transaction as raw transaciton in the robot's
+       memory */
+    rawTx = getRawTransaction(robotId, voteResult);
+    
+    int args2[0] = {};
+    
+    // For debugging (show amount of white and black votes)
+    string numWhite = smartContractInterface(robotId, interface, contractAddress, "wVotes", args2, 0);
+    string numBlack = smartContractInterface(robotId, interface, contractAddress, "bVotes", args2, 0);
+    
+    cout << "Num white votes is: " << numWhite << "Num Black votes is: " << numBlack << endl;
+    
+    
     /* Assigning a new exploration time, for the next exploration state */
+    
     m_sStateData.remainingExplorationTime = Ceil(m_pcRNG->Exponential((Real)simulationParams.sigma));
     m_sStateData.explorDurationTime = m_sStateData.remainingExplorationTime;
 
@@ -411,14 +400,23 @@ void EPuck_Environment_Classification::Explore() {
      * direct comparison then the next diffusing time is weighted with the ideal quality of the best opinion
      */
 
-    m_sStateData.remainingDiffusingTime = Ceil(m_pcRNG->Exponential((Real)simulationParams.g*(Real)opinion.quality)+30);
+    if (simulationParams.decision_rule == 2) {
+
+      m_sStateData.remainingDiffusingTime = (m_pcRNG->Exponential(((Real)simulationParams.g)*((Real)simulationParams.percentRed)))+30;
+
+    } else if (simulationParams.decision_rule == 1 || simulationParams.decision_rule == 3) {
+
+      m_sStateData.remainingDiffusingTime = Ceil(m_pcRNG->Exponential((Real)simulationParams.g*(Real)opinion.quality)+30);
+
+    } else {
+
+      /* Non-implemented decision rule */
+      cout << "Unknown decision rule" << endl;
+      throw;
+
+    }
 
     cout << "Remaining diffusing time is: " << m_sStateData.remainingDiffusingTime << " and opinion is " << opinion.actualOpinion << endl;
-
-    /* TODO: simulationParams.decision_rule==2 added by volker check if correct!!! */ 
-    // TODO: check what the decision rules mean; add back constant time for direct modulation again
-    //    if(simulationParams.decision_rule==0 || simulationParams.decision_rule==2)
-    //      m_sStateData.remainingDiffusingTime = (m_pcRNG->Exponential(((Real)simulationParams.g)*((Real)simulationParams.percentRed)))+30;
 
     m_sStateData.diffusingDurationTime = m_sStateData.remainingDiffusingTime;
   }
@@ -449,24 +447,29 @@ void EPuck_Environment_Classification::Diffusing() {
 	IC.senderID = tPackets[i]->Data[3];
       
 	/* Update Ethereum neighbors */
-	currentNeighbors.insert(IC.senderID);   
+	currentNeighbors.insert(IC.senderID);   	
+
+	/* Listen to other opinions */
+	/* In my implementation, robots in the diffusing state are
+	   connected with each other; since the blockchain is a
+	   bilateral protocol and one cannot only receive but not send
+	   or vice versa */
+	UpdateNeighbors(currentNeighbors);
       
     } 
 
 
-      /* In the 3 lasts seconds (30 ticks) the robot starts listening other opinions
-       * and diffusing his own opinion, quality and ID */
+      /* In the 3 lasts seconds (30 ticks) the robot starts listening to other opinions
+       * and diffusing its own opinion, quality and ID */
       if(  m_sStateData.remainingDiffusingTime < 30 )
 	{
-	  /* Listen to other opinions */
-	  UpdateNeighbors(currentNeighbors);
 
-	  if (!mining) {
-	    cout << " START MINING -- robot" << robotId << endl;
-	    mining = true;
-	    start_mining(robotId, 1);     	    
-	  }    
-	  
+	if (!mining) {
+	  cout << " START MINING -- robot" << robotId << endl;
+	  mining = true;
+	  start_mining(robotId, 1);     	    
+	}    
+		  
 	}
 
       /* LEDS must be lighted with intermittence in diffusing state */
@@ -511,16 +514,42 @@ void EPuck_Environment_Classification::Diffusing() {
       m_pcRABA->SetData(toSend);
 
       /* Send opinion via Ethereum */
-     
-      /* Send transaction to all neighbors */
-      std::set<UInt8>::iterator it;
-      for (it = currentNeighbors.begin(); it != currentNeighbors.end(); ++it) {
-	UInt8 i = *it;
-	std::string newTxHash = sendRawTransaction(i, rawTx);
-	cout << "rawTx is" << rawTx << endl;
-	cout << "Robot " << i << "txHash is: " << newTxHash << endl;
-      }
 
+      if (simulationParams.decision_rule == 2) {
+	/* Send transaction to all neighbors */
+	/* TODO: I should check if this rule coul;d be really
+	   implemented with real robots in a p2p way */
+
+	std::set<UInt8>::iterator it;
+	for (it = currentNeighbors.begin(); it != currentNeighbors.end(); ++it) {
+	  UInt8 i = *it;
+	  std::string newTxHash = sendRawTransaction(i, rawTx);
+	  cout << "rawTx is" << rawTx << endl;
+	  cout << "Robot " << i << "txHash is: " << newTxHash << endl;
+	}
+      } else if (simulationParams.decision_rule == 3) {
+
+	/* Create a transaction in each time step */    
+	
+	uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
+	cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
+	int args[2] = {opinion.actualOpinion / 2, opinionInt}; 
+	string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2);
+	
+	cout << "voteResult is " << voteResult << endl;
+
+	
+      } else if (simulationParams.decision_rule == 4) {
+
+	/* Switch blockchain versions, i.e., mine on a different
+	   blockchain */
+	throw;
+
+      } else {
+
+	throw;
+
+      }
 
       m_sStateData.remainingDiffusingTime--;
 
@@ -581,16 +610,9 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
 
   int robotId = Id2Int(GetId());
 
-  string contractAddressNoSpace = contractAddress;
-
-  contractAddressNoSpace.erase(std::remove(contractAddressNoSpace.begin(), 
-					   contractAddressNoSpace.end(), '\n'),
-			       contractAddressNoSpace.end());
-
-
   uint opinionInt = (uint) (opinion.quality * 100);
   int args[4] = {decision_rule, opinion.actualOpinion / 2, opinionInt, simulationParams.numPackSaved};
-  string sNewOpinion = smartContractInterface(robotId, interface, contractAddressNoSpace, "applyStrategy", args, 4);
+  string sNewOpinion = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 4);
   int newOpinion = atoi(sNewOpinion.c_str());
   opinion.actualOpinion = newOpinion * 2; // Is implemented as 0 and 1 in the smart contract
   
