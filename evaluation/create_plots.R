@@ -19,7 +19,7 @@ max.trials <- 45
 num.robots <- 10
 ground.truth <- "Blacks"
 tol4qualitative=c("#4477AA", "#117733", "#DDCC77", "#CC6677")
-difficulty <- c(0, 10, 20, 30, 40) # Make sure to match it with metastarter.sh
+difficulty <- c(0, 10, 20, 30, 40, 44, 48) # Make sure to match it with metastarter.sh
 
 ## Determines which measures should be evaulated, e.g., if an
 ## experiment was run for determining the measures (consensus time,

@@ -832,20 +832,22 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 
 		    /* Number of white votes per robot */
 
-		    string numWhite = smartContractInterface(robotId, interface, contractAddressNoSpace, "whiteVotes", args, 0);
+		    string numWhite = smartContractInterface(robotId, interface, contractAddressNoSpace, "whiteVotes", args, 0, 0);
 		    numWhite.erase(std::remove(numWhite.begin(), numWhite.end(), '\n'), numWhite.end());
 		    blockChainWhiteVotes << "\t" << numWhite;
 
 		    /* Number of black votes per robot */
-		    string numBlack = smartContractInterface(robotId, interface, contractAddressNoSpace, "blackVotes", args, 0);
+		    string numBlack = smartContractInterface(robotId, interface, contractAddressNoSpace, "blackVotes", args, 0, 0);
 		    numBlack.erase(std::remove(numBlack.begin(), numBlack.end(), '\n'), numBlack.end());
 		    blockChainBlackVotes << "\t" << numBlack;
 
 
 		    /* Last 2 votes per robot */
-		    string last2Votes = smartContractInterface(robotId, interface, contractAddressNoSpace, "last2Votes", args, 0);
-		    last2Votes.erase(std::remove(last2Votes.begin(), last2Votes.end(), '\n'), last2Votes.end());
-		    blockChainLast2Votes << "\t" << last2Votes;
+		    string lastVote = smartContractInterface(robotId, interface, contractAddressNoSpace, "returnLast", args, 0, 0);
+		    string secondToLastVote = smartContractInterface(robotId, interface, contractAddressNoSpace, "returnSecondToLast", args, 0, 0);
+		    lastVote.erase(std::remove(lastVote.begin(), lastVote.end(), '\n'), lastVote.end());
+		    secondToLastVote.erase(std::remove(secondToLastVote.begin(), secondToLastVote.end(), '\n'), secondToLastVote.end());
+		    blockChainLast2Votes << "\t[" << lastVote << ";" << secondToLastVote << "]";
 
 
 		  }

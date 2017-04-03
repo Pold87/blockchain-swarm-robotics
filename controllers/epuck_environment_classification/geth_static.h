@@ -61,7 +61,7 @@ std::string sendEther(int i, std::string from, std::string to, int v);
 std::string load_contract(int i, std::string contractName, std::string contractAddress, std::string contractInterface);
 
 // Interact with a generic smart contract
-std::string smartContractInterface(int i, std::string interface, std::string contractAddress, std::string func, int args[], int argc);
+std::string smartContractInterface(int i, std::string interface, std::string contractAddress, std::string func, int args[], int argc, int v);
 
 /* Unlock account */
 std::string unlockAccount(int i, std::string pw);

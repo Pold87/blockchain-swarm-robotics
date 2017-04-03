@@ -372,8 +372,8 @@ void EPuck_Environment_Classification::Explore() {
 
     uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
     cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
-    int args[2] = {opinion.actualOpinion / 2, opinionInt}; 
-    string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2);
+    int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
+    string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt);
     
     cout << "voteResult is " << voteResult << endl;
     
@@ -384,8 +384,8 @@ void EPuck_Environment_Classification::Explore() {
     int args2[0] = {};
     
     // For debugging (show amount of white and black votes)
-    string numWhite = smartContractInterface(robotId, interface, contractAddress, "wVotes", args2, 0);
-    string numBlack = smartContractInterface(robotId, interface, contractAddress, "bVotes", args2, 0);
+    string numWhite = smartContractInterface(robotId, interface, contractAddress, "wVotes", args2, 0, 0);
+    string numBlack = smartContractInterface(robotId, interface, contractAddress, "bVotes", args2, 0, 0);
     
     cout << "Num white votes is: " << numWhite << "Num Black votes is: " << numBlack << endl;
     
@@ -533,8 +533,8 @@ void EPuck_Environment_Classification::Diffusing() {
 	
 	uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
 	cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
-	int args[2] = {opinion.actualOpinion / 2, opinionInt}; 
-	string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2);
+	int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
+	string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt);
 	
 	cout << "voteResult is " << voteResult << endl;
 
@@ -612,7 +612,7 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
 
   uint opinionInt = (uint) (opinion.quality * 100);
   int args[4] = {decision_rule, opinion.actualOpinion / 2, opinionInt, simulationParams.numPackSaved};
-  string sNewOpinion = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 4);
+  string sNewOpinion = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 4, 0);
   int newOpinion = atoi(sNewOpinion.c_str());
   opinion.actualOpinion = newOpinion * 2; // Is implemented as 0 and 1 in the smart contract
   

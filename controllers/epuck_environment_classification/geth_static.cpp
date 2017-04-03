@@ -373,10 +373,12 @@ std::string kill_geth_thread(int i) {
   
 }
 
+// Interact with a function of a smart contract
+// v: Amount of wei to send
 std::string smartContractInterface(int i, string interface, string contractAddress,
- 				  string func, int args[], int argc) {
+				   string func, int args[], int argc, int v) {
   
-
+  
    ostringstream fullCommandStream;
 
    fullCommandStream << "var cC = web3.eth.contract(" << interface << ");var c = cC.at(" << contractAddress << ");c." << func << "(";
@@ -386,7 +388,7 @@ std::string smartContractInterface(int i, string interface, string contractAddre
      fullCommandStream << args[k] << ",";  
    }
 
-   fullCommandStream << "{from: eth.coinbase, gas: '1000000'});";
+   fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '1000000'});";
    
   
    std::string fullCommand = fullCommandStream.str();
