@@ -194,6 +194,13 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
 
   } while (u < maxContractAddressTrials && contractAddress.find("TypeError") == 0);
 
+
+  /* Remove space in contract address */
+  contractAddress.erase(std::remove(contractAddress.begin(), 
+				    contractAddress.end(), '\n'),
+			contractAddress.end());
+
+
   std::string minerAddress = getCoinbase(minerId);
 
   /* Set the address of the deployed contract in each robot */

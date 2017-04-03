@@ -332,7 +332,7 @@ std::string getContractAddress(int i, std::string txHash) {
 std::string unlockAccount(int i, std::string pw) {
     std::ostringstream fullCommandStream;
 
-  fullCommandStream << "personal.unlockAccount(eth.coinbase, \"" << pw << "\", 50000)";
+  fullCommandStream << "personal.unlockAccount(eth.coinbase, \"" << pw << "\", 0)";
   
   string cmd = fullCommandStream.str();
   string res = exec_geth_cmd(i, cmd);
