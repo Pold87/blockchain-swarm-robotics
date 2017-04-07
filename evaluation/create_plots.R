@@ -3,10 +3,11 @@
 library(ggplot2)
 library(ggthemes)
 library(directlabels)
+library(grid)
 ## Settings
 trials.base <- "volker"
 
-use.fake.data <- FALSE
+use.fake.data <- TRUE
 
 
 report.dir <- "/home/volker/Dropbox/mypapers/technical_report_collective/img/"
@@ -70,34 +71,37 @@ dev.off()
 
 plot.exit.prob.gg <- function(df, xlab, ylab, out.name) {
 
-    ## Save to PDF
-    ## TODO
-    print(head(df))
     df[, 'strategy'] <- as.factor(df[, 'strategy'])
-    ylim(0, 1)
     p <- ggplot(df, aes(x=difficulty, y=E.Ns, group=strategy)) +
         geom_line(aes(colour = strategy), size=1.1) +
         geom_point(aes(colour = strategy, shape = strategy), size=3) +
         theme_classic() +
-        theme(axis.text=element_text(size=14, colour="gray35"),
-              axis.title=element_text(size=14, colour="gray35"),
-              axis.title.y = element_text(angle=0, margin = margin(r = -60, t = -60)),
-              panel.border = element_blank(),
-              panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank(),
-              axis.line = element_blank(),
+        theme(axis.text=element_text(size=17, colour="gray25"),
+              axis.title=element_text(size=17, colour="gray25"),
+              axis.title.y = element_text(angle=0, margin = margin(r = -80), vjust=1.01),
+              axis.line = element_blank(),              
               axis.ticks.length=unit(-0.25, "cm"),
-              axis.ticks = element_line(colour = 'gray35'),
+              axis.ticks = element_line(colour = 'gray25'),
               axis.text.x = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")),
               axis.text.y = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")))  +
         ylab(ylab) +
         xlab(xlab) +
-        base_breaks_x(df$difficulty) +
-        base_breaks_y(df$E.Ns) +
-        coord_fixed(ratio = 1)
 
-    p <- direct.label(p, list(dl.trans(x=x-2.5, y=y+0.4), "last.qp"))
-    ggsave(paste0(report.dir, "ggplot.pdf"))
+    base_breaks_x(seq(0.5, 1, 0.1)) + 
+    base_breaks_y(seq(0.4, 1, 0.1)) + 
+        
+    expand_limits(x = 1.05)
+
+    p <- direct.label(p, list(dl.trans(x=x+0.2, y=y),
+                              list("last.qp", cex=1.4)))
+
+    ## Code to turn off clipping
+    gt1 <- ggplotGrob(p)
+    gt1$layout$clip[gt1$layout$name == "panel"] <- "off"
+    grid.draw(gt1)
+        
+    #p <- direct.label(p, "last.qp")
+    ggsave(paste0(report.dir, "ggplot_exit.pdf"))
     }
 
 
@@ -120,35 +124,40 @@ dev.off()
 }
 
 ## Plot conensus time
-plot.consensus.time.gg <- function(x, y, xlab, ylab, out.name) {
+plot.consensus.time.gg <- function(df, xlab, ylab, out.name) {
 
-    ## Save to PDF
-    ## TODO
-    print(head(df))
     df[, 'strategy'] <- as.factor(df[, 'strategy'])
-    ylim(0, 1)
-    p <- ggplot(df, aes(x=difficulty, y=consensus.time, group=strategy)) +
+    p <- ggplot(df, aes(x=Ea0, y=consensus.time / 10, group=strategy)) +
         geom_line(aes(colour = strategy), size=1.1) +
         geom_point(aes(colour = strategy, shape = strategy), size=3) +
         theme_classic() +
-        theme(axis.text=element_text(size=14, colour="gray35"),
-              axis.title=element_text(size=14, colour="gray35"),
+        theme(axis.text=element_text(size=17, colour="gray15"),
+              axis.title=element_text(size=17, colour="gray15"),
               axis.title.y = element_text(angle=0, margin = margin(r = -60, t = -60)),
               panel.border = element_blank(),
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank(),
               axis.line = element_blank(),
               axis.ticks.length=unit(-0.25, "cm"),
-              axis.ticks = element_line(colour = 'gray35'),
+              axis.ticks = element_line(colour = 'gray15'),
               axis.text.x = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")),
               axis.text.y = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")))  +
         ylab(ylab) +
-        xlab(xlab) +
-        base_breaks_x(df$difficulty) +
-        base_breaks_y(df$consensus.time)
-#        coord_fixed(ratio = 1)
+        xlab(xlab) + 
+        base_breaks_x(seq(0, 20, 5)) +
+        base_breaks_y(seq(0, 20, 5)) + expand_limits(x=25)
 
-    p <- direct.label(p, list(dl.trans(x=x-2.5, y=y+0.4), "last.qp"))
+
+    p <- direct.label(p, list(dl.trans(x=x+0.2, y=y),
+                              list("last.qp", cex=1.0)))
+    
+   # p <- direct.label(p, list(dl.trans(x=x-2.5, y=y+0.4), "last.qp"))
+
+    ## Code to turn off clipping
+    gt1 <- ggplotGrob(p)
+    gt1$layout$clip[gt1$layout$name == "panel"] <- "off"
+    grid.draw(gt1)
+    
     ggsave(paste0(report.dir, "ggplot_consensus.pdf"))
     }
 
@@ -206,20 +215,20 @@ if (!use.fake.data) {
     plot.exit.prob(df$difficulty, df$E.Ns,
                    xlab="Percentage white cells", ylab="Exit probability",
                    sprintf("exit_prob_d_%d.pdf", k))
-        plot.exit.prob.gg(df,
-                       xlab="Percentage white cells", ylab="Exit probability",
-                       "exit_prob_d_fake.pdf")
+    plot.exit.prob.gg(df,
+                      xlab="Percentage white cells", ylab="Exit probability",
+                      "exit_prob_d_fake.pdf")
     
     } else {
     ## Import fake data
-    df <- read.csv(paste0(fake.data.dir, "fake_d.csv"))
+    df <- read.csv(paste0(fake.data.dir, "fake_python.csv"))
     ## Save as PDF
     plot.exit.prob(df$difficulty, df$E.Ns,
                    xlab="Percentage white cells", ylab="Exit probability",
                    "exit_prob_d_fake.pdf")
-        plot.exit.prob.gg(df,
-                       xlab="Percentage white cells", ylab="Exit probability",
-                       "exit_prob_d_fake.pdf")
+    plot.exit.prob.gg(df,
+                      xlab=expression(paste("Problem difficulty (", rho["w"]^'*', ")")), ylab=expression(paste("Exit probability (EN)")),
+                      "exit_prob_d_fake.pdf")
     }
 
 }
@@ -343,17 +352,17 @@ if (!use.fake.data) {
 df <- data.frame(difficulty, consensus.time, strategy)
 } else {
     ## Import fake data
-    df <- read.csv(paste0(fake.data.dir, "fake_d_consensustime.csv"))
+    df <- read.csv(paste0(fake.data.dir, "fake_python_cons.csv"))
 }
 
 ## Save in PDF
-plot.consensus.time(df$difficulty, df$consensus.time,
-       xlab="Percentage white cells", ylab="Consensus time",
-       "consensustime_d.pdf")
+#plot.consensus.time(df$difficulty, df$consensus.time,
+#       xlab="Percentage white cells", ylab="Consensus time",
+#       "consensustime_d.pdf")
 
-plot.consensus.time.gg(df$difficulty, df$consensus.time,
-       xlab="Percentage white cells", ylab="Consensus time",
-       "consensustime_d_gg.pdf")
+plot.consensus.time.gg(df,
+                       xlab=expression("Initial number of robots with opinion w: E[a](0)"), ylab="Consensus time (T[N] / 10)",
+                       "consensustime_d_gg.pdf")
 
 
 }
