@@ -40,12 +40,12 @@
 			       turn="45"
 			       lamda="100"
 			       exitFlag="true"
-			       decision_rule="2"
+			       decision_rule="1"
 			       num_pack_saved="2"
-			       percent_red="52"
+			       percent_red="66"
 			       base_dir="/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/"
 			       interface_path="interface.txt"
-			       percent_blue="48"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
+			       percent_blue="34"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
 							  1 = Voter model; 2 = Direct comparison; 3 = Majority Rule-->
  
       </params>
@@ -56,13 +56,13 @@
 
   <cells  number_of_red_cells="0"
 	  base_dir_loop="/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/"
-	  data_dir="data/debug/"
+	  data_dir="data/decision_rule_1_eth_weighted/"
           number_of_green_cells="0"
 	  number_of_blue_cells="0"
 	  using_percentage="true"
-          percent_red="52"
+          percent_red="66"
 	  exit="true"            
-	  percent_blue="48"
+	  percent_blue="34"
 	  percent_green="0"
 	  save_every_ticks="10"
 	  save_every_ticks_flag="true"
@@ -71,7 +71,7 @@
 	  save_every_robot_flag="true"
 	  save_every_quality_flag="true"
 	  save_global_stat_flag="true"
-	  radix="num10_black485"
+	  radix="num10_black341"
 	  number_of_robots="10"
 	  number_of_runs="1"
           number_of_qualities="2"
@@ -84,7 +84,7 @@
 	  lamda="100"
 	  turn="45"
 	  miningdiff="1000000"
-	  decision_rule="2"/>
+	  decision_rule="1"/>
 
   </loop_functions>
   <!-- *********************** -->

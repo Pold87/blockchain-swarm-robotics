@@ -527,7 +527,7 @@ void EPuck_Environment_Classification::Diffusing() {
 	  cout << "rawTx is" << rawTx << endl;
 	  cout << "Robot " << i << "txHash is: " << newTxHash << endl;
 	}
-      } else if (simulationParams.decision_rule == 3) {
+      } else if (simulationParams.decision_rule == 1 || simulationParams.decision_rule == 3) {
 
 	/* Create a transaction in each time step */    
 	
