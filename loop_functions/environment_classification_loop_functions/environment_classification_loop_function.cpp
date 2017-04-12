@@ -29,7 +29,7 @@ m_pcFloor(NULL)
 
 using namespace std;
 
-static const int minerId = 100; /* ID of the miner (TODO: set in config file) */
+static const int minerId = 110; /* ID of the miner (TODO: set in config file) */
 static const int maxTime = 1000; /* Maximum amount of time per robot to wait until
 		       they received their ether */
 static const int maxContractAddressTrials = 100; /* Repeats getting the contract address procedure (sometimes the first result is a TypeError */
@@ -118,6 +118,7 @@ void CEnvironmentClassificationLoopFunctions::CheckEtherReceived() {
       if (t == maxTime - 1) {
 	cout << "CEnvironmentClassificationLoopFunctions::Init: Maximum time reached for waiting that each robots receives its ether.Exiting." << std::endl;
 	exec("killall geth");
+	exec("bash killblockchainallccall");
 	throw;
       }
     } 
@@ -158,13 +159,6 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
   /* Change mining difficulty and rebuild geth */
 
   std::ostringstream fullCommandStream;
-  //  cout << "Changing mining difficulty" << endl;
-  //system("pwd");
-  //exec("pwd");
-  //fullCommandStream << "./change_difficulty.sh" << " " << miningDiff;
-  //string cmd = fullCommandStream.str();
-  //string res = exec(cmd.c_str());
-  //cout << res << endl;
 
   /* Initialize the miner */
   geth_init(minerId);
@@ -173,7 +167,10 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
   unlockAccount(minerId, "test");
   start_mining(minerId, 12);	
   
+  std::string minerAddress = getCoinbase(minerId);
 
+  sleep(20); 
+  
   /* Deploy contract */  
 
   //  string contractPath = baseDirLoop + "deploy_contract.txt";
@@ -200,8 +197,6 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
 				    contractAddress.end(), '\n'),
 			contractAddress.end());
 
-
-  std::string minerAddress = getCoinbase(minerId);
 
   /* Set the address of the deployed contract in each robot */
   setContractAddressAndDistributeEther(contractAddress, minerAddress);
@@ -452,6 +447,7 @@ void CEnvironmentClassificationLoopFunctions::Reset() {
 
   /* Blockchain related */
   exec("killall geth");
+  exec("bash killblockchainallccall");
   system("rm -rf ~/Documents/eth_data/*");     
 
   /* Simulation related */
@@ -659,6 +655,8 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 				m_bExperimentFinished = true;
 
 				exec("killall geth");
+				exec("bash killblockchainallccall");
+				
 
 				
 			}

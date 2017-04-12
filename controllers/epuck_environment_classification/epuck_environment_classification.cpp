@@ -22,9 +22,14 @@
 using namespace std;
 
 map<int, string> enodes;
+map<string, string> ips;
 map<int, string> coinbaseAddresses;
 string interface; // Smart contract interface
-
+int usedRack = 3;
+int numNodes = 7;
+//vector<string> usedNodes = {"c3-0", "c3-1", "c3-2", "c3-3", "c3-4", "c3-5", "c3-6"};
+string username = "vstrobel";
+  
 
 EPuck_Environment_Classification::SNeighborData::SNeighborData() :
   neighbors(set<UInt8>()) {}
@@ -77,6 +82,7 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "num_pack_saved", numPackSaved);
     GetNodeAttribute(t_node, "base_dir", baseDir);
     GetNodeAttribute(t_node, "interface_path", interfacePath);
+    GetNodeAttribute(t_node, "use_multiple_nodes", useMultipleNodes);
   }
   catch(CARGoSException& ex) {
     THROW_ARGOSEXCEPTION_NESTED("Error initializing controller state parameters.", ex);
@@ -136,12 +142,40 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
   int robotId = Id2Int(GetId());
 
   if (robotId == 0) {
-    system("killall geth");     
+
+    exec("bash killblockchainallccall");
+
+    if (simulationParams.useMultipleNodes) {
+      for (int v = 0; v < numNodes; v++) {
+
+	ostringstream fullCommandStream;
+
+	fullCommandStream << "ssh " << username << "@c" << usedRack << "-" << v << " killall geth";
+	
+	std::string fullCommand = fullCommandStream.str();
+
+	string res = exec(fullCommand.c_str());
+
+	cout << "received: " << res;
+	
+      }      
+    } else {
+      system("killall geth");
+    }
     system("rm -rf ~/Documents/eth_data/*");     
     interface = readStringFromFile(simulationParams.baseDir + simulationParams.interfacePath);
-  }
+    }
  
-   
+
+  /* Find out on which cluster node this robot's geth process should be executed */
+  string node = getNode(robotId);
+  /* Resolve the hostname to its ip */
+  string ip = hostname2ip(node);
+  /* Save the mapping from node to ip */
+  ips[node] = ip;
+
+  cout << "The node is: " << node << " and the ip is: " << ip << endl;
+  
   geth_init(robotId);
   start_geth(robotId);
   createAccount(robotId);   

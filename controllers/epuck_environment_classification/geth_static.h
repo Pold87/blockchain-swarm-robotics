@@ -4,6 +4,12 @@ uint Id2Int(std::string id);
 
 bool replace(std::string& str, const std::string& from, const std::string& to);
 
+std::string replaceAll(std::string subject, const std::string& search,
+		  const std::string& replace);
+
+void ReplaceStringInPlace(std::string& subject, const std::string& search,
+                          const std::string& replace);
+
 std::string exec_geth_cmd(int i, std::string command);
 
 // Execute a command line command and return the result as string
@@ -80,11 +86,14 @@ std::string deploy_contract(int i, std::string interfacePath, std::string dataPa
 /* Check account balance of robot i (in wei)*/
 int check_balance(int i);
 
-
 /* Get the raw transaction based on the tx hash */
 std::string getRawTransaction(int i, std::string txHash);
 
 /* Send raw transaction and include it in the tx pool */
 std::string sendRawTransaction(int i, std::string rawTx);
 
+/* Find out on which node the geth process of a robot i is executed */
+std::string getNode(int i);
 
+/* Convert the hostname of a node to its ip */
+std::string hostname2ip(std::string hostname);
