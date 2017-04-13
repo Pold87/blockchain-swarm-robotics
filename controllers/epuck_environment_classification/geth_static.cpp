@@ -222,12 +222,15 @@ void geth_init(int i) {
     fullCommandStream << "ssh vstrobel@" << node << " \"";
   }
     
-  fullCommandStream << "geth --verbosity 9" << " --datadir " << str_datadir << " init " << genesis;
+  fullCommandStream << "geth --verbosity 3" << " --datadir " << str_datadir << " init " << genesis;
 
   if (USE_MULTIPLE_NODES)
     fullCommandStream << "\"";
     
   string commandStream = fullCommandStream.str();
+
+  if (DEBUG)
+    cout << "geth init: " << commandStream << endl; 
   
   exec(commandStream.c_str());
   sleep(1);
@@ -300,7 +303,7 @@ void start_geth(int i) {
   }
 
   
-  string base_command = "geth --verbosity 2 --networkid 2 --nodiscover ";
+  string base_command = "geth --verbosity 3 --networkid 2 --nodiscover ";
 
   std::ostringstream datadirStream;
   datadirStream << "~/Documents/eth_data/data" << i << + "/";
@@ -502,14 +505,28 @@ std::string unlockAccount(int i, std::string pw) {
 std::string kill_geth_thread(int i) { 
 
   int port = rpc_base_port + i;
-  
+
   std::ostringstream fullCommandStream;
+
+  string node;
+  if (USE_MULTIPLE_NODES) {
+    /* Find out nodes of this robot  */
+    node = getNode(i);
+    /* Run geth command on this node  */
+    fullCommandStream << "ssh vstrobel@" << node << " \"";
+    fullCommandStream << "ps ax | grep \\\"\\-\\-rpcport " << port << "\\\"";
+    fullCommandStream << "\"";
+    
+  } else {
   fullCommandStream << "ps ax | grep \"\\-\\-rpcport " << port << "\"";
+  }
+
   string cmd = fullCommandStream.str();
   string res = exec(cmd.c_str());
 
+  
   if (DEBUG)
-    cout << "DEBUG -- kill_geth_thread: " << res << endl;
+    cout << "DEBUG -- kill_geth_thread -- command:" << cmd << " result: " << res << endl;
 
 
   /* Only get the first word, i.e., the PID from the command */
@@ -518,8 +535,17 @@ std::string kill_geth_thread(int i) {
 
   iss >> pid;
 
-  cmd = "kill " + pid;
-  res = exec(cmd.c_str());
+  string cmd2;
+  if (USE_MULTIPLE_NODES) {
+    std::ostringstream fullCommandStream2;
+    fullCommandStream2 << "ssh vstrobel@" << node << " ";
+    fullCommandStream2 << "kill " << pid;
+    cmd2 = fullCommandStream2.str();
+  } else {
+  cmd2 = "kill " + pid;
+  }
+
+  res = exec(cmd2.c_str());
   
   if (DEBUG)
     cout << "DEBUG -- kill_geth_thread: " << res << endl;  
@@ -548,7 +574,7 @@ std::string smartContractInterface(int i, string interface, string contractAddre
   
    std::string fullCommand = fullCommandStream.str();
 
-   cout << fullCommand << std::endl;
+   //cout << fullCommand << std::endl;
 
 
    string res = exec_geth_cmd(i, fullCommand);
@@ -595,7 +621,7 @@ std::string deploy_contract(int i, string interfacePath, string dataPath, string
     cout << "txHash: " << txHash << endl; 
 
     /* If a transaction hash was generated, i.e., neither true nor false nor Error were found */
-    if (txHash.find("true") == string::npos && txHash.find("false") == string::npos && txHash.find("Error") == string::npos) {
+    if (txHash.find("true") == string::npos && txHash.find("false") == string::npos && txHash.find("Error") == string::npos && txHash.find("Fatal") == string::npos) {
 	return txHash;
       }
     }  

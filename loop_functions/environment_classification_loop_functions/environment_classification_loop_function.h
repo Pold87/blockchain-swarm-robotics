@@ -73,6 +73,7 @@ private:
 	virtual void setContractAddressAndDistributeEther(std::string contractAddress, std::string minerAddress);
 	virtual void CheckEtherReceived();
 	virtual void fillSettings(TConfigurationNode& tEnvironment);
+	virtual std::vector<int> getAllRobotIds();
 	
 	/* Variable of the environment, help variables and experiment finished signal */
 	CRange<Real> zeroOne;
@@ -105,6 +106,9 @@ private:
 
 	std::ofstream blockChainLast2Votes;			// Flag: Write blockchain information to file
 
+
+	std::ofstream timeFile; // Save the consensus time in seconds
+	
 
 	/* Flags to decide if save or not the files */
 	bool everyTicksFileFlag;

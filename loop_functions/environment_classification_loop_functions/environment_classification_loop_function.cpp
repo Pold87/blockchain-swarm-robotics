@@ -4,6 +4,8 @@
 #include <argos3/core/utility/math/rng.h>
 #include "../../controllers/epuck_environment_classification/geth_static.h" /* Use geth from C++ */
 
+#include <time.h>
+
 #define ALPHA_CHANNEL		         0
 #define COLOR_STRENGHT               255
 #define TOTAL_CELLS		             400
@@ -29,10 +31,10 @@ m_pcFloor(NULL)
 
 using namespace std;
 
-static const int minerId = 110; /* ID of the miner (TODO: set in config file) */
+static const int minerId = 111; /* ID of the miner (TODO: set in config file) */
 static const int maxTime = 1000; /* Maximum amount of time per robot to wait until
 		       they received their ether */
-static const int maxContractAddressTrials = 100; /* Repeats getting the contract address procedure (sometimes the first result is a TypeError */
+static const int maxContractAddressTrials = 300; /* Repeats getting the contract address procedure (sometimes the first result is a TypeError */
 
 
 std::string contractAddress;
@@ -91,6 +93,26 @@ void CEnvironmentClassificationLoopFunctions::fillSettings(TConfigurationNode& t
   }
 }
 
+vector<int> CEnvironmentClassificationLoopFunctions::getAllRobotIds() {
+
+  vector<int> res;
+
+  CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
+  for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
+
+    /* Get handle to e-puck entity and controller */
+    CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
+    EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
+
+    std::string id = cController.GetId();
+    int robotId = Id2Int(id);
+    res.push_back(robotId);
+  }
+
+  return res;
+  
+}
+
 void CEnvironmentClassificationLoopFunctions::CheckEtherReceived() {
 
   CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
@@ -107,8 +129,8 @@ void CEnvironmentClassificationLoopFunctions::CheckEtherReceived() {
     for (int t = 0; t < maxTime; ++t) {
       int balance = check_balance(robotId);
 
-      if (DEBUGLOOP)
-	cout << "Checking account balance. It is " << balance << " and the time step is " << t << std::endl; 
+      //      if (DEBUGLOOP)
+      //	cout << "Checking account balance. It is " << balance << " and the time step is " << t << std::endl; 
 
       if (balance != 0)
 	break; /* Robot received something */
@@ -145,7 +167,7 @@ void CEnvironmentClassificationLoopFunctions::setContractAddressAndDistributeEth
     add_peer(minerId, e);
 
     /* Distribute ether among the robots */
-    sendEther(minerId, minerAddress, address, 2);
+    sendEther(minerId, minerAddress, address, 1);
     cout << "Sent ether to address: " << address;
   }
   
@@ -162,14 +184,21 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
 
   /* Initialize the miner */
   geth_init(minerId);
+  sleep(1);
   start_geth(minerId);
   createAccount(minerId);
   unlockAccount(minerId, "test");
-  start_mining(minerId, 12);	
+  start_mining(minerId, 10);	
   
   std::string minerAddress = getCoinbase(minerId);
 
-  sleep(20); 
+  /* Weight until at least two blocks are mined */
+  int bHeight;
+  do {
+    bHeight = getBlockChainLength(minerId);
+    cout << "Checking block chain height. It is " << bHeight << endl;
+    sleep(1);
+  } while (bHeight < 2);
   
   /* Deploy contract */  
 
@@ -179,8 +208,6 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
   string dataPath = baseDirLoop + "data.txt";
   string templatePath = baseDirLoop + "contractTemplate.txt";
   string txHash = deploy_contract(minerId, interfacePath, dataPath, templatePath);
-
-  sleep(25); 
 
   int u = 0;
 
@@ -201,21 +228,98 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
   /* Set the address of the deployed contract in each robot */
   setContractAddressAndDistributeEther(contractAddress, minerAddress);
  	
-  sleep(15); 
-
   /* Check that all robots received their ether */
   CheckEtherReceived();
 
-  cout << "Disconnecting everyone by killing mining thread" << endl;
   stop_mining(minerId);
 
-  cout << "Sleeping for 60 seconds now" << endl;
 
-  sleep(60); /* Wait until all robots have the same blockchain .TODO:
-		Ensure that using a function */
+  /* Connect everyone to everyone */
 
+  vector<int> allRobotIds = getAllRobotIds();  
+
+  for (std::vector<int>::iterator it1 = allRobotIds.begin() ; it1 != allRobotIds.end(); ++it1) {
+    for (std::vector<int>::iterator it2 = it1; it2 != allRobotIds.end(); ++it2) {
+
+      if (*it1 == *it2)
+	continue;
+
+      cout << "it 1 is " << *it1 << " and it2 is " << *it2 << endl;
+      string e = get_enode(*it2);
+      add_peer(*it1, e);      
+    }
+  }  
+  
+  cout << "Waiting until all robots have the same blockchain" << endl;
+
+  /* Wait until all robots have the same blockchain */
+
+  CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
+
+  int s, a, b;
+  bool canExit = false;
+  
+  for (int y = 0; y < 300; y++) {
+
+    cout << "Checking if all robots have the same blockchain height; y = " << y << endl;
+    
+    if (canExit)
+      break;
+
+    canExit = true;
+    
+    if (y == 299) {
+      cout << "Robots never got the same blockchain" << endl;
+      exec("killall geth");
+      exec("bash killblockchainallccall");
+      throw;
+    }
+
+    s = 0;
+    for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
+
+      CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
+      EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
+      
+      std::string id = cController.GetId();		    
+      int robotId = Id2Int(id);
+      
+      /* Check one robot (the first one) */
+      if (s == 0) {
+	a = getBlockChainLength(robotId);      
+      } else {
+	b = getBlockChainLength(robotId);
+	if (a != b) {
+	  canExit = false; 
+	  }	
+    }
+
+      cout << "a is " << a << " and b is " << b << endl;      
+      s++;
+      
+    }
+
+  }
+
+
+  cout << "Disconnecting everyone" << endl;
+  vector<int> allRobotIds2 = getAllRobotIds();  
+
+  for (std::vector<int>::iterator it1 = allRobotIds2.begin() ; it1 != allRobotIds2.end(); ++it1) {
+    for (std::vector<int>::iterator it2 = it1; it2 != allRobotIds2.end(); ++it2) {
+
+      if (*it1 == *it2 )
+	continue;
+
+      cout << "it 1 is " << *it1 << " and it2 is " << *it2 << endl;
+      string e = get_enode(*it2);
+      remove_peer(*it1, e);      
+    }
+  }
+  
+  
+  cout << "Disconnecting everyone by killing mining thread" << endl;  
   kill_geth_thread(minerId);
-
   
 }
 
@@ -229,7 +333,17 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 
   /* Initialize miner, distribute Ethereum, and more */
   InitEthereum();
-    
+
+  time_t ti;
+  time(&ti);
+  std::string m_strOutput;
+  std::stringstream nRunsStream;
+  nRunsStream << number_of_runs;
+  std::string nRuns = nRunsStream.str();
+  m_strOutput = dataDir + passedRadix +"-time.RUN" + nRuns;
+  timeFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
+  timeFile << ti << std::endl;
+  
   incorrectParameters = false;
   m_pcRNG = CRandom::CreateRNG("argos");
 
@@ -340,7 +454,6 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 				opinion.actualOpCol = CColor::BLUE;
 			/* Setting robots initial states: exploring state */
 		}
-		std::string m_strOutput;
 
 		/*
 		 * File saving number of diffusing and exploring robots, for every opinion.
@@ -654,6 +767,15 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 				std::cout << "Consensus is reached and the experiment is FINISHED" << std::endl;
 				m_bExperimentFinished = true;
 
+				ostringstream fullS;
+
+				fullS << "mv ~/Documents/eth_data/* " << dataDir;
+  
+				std::string fullC = fullS.str();
+
+				cout << "executing (moving blockchain folder): " << fullC << endl;
+				
+				system(fullC.c_str());     				
 				exec("killall geth");
 				exec("bash killblockchainallccall");
 				
@@ -704,6 +826,23 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 				if (everyQualityFile.is_open()){
 					everyQualityFile.close();
 				}
+
+				/* Close blockchain files */
+				if (blockChainFile.is_open()){
+				  blockChainFile.close();
+				  blockChainWhiteVotes.close();
+				  blockChainBlackVotes.close();
+				  blockChainLast2Votes.close();
+				}
+
+
+				if (timeFile.is_open()) {
+				  time_t ti_end;
+				  time(&ti_end);
+				  timeFile << ti_end << std::endl;
+				  timeFile.close();
+				}
+				
 
 				/* globalStatFile: write the general statistics, such as counted cells,
 		   times of diffusing and exploring */

@@ -8,7 +8,8 @@ REPETITIONS=15
 DECISIONRULE=3
 PERCENT_BLACKS=(34 48)
 # the one I did all the tests with:
-MININGDIFF=1000000
+##MININGDIFF=1000000
+MININGDIFF=400000
 # never go with the difficulty below 131072! (see https://github.com/ethereum/go-ethereum/issues/3590)
 #MININGDIFF=
 USEMULTIPLENODES=true

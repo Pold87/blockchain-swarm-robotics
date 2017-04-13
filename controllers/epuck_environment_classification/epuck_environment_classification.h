@@ -177,11 +177,11 @@ public:
      
    };
 
+   void UpdateNeighbors(std::set<UInt8> newNeighbors);
+
 private:
 
    void InitGeth(int robotId);
-
-   void UpdateNeighbors(std::set<UInt8> newNeighbors);
 
    void DistributeID();
    

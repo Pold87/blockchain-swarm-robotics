@@ -65,7 +65,7 @@
 	  exit="true"            
 	  percent_blue="34"
 	  percent_green="0"
-	  save_every_ticks="10"
+	  save_every_ticks="100"
 	  save_every_ticks_flag="true"
 	  save_every_run_flag="true"
 	  save_blockchain_flag="true"
@@ -84,7 +84,7 @@
 	  sigma="10"
 	  lamda="100"
 	  turn="45"
-	  miningdiff="1000000"
+	  miningdiff="400000"
 	  decision_rule="3"/>
 
   </loop_functions>

@@ -1,4 +1,6 @@
 TEMPLATE=~/go-ethereum/core/block_validator.go.template
+#TEMPLATE=~/go-ethereum/consensus/ethash/consensus.go.template
+#OUTFILE=~/go-ethereum/consensus/ethash/consensus.go
 OUTFILE=~/go-ethereum/core/block_validator.go
 
 if [ $# -eq 0 ]

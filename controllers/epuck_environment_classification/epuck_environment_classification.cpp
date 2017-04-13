@@ -211,37 +211,37 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<UInt8> newNeighbors) 
   		      std::inserter(neighborsToAdd, neighborsToAdd.end()));
  
   
-  //cout << "Robot " << robotId << " Old neighbors: ";
+  cout << "Robot " << robotId << " Old neighbors: ";
 
   std::set<UInt8>::iterator it;
   for (it = m_sNeighborData.neighbors.begin(); it != m_sNeighborData.neighbors.end(); ++it) {
     UInt8 i = *it;
   }
 
-  //cout << "Robot " << robotId << " New neighbors: ";
+  cout << "Robot " << robotId << " New neighbors: ";
   for (it = newNeighbors.begin(); it != newNeighbors.end(); ++it) {
     UInt8 i = *it;
-    //cout << i << " ";
+    cout << i << " ";
   }
-  //cout << endl;
+  cout << endl;
   
-  //cout << "Robot " << robotId << " Removing neighbors: ";
+  cout << "Robot " << robotId << " Removing neighbors: ";
 
   for (it = neighborsToRemove.begin(); it != neighborsToRemove.end(); ++it) {
     UInt8 i = *it;
-    //cout << i << " ";
+    cout << i << " ";
     remove_peer(robotId, enodes[i]);
   }
   cout << endl;
     
-  //cout << "Robot " << robotId << " Adding neighbors: ";
+  cout << "Robot " << robotId << " Adding neighbors: ";
 
   for (it = neighborsToAdd.begin(); it != neighborsToAdd.end(); ++it) {
     UInt8 i = *it;
-    //cout << i << " ";
+    cout << i << " ";
     add_peer(robotId, enodes[i]);
   }
-  //cout << endl;
+  cout << endl;
   
   //Update neighbor array
   m_sNeighborData.neighbors = newNeighbors;
@@ -482,15 +482,16 @@ void EPuck_Environment_Classification::Diffusing() {
       
 	/* Update Ethereum neighbors */
 	currentNeighbors.insert(IC.senderID);   	
+      
+      }
 
-	/* Listen to other opinions */
+      	/* Listen to other opinions */
 	/* In my implementation, robots in the diffusing state are
 	   connected with each other; since the blockchain is a
 	   bilateral protocol and one cannot only receive but not send
 	   or vice versa */
-	UpdateNeighbors(currentNeighbors);
-      
-    } 
+
+      UpdateNeighbors(currentNeighbors);
 
 
       /* In the 3 lasts seconds (30 ticks) the robot starts listening to other opinions
@@ -549,7 +550,10 @@ void EPuck_Environment_Classification::Diffusing() {
 
       /* Send opinion via Ethereum */
 
-      if (simulationParams.decision_rule == 2) {
+      /* TODO: I think the direct modulation can be implemented
+	 exactly as the other opinions, therefore, I'll keep that here
+	 for a backup */
+      if (simulationParams.decision_rule == 100) {
 	/* Send transaction to all neighbors */
 	/* TODO: I should check if this rule coul;d be really
 	   implemented with real robots in a p2p way */
@@ -561,6 +565,10 @@ void EPuck_Environment_Classification::Diffusing() {
 	  cout << "rawTx is" << rawTx << endl;
 	  cout << "Robot " << i << "txHash is: " << newTxHash << endl;
 	}
+      } else if (simulationParams.decision_rule == 2) {
+
+	/* Don't do anything */
+	
       } else if (simulationParams.decision_rule == 1 || simulationParams.decision_rule == 3) {
 
 	/* Create a transaction in each time step */    
