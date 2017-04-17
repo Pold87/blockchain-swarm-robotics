@@ -21,7 +21,7 @@ with open("fake_python_exit.csv", 'w') as f:
             en +=  round(np.random.normal(0.02, 0.01), 3)
 
 
-Eas=range(20)
+Eas=range(2, 20)
             
 # Create fake data for consensus time
 with open("fake_python_cons.csv", 'w') as f:    

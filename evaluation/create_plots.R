@@ -10,9 +10,9 @@ trials.base <- "volker"
 use.fake.data <- TRUE
 
 
-report.dir <- "/home/volker/Dropbox/mypapers/technical_report_collective/img/"
+report.dir <- "~/Dropbox/mypapers/technical_report_collective/img/"
 data.dir <- "../data/debug/"
-fake.data.dir <- "/home/volker/Documents/bc_collective/evaluation/"
+fake.data.dir <- "~/Documents/bc_collective/evaluation/"
 
 #setwd(data.dir)
 
@@ -143,9 +143,10 @@ plot.consensus.time.gg <- function(df, xlab, ylab, out.name) {
               axis.text.x = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")),
               axis.text.y = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")))  +
         ylab(ylab) +
-        xlab(xlab) + 
+        xlab(xlab) +
+        coord_fixed() + 
         base_breaks_x(seq(0, 20, 5)) +
-        base_breaks_y(seq(0, 20, 5)) + expand_limits(x=25)
+        base_breaks_y(seq(10, 20, 5)) + expand_limits(x=25)
 
 
     p <- direct.label(p, list(dl.trans(x=x+0.2, y=y),
