@@ -1,0 +1,19 @@
+rack=3
+maxNode=5
+username=vstrobel
+
+for node in `seq 0 $maxNode`;
+do
+  prefix="ssh ${username}@c${rack}-${node}"
+  pid=`$prefix ps -ef | grep -v "grep" | grep -m 1 "metastarter" | awk '{print $2}'`
+  $prefix kill $pid
+  pid2=`$prefix ps -ef | grep -v "grep" | grep -m 1 "start_from_template" | awk '{print $2}'`
+  $prefix kill $pid2
+  $prefix killall argos3
+  $prefix killall -HUP geth
+  $prefix killall -HUP "geth${node}"	
+  
+done
+
+mv nohup.out nohup.out.bk
+#rm -rf ~/.ethash

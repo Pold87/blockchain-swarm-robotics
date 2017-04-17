@@ -1,0 +1,12 @@
+rack=3
+maxNode=6
+username=vstrobel
+
+for node in `seq 0 $maxNode`;
+do
+  prefix="ssh ${username}@c${rack}-${node}"
+  $prefix killall -HUP geth
+  $prefix killall -HUP "geth${node}"	  
+done
+
+#rm -rf ~/.ethash
