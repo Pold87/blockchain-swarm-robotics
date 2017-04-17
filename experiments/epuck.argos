@@ -40,11 +40,13 @@
 			       turn="45"
 			       lamda="100"
 			       exitFlag="true"
-			       decision_rule="1"
+			       decision_rule="3"
 			       num_pack_saved="2"
 			       percent_red="66"
 			       base_dir="/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/"
+			       use_multiple_nodes="true"
 			       interface_path="interface.txt"
+			       blockchain_path="BLOCKCHAINPATH"
 			       percent_blue="34"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
 							  1 = Voter model; 2 = Direct comparison; 3 = Majority Rule-->
  
@@ -56,7 +58,7 @@
 
   <cells  number_of_red_cells="0"
 	  base_dir_loop="/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/"
-	  data_dir="data/decision_rule_1_eth_weighted/"
+	  data_dir="data/experiment1_decisionrule3/"
           number_of_green_cells="0"
 	  number_of_blue_cells="0"
 	  using_percentage="true"
@@ -64,19 +66,19 @@
 	  exit="true"            
 	  percent_blue="34"
 	  percent_green="0"
-	  save_every_ticks="10"
+	  save_every_ticks="100"
 	  save_every_ticks_flag="true"
 	  save_every_run_flag="true"
 	  save_blockchain_flag="true"
 	  save_every_robot_flag="true"
 	  save_every_quality_flag="true"
 	  save_global_stat_flag="true"
-	  radix="num10_black341"
-	  number_of_robots="10"
+	  radix="num20_black3413"
+	  number_of_robots="20"
 	  number_of_runs="1"
           number_of_qualities="2"
-          r_0="5"
-	  b_0="5"
+          r_0="10"
+	  b_0="10"
 	  g_0="0"
 	  length_of_runs="10"
 	  g="2"
@@ -84,7 +86,9 @@
 	  lamda="100"
 	  turn="45"
 	  miningdiff="1000000"
-	  decision_rule="1"/>
+	  miner_id="MINERID"
+	  decision_rule="3"
+	  blockchain_path="BLOCKCHAINPATH"/>
 
   </loop_functions>
   <!-- *********************** -->
@@ -114,7 +118,7 @@
    <distribute>
       <position method="uniform" min="0.1,0.1,0" max="1.9 , 1.9, 0" />
       <orientation method="gaussian" mean="1,1,0 " std_dev="360,0,0 " />
-      <entity quantity="10" max_trials="20">
+      <entity quantity="20" max_trials="20">
         <e-puck id="ep" >
           <controller config="epc" />
         </e-puck>

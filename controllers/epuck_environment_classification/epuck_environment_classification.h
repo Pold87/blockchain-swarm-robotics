@@ -66,6 +66,7 @@ public:
 	    Real g;
 	    Real sigma;
 	    bool exitFlag;
+	    bool useMultipleNodes;
 	    std::string radix;
 	    std::string baseDir; /* Basedir of the controller folder */
 	    std::string interfacePath;
@@ -169,24 +170,13 @@ public:
      contractAddress = contractAddr;
    }
 
-   struct SNeighborData {
-
-     std::set<UInt8> neighbors;
-     SNeighborData();
-     
-   };
+   void UpdateNeighbors(std::set<int> newNeighbors);
 
 private:
 
    void InitGeth(int robotId);
 
-   void UpdateNeighbors(std::set<UInt8> newNeighbors);
-
    void DistributeID();
-   
-   /* The neighbor data */
-   SNeighborData m_sNeighborData;
-
    
    CCI_EPuckWheelsActuator* m_pcWheels;
    Real m_fWheelVelocity;
@@ -216,6 +206,7 @@ private:
    std::string minerAddress;
    std::string contractAddress;
    std::string rawTx;
+   std::set<int> neighbors;
    bool mining;
    CColor red, blue, green;                    // Add here eventual additional color AGGIUNGERECOLORI
 //   int totalCounted, countedOfThisOpinion[N_COL];  USED JUST FOR STATISTICS, no more used

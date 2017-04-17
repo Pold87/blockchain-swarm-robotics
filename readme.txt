@@ -9,3 +9,4 @@ This folder contains the source files for the environment classification.
 	- setup_tmp_dir cleanup user’s folder on the cluster’s nodes
 	- vp_ec_exp1_dr1.sh: vary parameters script. It’s an example to vary parameters in order to launch multiple experiments with different parameters on the cluster
 	
+* The next geth version uses go instead of C for generating the DAG, therefore, I might get memory errors in the future
