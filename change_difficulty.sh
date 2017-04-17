@@ -10,7 +10,6 @@ else
     MININGDIFF=$1
 fi
 
-
 sed -e "s|MININGDIFF|$MININGDIFF|g" $TEMPLATE > $OUTFILE
 
 # Rebuild geth

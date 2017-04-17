@@ -94,6 +94,7 @@ std::string sendRawTransaction(int i, std::string rawTx);
 
 /* Find out on which node the geth process of a robot i is executed */
 std::string getNode(int i);
+int getNodeInt(int i);
 
 /* Convert the hostname of a node to its ip */
 std::string hostname2ip(std::string hostname);

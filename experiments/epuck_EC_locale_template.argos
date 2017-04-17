@@ -46,6 +46,7 @@
 			       base_dir="BASEDIR"
 			       use_multiple_nodes="USEMULTIPLENODES"
 			       interface_path="interface.txt"
+			       blockchain_path="BLOCKCHAINPATH"
 			       percent_blue="PERCENT_BLUE"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
 							  1 = Voter model; 2 = Direct comparison; 3 = Majority Rule-->
  
@@ -85,7 +86,9 @@
 	  lamda="100"
 	  turn="45"
 	  miningdiff="MININGDIFF"
-	  decision_rule="DECISIONRULE"/>
+	  miner_id="MINERID"
+	  decision_rule="DECISIONRULE"
+	  blockchain_path="BLOCKCHAINPATH"/>
 
   </loop_functions>
   <!-- *********************** -->

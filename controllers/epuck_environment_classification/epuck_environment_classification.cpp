@@ -31,10 +31,6 @@ int numNodes = 7;
 string username = "vstrobel";
   
 
-EPuck_Environment_Classification::SNeighborData::SNeighborData() :
-  neighbors(set<UInt8>()) {}
-
-
 /* Convert a number to a string */
 template <typename T> std::string NumberToString ( T Number )
 {
@@ -83,6 +79,7 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "base_dir", baseDir);
     GetNodeAttribute(t_node, "interface_path", interfacePath);
     GetNodeAttribute(t_node, "use_multiple_nodes", useMultipleNodes);
+    GetNodeAttribute(t_node, "blockchain_path", blockchainPath);
   }
   catch(CARGoSException& ex) {
     THROW_ARGOSEXCEPTION_NESTED("Error initializing controller state parameters.", ex);
@@ -143,26 +140,17 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
 
   if (robotId == 0) {
 
-    exec("bash killblockchainallccall");
-
     if (simulationParams.useMultipleNodes) {
-      for (int v = 0; v < numNodes; v++) {
-
-	ostringstream fullCommandStream;
-
-	fullCommandStream << "ssh " << username << "@c" << usedRack << "-" << v << " killall geth";
-	
-	std::string fullCommand = fullCommandStream.str();
-
-	string res = exec(fullCommand.c_str());
-
-	cout << "received: " << res;
-	
-      }      
+      /* TODO: new killbockchain */
+      exec("bash killblockchainallccall");
     } else {
       system("killall geth");
     }
-    system("rm -rf ~/Documents/eth_data/*");     
+
+    std::ostringstream fullCommandStream;
+    fullCommandStream << "rm -rf " << blockchainPath << "/*";
+    std::string fullCommand = fullCommandStream.str();
+    system(fullCommand.c_str());     
     interface = readStringFromFile(simulationParams.baseDir + simulationParams.interfacePath);
     }
  
@@ -188,16 +176,16 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
 }
 
 
-void EPuck_Environment_Classification::UpdateNeighbors(set<UInt8> newNeighbors) {
+void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
 
-  set<UInt8> neighborsToAdd;
-  set<UInt8> neighborsToRemove;
+  set<int> neighborsToAdd;
+  set<int> neighborsToRemove;
 
   int robotId = Id2Int(GetId());
   
   /* Old neighbors minus new neighbors = neighbors that should be removed */
-  std::set_difference(m_sNeighborData.neighbors.begin(),
-  		      m_sNeighborData.neighbors.end(),
+  std::set_difference(neighbors.begin(),
+  		      neighbors.end(),
   		      newNeighbors.begin(),
   		      newNeighbors.end(),
   		      std::inserter(neighborsToRemove, neighborsToRemove.end()));
@@ -206,45 +194,48 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<UInt8> newNeighbors) 
   /* New neighbors minus old neighbors = neighbors that should be added */
   std::set_difference(newNeighbors.begin(),
   		      newNeighbors.end(),
-  		      m_sNeighborData.neighbors.begin(),
-  		      m_sNeighborData.neighbors.end(),
+  		      neighbors.begin(),
+  		      neighbors.end(),
   		      std::inserter(neighborsToAdd, neighborsToAdd.end()));
  
   
-  cout << "Robot " << robotId << " Old neighbors: ";
+  //  cout << "Robot " << robotId << " Old neighbors: ";
 
-  std::set<UInt8>::iterator it;
-  for (it = m_sNeighborData.neighbors.begin(); it != m_sNeighborData.neighbors.end(); ++it) {
-    UInt8 i = *it;
+  std::set<int>::iterator it;
+  for (it = neighbors.begin(); it != neighbors.end(); ++it) {
+    int i = *it;
+    //    cout << i << " ";
   }
+  //  cout << endl;
 
-  cout << "Robot " << robotId << " New neighbors: ";
+  //  cout << "Robot " << robotId << " New neighbors: ";
   for (it = newNeighbors.begin(); it != newNeighbors.end(); ++it) {
-    UInt8 i = *it;
-    cout << i << " ";
+    int i = *it;
+    //    cout << i << " ";
   }
-  cout << endl;
+  //  cout << endl;
   
-  cout << "Robot " << robotId << " Removing neighbors: ";
+  //  cout << "Robot " << robotId << " Removing neighbors: ";
 
   for (it = neighborsToRemove.begin(); it != neighborsToRemove.end(); ++it) {
-    UInt8 i = *it;
-    cout << i << " ";
-    remove_peer(robotId, enodes[i]);
+    int i = *it;
+    //    cout << i << " ";
+    remove_peer(robotId, get_enode(i));
   }
-  cout << endl;
+  //  cout << endl;
     
-  cout << "Robot " << robotId << " Adding neighbors: ";
+  //  cout << "Robot " << robotId << " Adding neighbors: ";
 
   for (it = neighborsToAdd.begin(); it != neighborsToAdd.end(); ++it) {
-    UInt8 i = *it;
-    cout << i << " ";
-    add_peer(robotId, enodes[i]);
+    int i = *it;
+    //    cout << i << " ";
+    add_peer(robotId, get_enode(i));
   }
-  cout << endl;
+  //  cout << endl;
   
   //Update neighbor array
-  m_sNeighborData.neighbors = newNeighbors;
+  set<int> neighborsTmp(newNeighbors);
+  neighbors = neighborsTmp;
   
 }
 
@@ -268,7 +259,7 @@ void EPuck_Environment_Classification::ControlStep() {
   case SStateData::STATE_EXPLORING: {
 
     /* If one wants to have a fully connected network */
-    set<UInt8> currentNeighbors;
+    set<int> currentNeighbors;
     
     // Fully connected
     //for (UInt8 i = 1; i <= 10; i++) {
@@ -409,19 +400,19 @@ void EPuck_Environment_Classification::Explore() {
     int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
     string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt);
     
-    cout << "voteResult is " << voteResult << endl;
+    //cout << "voteResult is " << voteResult << endl;
     
     /* Save the transaction as raw transaciton in the robot's
        memory */
-    rawTx = getRawTransaction(robotId, voteResult);
+    //rawTx = getRawTransaction(robotId, voteResult);
     
     int args2[0] = {};
     
     // For debugging (show amount of white and black votes)
-    string numWhite = smartContractInterface(robotId, interface, contractAddress, "wVotes", args2, 0, 0);
-    string numBlack = smartContractInterface(robotId, interface, contractAddress, "bVotes", args2, 0, 0);
+    //string numWhite = smartContractInterface(robotId, interface, contractAddress, "wVotes", args2, 0, 0);
+    //string numBlack = smartContractInterface(robotId, interface, contractAddress, "bVotes", args2, 0, 0);
     
-    cout << "Num white votes is: " << numWhite << "Num Black votes is: " << numBlack << endl;
+    //cout << "Num white votes is: " << numWhite << "Num Black votes is: " << numBlack << endl;
     
     
     /* Assigning a new exploration time, for the next exploration state */
@@ -474,7 +465,7 @@ void EPuck_Environment_Classification::Diffusing() {
        * has been taken this array will be emptied for the next diffusing state. */
       const CCI_EPuckRangeAndBearingSensor::TPackets& tPackets = m_pcRABS->GetPackets();
       
-      set<UInt8> currentNeighbors;
+      set<int> currentNeighbors;
       
       for(size_t i = 0; i < tPackets.size() ; ++i) {
             
@@ -558,13 +549,13 @@ void EPuck_Environment_Classification::Diffusing() {
 	/* TODO: I should check if this rule coul;d be really
 	   implemented with real robots in a p2p way */
 
-	std::set<UInt8>::iterator it;
-	for (it = currentNeighbors.begin(); it != currentNeighbors.end(); ++it) {
-	  UInt8 i = *it;
-	  std::string newTxHash = sendRawTransaction(i, rawTx);
-	  cout << "rawTx is" << rawTx << endl;
-	  cout << "Robot " << i << "txHash is: " << newTxHash << endl;
-	}
+	//std::set<UInt8>::iterator it;
+	//for (it = currentNeighbors.begin(); it != currentNeighbors.end(); ++it) {
+	//  UInt8 i = *it;
+	//  std::string newTxHash = sendRawTransaction(i, rawTx);
+	//  cout << "rawTx is" << rawTx << endl;
+	//  cout << "Robot " << i << "txHash is: " << newTxHash << endl;
+	//}
       } else if (simulationParams.decision_rule == 2) {
 
 	/* Don't do anything */
@@ -578,7 +569,7 @@ void EPuck_Environment_Classification::Diffusing() {
 	int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
 	string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt);
 	
-	cout << "voteResult is " << voteResult << endl;
+	//cout << "voteResult is " << voteResult << endl;
 
 	
       } else if (simulationParams.decision_rule == 4) {

@@ -71,6 +71,9 @@ private:
 
 	virtual void InitEthereum();
 	virtual void setContractAddressAndDistributeEther(std::string contractAddress, std::string minerAddress);
+	virtual bool allSameBCHeight();
+	virtual void connectMore(std::vector<int> allRobotIds);
+	virtual void disconnectAll(std::vector<int> allRobotIds);
 	virtual void CheckEtherReceived();
 	virtual void fillSettings(TConfigurationNode& tEnvironment);
 	virtual std::vector<int> getAllRobotIds();
@@ -108,6 +111,7 @@ private:
 
 
 	std::ofstream timeFile; // Save the consensus time in seconds
+	std::ofstream timeFileEnd; // Save the consensus time in seconds
 	
 
 	/* Flags to decide if save or not the files */
@@ -129,6 +133,9 @@ private:
 	 * cells is incorrect.
 	 */
 	bool incorrectParameters;
+
+	/* If after a significant amount of time, there are still no new block, there's a problem with the mining process and this flag is set to true */
+	bool miningNotWorkingAnymore;
 
 	/* True  -> Use percentage to assign the colors of the floor
 	 * False -> Use absolute numbers */
@@ -160,13 +167,13 @@ private:
 	/* Number of robots with i-th initial opinion */
 	UInt32 initialOpinions[N_COL];
 
-	/* Swarm Size */
-	UInt32 n_robots;
+	UInt32 n_robots;  /* Swarm Size */
 	UInt32 g;
 	UInt32 sigma;
 	UInt32 decisionRule;
 	UInt32 miningDiff;
-
+	int minerId;
+	std::string blockchain_path;
 	std::string baseDirLoop;
 	std::string dataDir;
 

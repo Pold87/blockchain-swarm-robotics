@@ -2,23 +2,24 @@ TEMPLATE='experiments/epuck_EC_locale_template.argos'
 OUTFILE='experiments/epuck.argos'
 #BASEDIR='/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/'
 BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
-DATADIR='data/decision_rule_3_eth_weighted_20bots/'
+DATADIR='data/experiment1_decisionrule3/'
 NUMROBOTS=(20)
 REPETITIONS=15
 DECISIONRULE=3
 PERCENT_BLACKS=(34 48)
 # the one I did all the tests with:
-##MININGDIFF=1000000
-MININGDIFF=400000
+MININGDIFF=1000000
+##MININGDIFF=150000
 # never go with the difficulty below 131072! (see https://github.com/ethereum/go-ethereum/issues/3590)
 #MININGDIFF=
 USEMULTIPLENODES=true
-CHANGEDIFFIULTY="true"
+CHANGEDIFFIULTY=""
 
 mkdir -p $DATADIR
 
 if [ $CHANGEDIFFIULTY ]; then
-    ./change_difficulty.sh $MININGDIFF
+    #    ./change_difficulty.sh $MININGDIFF
+    ./create_geths.sh $MININGDIFF
 fi
 
 
@@ -33,6 +34,15 @@ for k in "${NUMROBOTS[@]}"; do
 	PERCENT_WHITE=$(expr 100 - $PERCENT_BLACK)
 
 	for i in `seq 1 $REPETITIONS`; do
+
+	    GENERATEDAG=`cat regeneratedag.txt`
+	    if [ $GENERATEDAG ]; then
+		#if [ "$i" -gt 0 ]; then
+		rm ~/.ethash/*
+		ssh vstrobel@c3-5 "geth makedag 0 ~/.ethash"
+		echo "" > regeneratedag.txt
+		#fi
+	    fi
 
 	    RADIX=$(printf 'num%d_black%d%d' $k $PERCENT_BLACK $i)
 

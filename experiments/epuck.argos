@@ -46,6 +46,7 @@
 			       base_dir="/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/"
 			       use_multiple_nodes="true"
 			       interface_path="interface.txt"
+			       blockchain_path="BLOCKCHAINPATH"
 			       percent_blue="34"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
 							  1 = Voter model; 2 = Direct comparison; 3 = Majority Rule-->
  
@@ -57,7 +58,7 @@
 
   <cells  number_of_red_cells="0"
 	  base_dir_loop="/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/"
-	  data_dir="data/decision_rule_3_eth_weighted_20bots/"
+	  data_dir="data/experiment1_decisionrule3/"
           number_of_green_cells="0"
 	  number_of_blue_cells="0"
 	  using_percentage="true"
@@ -72,7 +73,7 @@
 	  save_every_robot_flag="true"
 	  save_every_quality_flag="true"
 	  save_global_stat_flag="true"
-	  radix="num20_black341"
+	  radix="num20_black3413"
 	  number_of_robots="20"
 	  number_of_runs="1"
           number_of_qualities="2"
@@ -84,8 +85,10 @@
 	  sigma="10"
 	  lamda="100"
 	  turn="45"
-	  miningdiff="400000"
-	  decision_rule="3"/>
+	  miningdiff="1000000"
+	  miner_id="MINERID"
+	  decision_rule="3"
+	  blockchain_path="BLOCKCHAINPATH"/>
 
   </loop_functions>
   <!-- *********************** -->
