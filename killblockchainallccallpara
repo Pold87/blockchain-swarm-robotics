@@ -1,0 +1,12 @@
+rack=3
+username=vstrobel
+
+for node in "$@"
+do
+    prefix="ssh ${username}@c${rack}-${node}"
+    $prefix killall -HUP geth
+    $prefix killall -HUP "geth${node}"	      
+done
+
+
+
