@@ -70,6 +70,9 @@ public:
 	    std::string radix;
 	    std::string baseDir; /* Basedir of the controller folder */
 	    std::string interfacePath;
+	    std::string mappingPath;
+	    std::string blockchainPath;
+	    std::string datadirBase;
 	    UInt32 numPackSaved;
 	    UInt32 status;
 	    UInt32 LAMDA, turn;
@@ -175,7 +178,7 @@ public:
 private:
 
    void InitGeth(int robotId);
-
+   void readNodeMapping();
    void DistributeID();
    
    CCI_EPuckWheelsActuator* m_pcWheels;
