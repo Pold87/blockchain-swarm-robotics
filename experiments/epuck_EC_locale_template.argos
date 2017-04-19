@@ -86,7 +86,9 @@
 	  lamda="100"
 	  turn="45"
 	  miningdiff="MININGDIFF"
+	  use_multiple_nodes="USEMULTIPLENODES"
 	  miner_id="MINERID"
+	  miner_node="MINERNODE"
 	  decision_rule="DECISIONRULE"
 	  blockchain_path="BLOCKCHAINPATH"/>
 

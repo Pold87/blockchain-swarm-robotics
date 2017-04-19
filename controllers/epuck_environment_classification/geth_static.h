@@ -10,87 +10,104 @@ std::string replaceAll(std::string subject, const std::string& search,
 void ReplaceStringInPlace(std::string& subject, const std::string& search,
                           const std::string& replace);
 
-std::string exec_geth_cmd(int i, std::string command);
+// Read first line of file fileName and return as string
+std::string readStringFromFile(std::string fileName);
 
 // Execute a command line command and return the result as string
 std::string exec(const char* cmd);
 
+// Take a geth command, execute it on the selected robot, and return the result string
+std::string exec_geth_cmd(int i, std::string command);
+std::string exec_geth_cmd(int i, std::string command, int nodeInt, std::string datadirBase);
+
 // Initialize geth
 void geth_init(int i);
-
-// Get the enode information for robot i
-std::string get_enode(int i);
+void geth_init(int i, int nodeInt, std::string datadirBase);
 
 // Run geth for robot i
 void start_geth(int i);
+void start_geth(int i, int nodeInt, std::string datadirBase);
 
 /* Create a new account for robot i */
 void createAccount(int i);
+void createAccount(int i, int nodeInt, std::string datadirBase);
 
-// Run a geth command on robot i
-std::string exec_geth_cmd(int i, std::string command);
 
-// Add a peer (specified via the enode) to robot i
-std::string add_peer(int i, std::string enode);
-
-// Remove a peer (specified via the enode) from robot i
-std::string remove_peer(int i, std::string enode);
+// Get the enode information for robot i
+std::string get_enode(int i);
+std::string get_enode(int i, int nodeInt, std::string datadirBase);
 
 // Start mining (robot i) using t threads
 std::string start_mining(int i, int t);
+std::string start_mining(int i, int t, int nodeInt, std::string datadirBase);
 
 // Stop mining (robot i)
 std::string stop_mining(int i);
+std::string stop_mining(int i, int nodeInt, std::string datadirBase);
 
-// Read first line of file fileName and return as string
-std::string readStringFromFile(std::string fileName);
+// Add a peer (specified via the enode) to robot i
+std::string add_peer(int i, std::string enode);
+std::string add_peer(int i, std::string enode, int nodeInt, std::string datadirBase);
+
+// Remove a peer (specified via the enode) from robot i
+std::string remove_peer(int i, std::string enode);
+std::string remove_peer(int i, std::string enode, int nodeInt, std::string datadirBase);
 
 // Get coinbase address of robot i
 std::string getCoinbase(int i);
+std::string getCoinbase(int i, int nodeInt, std::string datadirBase);
 
 // Get blockchain length of robot i
 int getBlockChainLength(int i);
+int getBlockChainLength(int i, int nodeInt, std::string datadirBase);
 
 // Get number of white votes
 int getWhiteVotes(int i);
+int getWhiteVotes(int i, int nodeInt, std::string datadirBase);
 
 // Get number of black votes
 int getBlackVotes(int i);
+int getBlackVotes(int i, int nodeInt, std::string datadirBase);
 
 // Get last 2 votes
 int getLast2Votes(int i);
+int getLast2Votes(int i, int nodeInt, std::string datadirBase);
 
 // Send ether from robot i to address addr
 std::string sendEther(int i, std::string from, std::string to, int v);
-
-// Create an interface to a contract for robot i
-std::string load_contract(int i, std::string contractName, std::string contractAddress, std::string contractInterface);
+std::string sendEther(int i, std::string from, std::string to, int v, int nodeInt, std::string datadirBase);
 
 // Interact with a generic smart contract
 std::string smartContractInterface(int i, std::string interface, std::string contractAddress, std::string func, int args[], int argc, int v);
+std::string smartContractInterface(int i, std::string interface, std::string contractAddress, std::string func, int args[], int argc, int v, int nodeInt, std::string datadirBase);
 
 /* Unlock account */
 std::string unlockAccount(int i, std::string pw);
+std::string unlockAccount(int i, std::string pw, int nodeInt, std::string datadirBase);
 
 // Get contract address from transaction receipt
 std::string getContractAddress(int i, std::string txHash);
-
-std::string readEntireFile(std::string fileName);
+std::string getContractAddress(int i, std::string txHash, int nodeInt, std::string datadirBase);
 
 /* Kill geth thread based on robot number i */
 std::string kill_geth_thread(int i);
+std::string kill_geth_thread(int i, int nodeInt, std::string datadirBase);
 
 /* Deploy contract using robot number i */
 std::string deploy_contract(int i, std::string interfacePath, std::string dataPath, std::string templatePath);
+std::string deploy_contract(int i, std::string interfacePath, std::string dataPath, std::string templatePath, int nodeInt, std::string datadirBase);
 
 /* Check account balance of robot i (in wei)*/
 int check_balance(int i);
+int check_balance(int i, int nodeInt, std::string datadirBase);
 
 /* Get the raw transaction based on the tx hash */
 std::string getRawTransaction(int i, std::string txHash);
+std::string getRawTransaction(int i, std::string txHash, int nodeInt, std::string datadirBase);
 
 /* Send raw transaction and include it in the tx pool */
 std::string sendRawTransaction(int i, std::string rawTx);
+std::string sendRawTransaction(int i, std::string rawTx, int nodeInt, std::string datadirBase);
 
 /* Find out on which node the geth process of a robot i is executed */
 std::string getNode(int i);

@@ -3,12 +3,13 @@ OUTFILE='experiments/epuck.argos'
 #BASEDIR='/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/'
 BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
 DATADIR='data/experiment1_decisionrule2/'
-BLOCKCHAINPATH='/home/vstrobel/eth_data_para/'
+BLOCKCHAINPATH='/home/vstrobel/eth_data_para/data' # always without '/' at the end!!
 MINERID=120
 NUMROBOTS=(20)
 REPETITIONS=15
 DECISIONRULE=3
 PERCENT_BLACKS=(34 48)
+MINERNODE=0
 # the one I did all the tests with:
 MININGDIFF=1000000
 ##MININGDIFF=150000
@@ -16,15 +17,29 @@ MININGDIFF=1000000
 #MININGDIFF=
 USEMULTIPLENODES=true
 CHANGEDIFFIULTY=""
+USEDNODES=(0 6)
 
+# Create directories for collecting data and the geth processes
 mkdir -p $DATADIR
+mkdir -p $BLOCKCHAINPATH
 
+# Create file for killing the blockchain proceeses on these nodes
+echo "$(pwd)/killblockchainallccallpara " > "${BLOCKCHAINPATH}/bckillerccall"
+echo "$(pwd)/killblockchainallpara " > "${BLOCKCHAINPATH}/bckiller"
+for k in "${USEDNODES[@]}"; do
+    echo $k > "${BLOCKCHAINPATH}/bckillerccall"
+    echo $k > "${BLOCKCHAINPATH}/bckiller" 
+done
+
+
+# Rebuild geth with another value in checkDifficulty
 if [ $CHANGEDIFFIULTY ]; then
     #    ./change_difficulty.sh $MININGDIFF
     ./create_geths.sh $MININGDIFF
 fi
 
 
+# Iterate over experimental settings and start experiments
 for k in "${NUMROBOTS[@]}"; do
 
     R0=$(expr $k / 2)
@@ -49,7 +64,7 @@ for k in "${NUMROBOTS[@]}"; do
 	    RADIX=$(printf 'num%d_black%d%d' $k $PERCENT_BLACK $i)
 
 	# Create template
-	sed -e "s|BASEDIR|$BASEDIR|g" -e "s|DATADIR|$DATADIR|g" -e "s|RADIX|$RADIX|g" -e "s|NUMROBOTS|$k|g" -e "s|R0|$R0|g" -e "s|B0|$B0|g" -e "s|PERCENT_BLUE|$PERCENT_BLACK|g" -e "s|PERCENT_RED|$PERCENT_WHITE|g" -e "s|DECISIONRULE|$DECISIONRULE|g" -e "s|USEMULTIPLENODES|$USEMULTIPLENODES|g" -e "s|REPETITIONS|$REPETITIONS|g" -e "s|MININGDIFF|$MININGDIFF|g" $TEMPLATE > $OUTFILE
+	sed -e "s|BASEDIR|$BASEDIR|g" -e "s|DATADIR|$DATADIR|g" -e "s|RADIX|$RADIX|g" -e "s|NUMROBOTS|$k|g" -e "s|R0|$R0|g" -e "s|B0|$B0|g" -e "s|PERCENT_BLUE|$PERCENT_BLACK|g" -e "s|PERCENT_RED|$PERCENT_WHITE|g" -e "s|DECISIONRULE|$DECISIONRULE|g" -e "s|USEMULTIPLENODES|$USEMULTIPLENODES|g" -e "s|REPETITIONS|$REPETITIONS|g" -e "s|MININGDIFF|$MININGDIFF|g" -e "s|MINERNODE|$MINERNODE|g" -e "s|MINERID|$MINERID|g" -e "s|BLOCKCHAINPATH|$BLOCKCHAINPATH" $TEMPLATE > $OUTFILE
 	
     # Start experiment
 	argos3 -c $OUTFILE

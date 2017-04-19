@@ -1,6 +1,5 @@
 TEMPLATE='experiments/epuck_EC_locale_template.argos'
 OUTFILE='experiments/epuck.argos'
-#BASEDIR='/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/'
 BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
 DATADIR='data/experiment1_decisionrule2/'
 NUMROBOTS=(20)
@@ -13,6 +12,7 @@ MININGDIFF=1000000
 # never go with the difficulty below 131072! (see https://github.com/ethereum/go-ethereum/issues/3590)
 #MININGDIFF=
 USEMULTIPLENODES=true
+NODEMAPPING="config1.txt"
 CHANGEDIFFIULTY=""
 
 mkdir -p $DATADIR

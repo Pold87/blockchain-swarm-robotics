@@ -173,9 +173,12 @@ private:
 	UInt32 decisionRule;
 	UInt32 miningDiff;
 	int minerId;
-	std::string blockchain_path;
+	int minerNode;
+	std::string blockchainPath;
 	std::string baseDirLoop;
 	std::string dataDir;
+	std::string datadirBase;
+	bool useMultipleNodes;
 
 };
 
