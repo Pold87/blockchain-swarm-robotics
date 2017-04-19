@@ -2,10 +2,10 @@ TEMPLATE='experiments/epuck_EC_locale_template.argos'
 OUTFILE='experiments/epuck.argos'
 #BASEDIR='/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/'
 BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
-DATADIR='data/experiment1_decisionrule3/'
+DATADIR='data/experiment1_decisionrule2/'
 NUMROBOTS=(20)
 REPETITIONS=15
-DECISIONRULE=3
+DECISIONRULE=2
 PERCENT_BLACKS=(48)
 # the one I did all the tests with:
 MININGDIFF=1000000

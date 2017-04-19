@@ -40,7 +40,7 @@
 			       turn="45"
 			       lamda="100"
 			       exitFlag="true"
-			       decision_rule="3"
+			       decision_rule="2"
 			       num_pack_saved="2"
 			       percent_red="52"
 			       base_dir="/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/"
@@ -58,7 +58,7 @@
 
   <cells  number_of_red_cells="0"
 	  base_dir_loop="/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/"
-	  data_dir="data/experiment1_decisionrule3/"
+	  data_dir="data/experiment1_decisionrule2/"
           number_of_green_cells="0"
 	  number_of_blue_cells="0"
 	  using_percentage="true"
@@ -73,7 +73,7 @@
 	  save_every_robot_flag="true"
 	  save_every_quality_flag="true"
 	  save_global_stat_flag="true"
-	  radix="num20_black486"
+	  radix="num20_black4814"
 	  number_of_robots="20"
 	  number_of_runs="1"
           number_of_qualities="2"
@@ -87,7 +87,7 @@
 	  turn="45"
 	  miningdiff="1000000"
 	  miner_id="MINERID"
-	  decision_rule="3"
+	  decision_rule="2"
 	  blockchain_path="BLOCKCHAINPATH"/>
 
   </loop_functions>
