@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <limits>
 
 #define DEBUG true
 #define USE_MULTIPLE_NODES true
@@ -148,7 +149,7 @@ std::string hostname2ip(std::string hostname) {
 // Take a geth command, execute it on the selected robot, and return the result string
 string exec_geth_cmd(int i, string command){
 
-  cout << "exec_geth_cmd called !!!! Exiting..." << endl;
+  cout << "exec_geth_cmd called !!!! Exiting... Command was " << command << endl;
   throw;
   ostringstream fullCommandStream;
 
@@ -198,7 +199,7 @@ string exec_geth_cmd(int i, string command, int nodeInt, string datadirBase){
   ostringstream fullCommandStream;
 
   /* Run geth command on this node  */
-  fullCommandStream << "ssh vstrobel@" << rack << "-" << nodeInt << " \"";
+  fullCommandStream << "ssh vstrobel@c" << rack << "-" << nodeInt << " \"";
   
   ReplaceStringInPlace(command, "\"", "\\\"");
   
@@ -206,12 +207,12 @@ string exec_geth_cmd(int i, string command, int nodeInt, string datadirBase){
   
   std::string fullCommand = fullCommandStream.str();
 
-  if (DEBUG)
-    cout << "exec_geth_cmd: " << fullCommand << endl;
+  //  if (DEBUG)
+  //  cout << "exec_geth_cmd: " << fullCommand << endl;
   
   string res = exec(fullCommand.c_str());
 
-  cout << "res in exec_geth_cmd is " << res << endl; 
+  //cout << "res in exec_geth_cmd is " << res << endl; 
   
   if ( (res.find("Fatal") != string::npos) || (res.find("Error") != string::npos)) {
     cout << "exec_geth_cmd: " << fullCommand << endl;
@@ -278,7 +279,7 @@ void geth_init(int i, int nodeInt, string datadirBase) {
   ostringstream fullCommandStream;
 
   /* Run geth command on this node  */
-  fullCommandStream << "ssh vstrobel@" << rack << "-" << nodeInt << " \"";  
+  fullCommandStream << "ssh vstrobel@c" << rack << "-" << nodeInt << " \"";  
   fullCommandStream << "geth" << nodeInt << " --verbosity 3" << " --datadir " << str_datadir << " init " << genesis << "\"";
   
   string commandStream = fullCommandStream.str();
@@ -327,7 +328,7 @@ void start_geth(int i) {
 
   string ipc_path = "--ipcpath " + str_datadir + "geth.ipc";
 
-  fullCommandStream << ipc_path << " --datadir " << str_datadir << str_port << " --maxpeers 25";
+  fullCommandStream << ipc_path << " --datadir " << str_datadir << str_port << " --maxpeers 130";
 
   //if (USE_MULTIPLE_NODES)
   //  ReplaceStringInPlace(geth_command, "\"", "\\\"");
@@ -346,7 +347,7 @@ void start_geth(int i) {
 	  
 }
 
-void start_geth(int i, int nodeInt, string datadirBase) {
+void start_geth(int i, int basePort, int nodeInt, string datadirBase) {
   
   sleep(1);
   cout << "Starting geth for robot " << i << endl;
@@ -354,7 +355,7 @@ void start_geth(int i, int nodeInt, string datadirBase) {
   ostringstream fullCommandStream;
   
   /* Run geth command on this node  */
-  fullCommandStream << "ssh vstrobel@" << rack << "-" << nodeInt << " \"";
+  fullCommandStream << "ssh vstrobel@c" << rack << "-" << nodeInt << " \"";
   fullCommandStream << "geth" << nodeInt << " --verbosity 3 --networkid 2 --nodiscover ";
   
   std::ostringstream datadirStream;
@@ -363,7 +364,7 @@ void start_geth(int i, int nodeInt, string datadirBase) {
   string str_datadir = datadirStream.str();
   ostringstream portStream;
 
-  portStream << " --port " << (ipc_base_port + i);
+  portStream << " --port " << (basePort + i);
   string str_port = portStream.str();
 
   // Make folders
@@ -375,7 +376,7 @@ void start_geth(int i, int nodeInt, string datadirBase) {
 
   string ipc_path = "--ipcpath " + str_datadir + "geth.ipc";
 
-  fullCommandStream << ipc_path << " --datadir " << str_datadir << str_port << " --maxpeers 25" << "\"" << "&";
+  fullCommandStream << ipc_path << " --datadir " << str_datadir << str_port << " --maxpeers 130" << "\"" << "&";
 
   cout << "Running command " << fullCommandStream.str() << endl;
   
@@ -431,7 +432,7 @@ string get_enode(int i, int nodeInt, string datadirBase) {
   cout << "The enode is " << res << endl;
 
   ostringstream nodeStream;
-  nodeStream << rack << "-" << nodeInt;
+  nodeStream << "c" << rack << "-" << nodeInt;
   string node = nodeStream.str();
   
   /* Resolve the hostname to its ip */
@@ -491,8 +492,8 @@ string add_peer(int i, string enode) {
   string cmd = fullCommandStream.str();
   string res = exec_geth_cmd(i, cmd);
 
-  if (DEBUG)
-    cout << "add_peer: enode is " << enode << "result is" << res << endl;
+  //if (DEBUG)
+  //  cout << "add_peer: enode is " << enode << "result is" << res << endl;
 
   return res;
 }
@@ -505,8 +506,8 @@ string add_peer(int i, string enode, int nodeInt, string datadirBase) {
   string cmd = fullCommandStream.str();
   string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);
 
-  if (DEBUG)
-    cout << "add_peer: enode is " << enode << "result is" << res << endl;
+  //if (DEBUG)
+  //  cout << "add_peer: enode is " << enode << "result is" << res << endl;
 
   return res;
 }
@@ -627,8 +628,8 @@ std::string getContractAddress(int i, std::string txHash, int nodeInt, string da
   string cmd = fullCommandStream.str();
   string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);
 
-  if (DEBUG)
-    cout << "DEBUG -- getContractAddress: " << res << endl;
+  //  if (DEBUG)
+  //  cout << "DEBUG -- getContractAddress: " << res << endl;
     
   return res;
 }
@@ -678,11 +679,11 @@ std::string kill_geth_thread(int i) {
     node = getNode(i);
     /* Run geth command on this node  */
     fullCommandStream << "ssh vstrobel@" << node << " \"";
-    fullCommandStream << "ps ax | grep \\\"\\-\\-ipcport " << port << "\\\"";
+    fullCommandStream << "ps ax | grep \\\"\\-\\-port " << port << "\\\"";
     fullCommandStream << "\"";
     
   } else {
-  fullCommandStream << "ps ax | grep \"\\-\\-ipcport " << port << "\"";
+    fullCommandStream << "ps ax | grep \"\\-\\-port " << port << "\"";
   }
 
   string cmd = fullCommandStream.str();
@@ -719,21 +720,21 @@ std::string kill_geth_thread(int i) {
 }
 
 
-std::string kill_geth_thread(int i, int nodeInt, string datadirBase) { 
+std::string kill_geth_thread(int i, int basePort, int nodeInt, string datadirBase) { 
 
-  int port = ipc_base_port + i;
+  int port = basePort + i;
 
   std::ostringstream fullCommandStream;
 
   /* Run geth command on this node  */
-  fullCommandStream << "ssh vstrobel@" << rack << "-" << nodeInt << " \"";
-  fullCommandStream << "ps ax | grep \\\"\\-\\-ipcport " << port << "\\\"" << "\"";
+  fullCommandStream << "ssh vstrobel@c" << rack << "-" << nodeInt << " \"";
+  fullCommandStream << "ps ax | grep \\\"\\-\\-port " << port << "\\\"" << "\"";
   
   string cmd = fullCommandStream.str();
   string res = exec(cmd.c_str());
   
   if (DEBUG)
-    cout << "DEBUG -- kill_geth_thread -- command:" << cmd << " result: " << res << endl;
+    cout << "DEBUG -- kill_geth_thread (1st call) -- command:" << cmd << " result: " << res << endl;
 
   /* Only get the first word, i.e., the PID from the command */
   istringstream iss(res);
@@ -743,14 +744,40 @@ std::string kill_geth_thread(int i, int nodeInt, string datadirBase) {
 
   string cmd2;
   std::ostringstream fullCommandStream2;
-  fullCommandStream2 << "ssh vstrobel@" << rack << "-" << nodeInt << " ";
+  fullCommandStream2 << "ssh vstrobel@c" << rack << "-" << nodeInt << " ";
   fullCommandStream2 << "kill -HUP " << pid;
   cmd2 = fullCommandStream2.str();
 
   res = exec(cmd2.c_str());
   
   if (DEBUG)
-    cout << "DEBUG -- kill_geth_thread: " << res << endl;  
+    cout << "DEBUG -- kill_geth_thread (2nd call) -- command:" << cmd2 << " result: " << res << endl;
+
+
+  /* Kill again locally */
+  std::string pid2;
+  string cmd3;
+  std::ostringstream fullCommandStream3;
+  iss.ignore(numeric_limits<streamsize>::max(), '\n');
+  iss >> pid2;
+  fullCommandStream3 << "kill -HUP " << pid2;
+  cmd3 = fullCommandStream3.str();
+
+  res = exec(cmd3.c_str());
+
+  if (DEBUG)
+    cout << "DEBUG -- kill_geth_thread (3rd call) -- command:" << cmd3 << " result: " << res << endl;  
+  
+  /* And again via SSH */
+  string cmd4;
+  std::ostringstream fullCommandStream4;
+  fullCommandStream4 << "ssh vstrobel@c" << rack << "-" << nodeInt << " ";
+  fullCommandStream4 << "kill -HUP " << pid2;
+  cmd4 = fullCommandStream4.str();
+  res = exec(cmd4.c_str());
+  
+  if (DEBUG)
+    cout << "DEBUG -- kill_geth_thread (4th call) -- command:" << cmd4 << " result: " << res << endl;
   
   return res;
   
@@ -810,7 +837,7 @@ std::string smartContractInterface(int i, string interface, string contractAddre
    std::string fullCommand = fullCommandStream.str();
 
    string res = exec_geth_cmd(i, fullCommand, nodeInt, datadirBase);
-   cout << "Result received from SC is: " << res << endl;
+   //cout << "Result received from SC is: " << res << endl;
 
    return res;
  }
@@ -916,21 +943,30 @@ std::string deploy_contract(int i, string interfacePath, string dataPath, string
 
 
 /* Check account balance of robot i (in wei)*/
-int check_balance(int i) {
+long check_balance(int i) {
   string cmd = "eth.getBalance(eth.coinbase)";
   string res = exec_geth_cmd(i, cmd);
-  int balance = atoi(res.c_str());
+  long balance;
+  istringstream ss(res);
+  ss >> balance;
 
   return balance;
 }
 
 
 /* Check account balance of robot i (in wei) */
-int check_balance(int i, int nodeInt, string datadirBase) {
+long check_balance(int i, int nodeInt, string datadirBase) {
   string cmd = "eth.getBalance(eth.coinbase)";
   string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);  
-  int balance = atoi(res.c_str());
+  long balance;// = atoi(res.c_str());
 
+  if (res.find("true") != string::npos) {
+    balance = 0;
+  } else {  
+    istringstream ss(res);
+    ss >> balance;
+  }
+  
   return balance;
 }
 
@@ -940,7 +976,10 @@ int getBlockChainLength(int i) {
   
   string cmd = "eth.blockNumber";
   string res = exec_geth_cmd(i, cmd);  
-  int blockNumber = atoi(res.c_str());
+  int blockNumber;// = atoi(res.c_str());
+  istringstream ss(res);
+  ss >> blockNumber;
+  
 
   return blockNumber;
 
@@ -951,8 +990,18 @@ int getBlockChainLength(int i, int nodeInt, string datadirBase) {
   
   string cmd = "eth.blockNumber";
   string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);  
-  int blockNumber = atoi(res.c_str());
+  int blockNumber;
 
+  /* TODO: A check would be better. Sometime eth.blockNumber returns
+     true which is converted to 32515 */
+  if (res.find("true") != string::npos) {
+    blockNumber = -1;
+  } else {  
+    istringstream ss(res);
+    ss >> blockNumber;
+  }
+
+  
   return blockNumber;
 
 }
@@ -1005,7 +1054,10 @@ int getWhiteVotes(int i){
   string cmd = "whiteVotes()";
   string res = exec_geth_cmd(i, cmd);
   
-  int blockNumber = atoi(res.c_str());
+  int blockNumber;// = atoi(res.c_str());
+  istringstream ss(res);
+  ss >> blockNumber;
+
 
   return blockNumber;
 
@@ -1016,7 +1068,10 @@ int getWhiteVotes(int i){
 int getWhiteVotes(int i, int nodeInt, string datadirBase){
   string cmd = "whiteVotes()";
   string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);  
-  int blockNumber = atoi(res.c_str());
+  int blockNumber;// = atoi(res.c_str());
+  istringstream ss(res);
+  ss >> blockNumber;
+
 
   return blockNumber;
 
@@ -1028,7 +1083,10 @@ int getBlackVotes(int i) {
   string cmd = "blackVotes()";
   string res = exec_geth_cmd(i, cmd);
 
-  int resInt = atoi(res.c_str());
+  int resInt;// = atoi(res.c_str());
+  istringstream ss(res);
+  ss >> resInt;
+
 
   return resInt;
 }
@@ -1037,8 +1095,9 @@ int getBlackVotes(int i) {
 int getBlackVotes(int i, int nodeInt, string datadirBase) {
   string cmd = "blackVotes()";
   string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);
-
-  int resInt = atoi(res.c_str());
+  istringstream ss(res);  
+  int resInt;// = atoi(res.c_str());
+  ss >> resInt;  
 
   return resInt;
 }
@@ -1047,7 +1106,9 @@ int getBlackVotes(int i, int nodeInt, string datadirBase) {
 int getLast2Votes(int i) {
   string cmd = "last2Votes()";
   string res = exec_geth_cmd(i, cmd);
-  int resInt = atoi(res.c_str());
+  int resInt;// = atoi(res.c_str());
+  istringstream ss(res);
+  ss >> resInt;
 
   return resInt;
 }
@@ -1057,7 +1118,10 @@ int getLast2Votes(int i) {
 int getLast2Votes(int i, int nodeInt, string datadirBase) {
   string cmd = "last2Votes()";
   string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);
-  int resInt = atoi(res.c_str());
+  int resInt;// = atoi(res.c_str());
+  istringstream ss(res);
+  ss >> resInt;
+
 
   return resInt;
 }

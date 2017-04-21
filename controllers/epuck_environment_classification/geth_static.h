@@ -26,7 +26,7 @@ void geth_init(int i, int nodeInt, std::string datadirBase);
 
 // Run geth for robot i
 void start_geth(int i);
-void start_geth(int i, int nodeInt, std::string datadirBase);
+void start_geth(int i, int basePort, int nodeInt, std::string datadirBase);
 
 /* Create a new account for robot i */
 void createAccount(int i);
@@ -91,7 +91,7 @@ std::string getContractAddress(int i, std::string txHash, int nodeInt, std::stri
 
 /* Kill geth thread based on robot number i */
 std::string kill_geth_thread(int i);
-std::string kill_geth_thread(int i, int nodeInt, std::string datadirBase);
+std::string kill_geth_thread(int i, int basePort, int nodeInt, std::string datadirBase);
 
 /* Deploy contract using robot number i */
 std::string deploy_contract(int i, std::string interfacePath, std::string dataPath, std::string templatePath);
@@ -99,7 +99,7 @@ std::string deploy_contract(int i, std::string interfacePath, std::string dataPa
 
 /* Check account balance of robot i (in wei)*/
 int check_balance(int i);
-int check_balance(int i, int nodeInt, std::string datadirBase);
+long check_balance(int i, int nodeInt, std::string datadirBase);
 
 /* Get the raw transaction based on the tx hash */
 std::string getRawTransaction(int i, std::string txHash);

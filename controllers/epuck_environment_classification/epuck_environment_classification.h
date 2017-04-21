@@ -73,6 +73,7 @@ public:
 	    std::string mappingPath;
 	    std::string blockchainPath;
 	    std::string datadirBase;
+	    int basePort;
 	    UInt32 numPackSaved;
 	    UInt32 status;
 	    UInt32 LAMDA, turn;
@@ -169,6 +170,14 @@ public:
       return m_sStateData.State == SStateData::STATE_DIFFUSING;
    }
 
+   inline std::string getEnode()  {
+     return enode;
+   }
+
+   inline int getNodeInt() {
+     return nodeInt;
+   }
+
    inline void setContractAddress(std::string contractAddr) {
      contractAddress = contractAddr;
    }
@@ -210,6 +219,9 @@ private:
    std::string contractAddress;
    std::string rawTx;
    std::set<int> neighbors;
+   std::string enode;
+   int nodeInt;
+   std::map<int, int> robotIdToNode;  
    bool mining;
    CColor red, blue, green;                    // Add here eventual additional color AGGIUNGERECOLORI
 //   int totalCounted, countedOfThisOpinion[N_COL];  USED JUST FOR STATISTICS, no more used

@@ -1,44 +1,30 @@
 TEMPLATE='experiments/epuck_EC_locale_template.argos'
-OUTFILE='experiments/epuck.argos'
-#BASEDIR='/home/volker/Downloads/code/code/argos_simulations/Epuck/controllers/epuck_environment_classification/'
+OUTFILE='experiments/epuck1.argos'
 BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
-DATADIR='data/experiment1_decisionrule2/'
+DATADIR='data/paratests/'
 BLOCKCHAINPATH='/home/vstrobel/eth_data_para/data' # always without '/' at the end!!
 MINERID=120
-NUMROBOTS=(20)
+NUMROBOTS=(1) # TODO: CHANGE BACK !!!
 REPETITIONS=15
 DECISIONRULE=3
 PERCENT_BLACKS=(34 48)
-MINERNODE=0
 # the one I did all the tests with:
 MININGDIFF=1000000
-##MININGDIFF=150000
 # never go with the difficulty below 131072! (see https://github.com/ethereum/go-ethereum/issues/3590)
-#MININGDIFF=
 USEMULTIPLENODES=true
+MAPPINGPATH='/home/vstrobel/Documents/argdavide/experiments/config0.txt'
 CHANGEDIFFIULTY=""
-USEDNODES=(0 6)
+USEDNODES=(0 6) # TODO: CHANGE BACK !!!
+BASEPORT=33000
 
-# Create directories for collecting data and the geth processes
-mkdir -p $DATADIR
-mkdir -p $BLOCKCHAINPATH
+ # Rebuild geth with another value in checkDifficulty
+ if [ $CHANGEDIFFIULTY ]; then
+     #    ./change_difficulty.sh $MININGDIFF
+     ./create_geths.sh $MININGDIFF
+ fi
 
-# Create file for killing the blockchain proceeses on these nodes
-echo "$(pwd)/killblockchainallccallpara " > "${BLOCKCHAINPATH}/bckillerccall"
-echo "$(pwd)/killblockchainallpara " > "${BLOCKCHAINPATH}/bckiller"
-for k in "${USEDNODES[@]}"; do
-    echo $k > "${BLOCKCHAINPATH}/bckillerccall"
-    echo $k > "${BLOCKCHAINPATH}/bckiller" 
-done
-
-
-# Rebuild geth with another value in checkDifficulty
-if [ $CHANGEDIFFIULTY ]; then
-    #    ./change_difficulty.sh $MININGDIFF
-    ./create_geths.sh $MININGDIFF
-fi
-
-
+ mkdir -p $DATADIR
+ 
 # Iterate over experimental settings and start experiments
 for k in "${NUMROBOTS[@]}"; do
 
@@ -52,6 +38,10 @@ for k in "${NUMROBOTS[@]}"; do
 
 	for i in `seq 1 $REPETITIONS`; do
 
+	    # The miner node is the first of the used nodes
+	    MINERNODE=${USEDNODES[0]}
+
+
 	    GENERATEDAG=`cat regeneratedag.txt`
 	    if [ $GENERATEDAG ]; then
 		#if [ "$i" -gt 0 ]; then
@@ -61,13 +51,35 @@ for k in "${NUMROBOTS[@]}"; do
 		#fi
 	    fi
 
+	    # Create the mapping file
+	    python experiments/create_node_mapping_call.py $MAPPINGPATH $NUMROBOTS ${USEDNODES[0]} ${USEDNODES[1]}
+
+
+	    # Create directories for collecting data and the geth processes
+	    mkdir -p $BLOCKCHAINPATH
+
+	    
+	    # Create file for killing the blockchain proceeses on these nodes
+	    echo -n "$(pwd)/killblockchainallccallpara " > "${BLOCKCHAINPATH}/bckillerccall"
+	    echo -n "$(pwd)/killblockchainallpara " > "${BLOCKCHAINPATH}/bckiller"
+	    for u in "${USEDNODES[@]}"; do
+		echo -n "$u " >> "${BLOCKCHAINPATH}/bckillerccall"
+		echo -n "$u " >> "${BLOCKCHAINPATH}/bckiller" 
+	    done
+	    
+
 	    RADIX=$(printf 'num%d_black%d%d' $k $PERCENT_BLACK $i)
 
 	# Create template
-	sed -e "s|BASEDIR|$BASEDIR|g" -e "s|DATADIR|$DATADIR|g" -e "s|RADIX|$RADIX|g" -e "s|NUMROBOTS|$k|g" -e "s|R0|$R0|g" -e "s|B0|$B0|g" -e "s|PERCENT_BLUE|$PERCENT_BLACK|g" -e "s|PERCENT_RED|$PERCENT_WHITE|g" -e "s|DECISIONRULE|$DECISIONRULE|g" -e "s|USEMULTIPLENODES|$USEMULTIPLENODES|g" -e "s|REPETITIONS|$REPETITIONS|g" -e "s|MININGDIFF|$MININGDIFF|g" -e "s|MINERNODE|$MINERNODE|g" -e "s|MINERID|$MINERID|g" -e "s|BLOCKCHAINPATH|$BLOCKCHAINPATH" $TEMPLATE > $OUTFILE
+	sed -e "s|BASEDIR|$BASEDIR|g" -e "s|DATADIR|$DATADIR|g" -e "s|RADIX|$RADIX|g" -e "s|NUMROBOTS|$k|g" -e "s|R0|$R0|g" -e "s|B0|$B0|g" -e "s|PERCENT_BLUE|$PERCENT_BLACK|g" -e "s|PERCENT_RED|$PERCENT_WHITE|g" -e "s|DECISIONRULE|$DECISIONRULE|g" -e "s|USEMULTIPLENODES|$USEMULTIPLENODES|g" -e "s|REPETITIONS|$REPETITIONS|g" -e "s|MININGDIFF|$MININGDIFF|g" -e "s|MINERNODE|$MINERNODE|g" -e "s|MINERID|$MINERID|g" -e "s|BASEPORT|$BASEPORT|g" -e "s|BLOCKCHAINPATH|$BLOCKCHAINPATH|g" -e "s|MAPPINGPATH|$MAPPINGPATH|g" $TEMPLATE > $OUTFILE
 	
     # Start experiment
 	argos3 -c $OUTFILE
+
+	# Clean up
+	bash "${BLOCKCHAINPATH}/bckillerccall"
+	mkdir -p "${DATADIR}${p}-${i}"
+	mv "${BLOCKCHAINPATH}*" "${DATADIR}${p}-${i}"
 	    
 	done
 	

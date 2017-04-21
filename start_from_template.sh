@@ -5,14 +5,13 @@ DATADIR='data/experiment1_decisionrule2/'
 NUMROBOTS=(20)
 REPETITIONS=15
 DECISIONRULE=2
-PERCENT_BLACKS=(48)
+PERCENT_BLACKS=(34)
 # the one I did all the tests with:
 MININGDIFF=1000000
 ##MININGDIFF=150000
 # never go with the difficulty below 131072! (see https://github.com/ethereum/go-ethereum/issues/3590)
 #MININGDIFF=
 USEMULTIPLENODES=true
-NODEMAPPING="config1.txt"
 CHANGEDIFFIULTY=""
 
 mkdir -p $DATADIR

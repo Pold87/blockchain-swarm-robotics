@@ -1,9 +1,11 @@
+import sys
+
 outfile="config0.txt"
 
 num_robots=20
 #miner_id=111
 
-used_nodes = [1, 2]
+used_nodes = [0, 2]
 
 # Threshold; all robot ids below this value will be run on node 1, the
 # rest on node 2

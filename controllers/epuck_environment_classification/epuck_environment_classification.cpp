@@ -22,14 +22,12 @@
 using namespace std;
 
 map<int, string> enodes;
-map<string, string> ips;
 map<int, string> coinbaseAddresses;
 string interface; // Smart contract interface
 int usedRack = 3;
 int numNodes = 7;
 //vector<string> usedNodes = {"c3-0", "c3-1", "c3-2", "c3-3", "c3-4", "c3-5", "c3-6"};
 string username = "vstrobel";
-map<int, int> robotIdToNode;  
 
 /* Convert a number to a string */
 template <typename T> std::string NumberToString ( T Number )
@@ -80,6 +78,7 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "mapping_path", mappingPath);
     GetNodeAttribute(t_node, "use_multiple_nodes", useMultipleNodes);
     GetNodeAttribute(t_node, "blockchain_path", blockchainPath);
+    GetNodeAttribute(t_node, "base_port", basePort);
   }
   catch(CARGoSException& ex) {
     THROW_ARGOSEXCEPTION_NESTED("Error initializing controller state parameters.", ex);
@@ -129,15 +128,20 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
   toSend[3]=5;
   m_pcRABA->SetData(toSend);
 
+  readNodeMapping();
+  
   /* Strange settings that do strange things (TODO: ask Davide why)  */
   if(simulationParams.percentRed < simulationParams.percentBlue)
     simulationParams.percentRed = simulationParams.percentBlue;
   simulationParams.percentRed = simulationParams.percentRed / 100;
 
+  cout << "Percent red is " << simulationParams.percentRed << endl;
+  cout << "Percent blue is " << simulationParams.percentBlue << endl;
+  
   /* Ethereum */
-
+  cout << "ID Raw is: " << GetId() << endl;
   int robotId = Id2Int(GetId());
-  int nodeInt = robotIdToNode[robotId];
+  nodeInt = robotIdToNode[robotId];
 
   if (robotId == 0) {
 
@@ -155,7 +159,7 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
     /* The blockchain folder get moved to the data folder at the end
        of each run; therefore, this command is just to make sure that
        the directory is really empty */
-    fullCommandStream << "rm -rf " << simulationParams.blockchainPath << "/*";
+    fullCommandStream << "rm -rf " << simulationParams.blockchainPath << "?*";
 
     std::string fullCommand = fullCommandStream.str();
     system(fullCommand.c_str());     
@@ -165,21 +169,15 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
 
   /* Find out on which cluster node this robot's geth process should be executed */
   if (simulationParams.useMultipleNodes) {
-    string node = getNode(robotId);
-    /* Resolve the hostname to its ip */
-    string ip = hostname2ip(node);
-    /* Save the mapping from node to ip */
-    ips[node] = ip;    
-    cout << "The node is: " << node << " and the ip is: " << ip << endl;
 
     geth_init(robotId, nodeInt, simulationParams.blockchainPath);
-    start_geth(robotId, nodeInt, simulationParams.blockchainPath);
+    start_geth(robotId, simulationParams.basePort, nodeInt, simulationParams.blockchainPath);
     createAccount(robotId, nodeInt, simulationParams.blockchainPath);   
     enodes[robotId] = get_enode(robotId, nodeInt, simulationParams.blockchainPath);
+    enode = enodes[robotId];
     coinbaseAddresses[robotId] = getCoinbase(robotId, nodeInt, simulationParams.blockchainPath);
     address = coinbaseAddresses[robotId];    
     unlockAccount(robotId, "test", nodeInt, simulationParams.blockchainPath);
-
     
   } else {
     geth_init(robotId);
@@ -199,7 +197,7 @@ void EPuck_Environment_Classification::readNodeMapping() {
 
  ifstream infile;
 
- infile.open(simulationParams.mappingPath);
+ infile.open(simulationParams.mappingPath.c_str());
  
  while (infile >> r_id >> r_node)
    robotIdToNode[r_id] = r_node;
@@ -214,7 +212,7 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
   set<int> neighborsToRemove;
 
   int robotId = Id2Int(GetId());
-  int nodeInt = robotIdToNode[robotId];
+  //  int nodeInt = robotIdToNode[robotId];
   
   /* Old neighbors minus new neighbors = neighbors that should be removed */
   std::set_difference(neighbors.begin(),
@@ -248,29 +246,35 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
   }
   //  cout << endl;
   
-  //  cout << "Robot " << robotId << " Removing neighbors: ";
 
   for (it = neighborsToRemove.begin(); it != neighborsToRemove.end(); ++it) {
-    int i = *it;
-    //    cout << i << " ";
-    if (simulationParams.useMultipleNodes)
-      remove_peer(robotId, get_enode(i), nodeInt, simulationParams.blockchainPath);
-    else
-      remove_peer(robotId, get_enode(i));
-  }
-  //  cout << endl;
     
-  //  cout << "Robot " << robotId << " Adding neighbors: ";
+    int i = *it;
+    //cout << "Robot " << robotId << " Removing neighbors: ";
+    //cout << i << " ";
+    //cout << endl;
+    if (simulationParams.useMultipleNodes) {
+      string e = get_enode(i, robotIdToNode[i], simulationParams.blockchainPath);
+      remove_peer(robotId, e, nodeInt, simulationParams.blockchainPath);
+    } else {
+      remove_peer(robotId, get_enode(i));
+    }
+  }
+   
 
   for (it = neighborsToAdd.begin(); it != neighborsToAdd.end(); ++it) {
     int i = *it;
-    //    cout << i << " ";
-    if (simulationParams.useMultipleNodes)
-      add_peer(robotId, get_enode(i), nodeInt, simulationParams.blockchainPath);
-    else
+    //cout << "Robot " << robotId << " Adding neighbors: ";
+    //cout << i << " ";
+    // cout << endl;
+    if (simulationParams.useMultipleNodes) {
+      string e = get_enode(i, robotIdToNode[i], simulationParams.blockchainPath);
+      add_peer(robotId, e, nodeInt, simulationParams.blockchainPath);
+    }
+    else {
       add_peer(robotId, get_enode(i));
+    }
   }
-  //  cout << endl;
   
   //Update neighbor array
   set<int> neighborsTmp(newNeighbors);
@@ -284,7 +288,7 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
 void EPuck_Environment_Classification::ControlStep() {
 
   int robotId = Id2Int(GetId());
-  int nodeInt = robotIdToNode[robotId];
+  //  int nodeInt = robotIdToNode[robotId];
   
   /* Turn leds according with actualOpinion */
   TurnLeds();
@@ -396,7 +400,7 @@ void EPuck_Environment_Classification::Explore() {
   m_pcRABS->ClearPackets();
   
   int robotId = Id2Int(GetId());
-  int nodeInt = robotIdToNode[robotId];  
+  //  int nodeInt = robotIdToNode[robotId];  
 
   /* remainingExplorationTime it's the variable decremented each control step. 
    * This variable represents the time that a robot must still spend in exploration state.
@@ -433,7 +437,7 @@ void EPuck_Environment_Classification::Explore() {
     cout << "contract address is" << contractAddress << endl;
 
     uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
-    cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
+    //cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
     int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
 
     if (simulationParams.useMultipleNodes)
@@ -494,7 +498,7 @@ void EPuck_Environment_Classification::Diffusing() {
 
 
   int robotId = Id2Int(GetId());
-  int nodeInt = robotIdToNode[robotId];
+  //  int nodeInt = robotIdToNode[robotId];
   
   /* remainingDiffusingTime>0 means that is still time to perform diffusing state */
   if (m_sStateData.remainingDiffusingTime > 0)
@@ -514,7 +518,8 @@ void EPuck_Environment_Classification::Diffusing() {
 	IC.senderID = tPackets[i]->Data[3];
       
 	/* Update Ethereum neighbors */
-	currentNeighbors.insert(IC.senderID);   	      
+	if(tPackets[i]->Data[0] != 5) /* 5 signals empty data */
+	  currentNeighbors.insert(IC.senderID);   	      
       }
 
       	/* Listen to other opinions */
@@ -556,7 +561,7 @@ void EPuck_Environment_Classification::Diffusing() {
       /* First Byte used for the opinion of the robot */
       toSend[0] = opinion.actualOpinion;
 
-      cout << "Robot ID: " << robotId << "-- Actual opinion is: "  << toSend[0] <<  endl;
+      //cout << "Robot ID: " << robotId << "-- Actual opinion is: "  << toSend[0] <<  endl;
       
       /* Second and Third Byte used for the quality of the robots */
       Real p = opinion.quality;
@@ -609,7 +614,7 @@ void EPuck_Environment_Classification::Diffusing() {
 	/* Create a transaction in each time step */    
 	
 	uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
-	cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
+	//cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
 	int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
 
 	if (simulationParams.useMultipleNodes)
@@ -674,7 +679,7 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
 {
 
   int robotId = Id2Int(GetId());
-  int nodeInt = robotIdToNode[robotId];
+  //  int nodeInt = robotIdToNode[robotId];
 
   uint opinionInt = (uint) (opinion.quality * 100);
   int args[4] = {decision_rule, opinion.actualOpinion / 2, opinionInt, simulationParams.numPackSaved};

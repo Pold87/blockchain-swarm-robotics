@@ -179,6 +179,7 @@ private:
 	std::string dataDir;
 	std::string datadirBase;
 	bool useMultipleNodes;
+	int basePort;
 
 };
 
