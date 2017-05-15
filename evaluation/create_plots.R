@@ -169,6 +169,47 @@ plot.consensus.time.gg <- function(df, xlab, ylab, out.name) {
 
 
 
+## Plot blockchain height
+## Save as function above just for the blockchain height
+plot.bc.height.gg <- function(df, xlab, ylab, out.name) {
+
+    df[, 'strategy'] <- as.factor(df[, 'strategy'])
+    p <- ggplot(df, aes(x=difficulty, y=bc.height, group=strategy)) +
+        geom_line(aes(colour = strategy), size=1.1) +
+        geom_point(aes(colour = strategy, shape = strategy), size=3) +
+        theme_classic() +
+        theme(axis.text=element_text(size=17, colour="gray15"),
+              axis.title=element_text(size=17, colour="gray15"),
+              axis.title.y = element_text(angle=0, margin = margin(r = -60, t = -60)),
+              panel.border = element_blank(),
+              panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank(),
+              axis.line = element_blank(),
+              axis.ticks.length=unit(-0.25, "cm"),
+              axis.ticks = element_line(colour = 'gray15'),
+              axis.text.x = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")),
+              axis.text.y = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")))  +
+        ylab(ylab) +
+        xlab(xlab) +
+#        coord_fixed()
+        base_breaks_x(seq(0.5, 1, 0.1)) +
+#        base_breaks_x(seq(0, 20, 5)) +
+        base_breaks_y(seq(0, 140, 20))# + expand_limits(x=25)
+
+
+    p <- direct.label(p, list(dl.trans(x=x+0.2, y=y),
+                              list("last.qp", cex=1.0)))
+    
+   # p <- direct.label(p, list(dl.trans(x=x-2.5, y=y+0.4), "last.qp"))
+
+    ## Code to turn off clipping
+    gt1 <- ggplotGrob(p)
+    gt1$layout$clip[gt1$layout$name == "panel"] <- "off"
+    grid.draw(gt1)
+    
+    ggsave(paste0(report.dir, "ggplot_bcheight.pdf"))
+    }
+
 ########################
 ### EXIT PROBABILITY ###
 ########################
@@ -343,6 +384,7 @@ if (!use.fake.data) {
 
 strategies <- c(1,2,3)
 strategy <- c()
+k <- num.robots
 
 ## Consensus time: As a function of the difficulty of the task
 if (do.difficulty) {
@@ -350,43 +392,62 @@ if (!use.fake.data) {
 
     consensus.time <- c()
     strategy <- c()
+    bc.height <- c()
     for (s in strategies) {
         for (d in difficulty) {
-            for (k in num.robots) {
 
                 used.difficulties <- c(used.difficulties, d)
                 successes <- c()
                 strategy <- c(strategy, s)
                 consensus.times <- c()
+                bc.heights <- c()
                 
                 for (node in nodes) {
 
-                    trials.name <- sprintf("%s/experiment1_decision%s-node%s/num%d_black%d", data.dir, s, node, k, d)    
+                    trials.name <- sprintf("%s/experiment1_decision%s-node%s/num%d_black%d", data.dir, s, node, k, d)
                 
                 ## For all trials
                 for (i in 1:max.trials) {
                     f <- paste0(trials.name, i, ".RUNS")
+                    f.bc <- paste0(trials.name, i, "-blockchain.RUN1")
+
+                    # Consensus time
                     if (file.exists(f)) {
                         X <- read.table(f, header=T)
                         if (!is.na(X[1, "ExitTime"])){ # Check that the run was completed
+
+                            # Just for finding out why voter model is different with medium difficulty
+                            if (d == 42) {
+                                print(paste("strat is", s, "d is", d, "node is", node, "consensus time is", X[1, "ExitTime"]))
+                            }
+                            
                             consensus.times <- c(consensus.times, X[1, "ExitTime"])
+
+                            ## Blockchain height
+                            if (file.exists(f.bc)) {
+                                X.bc <- read.table(f.bc, header=T)
+                                avg.height <- mean(unlist(X.bc[nrow(X.bc),2:ncol(X.bc)]))
+                                bc.heights <- c(bc.heights, avg.height)
+                            }                            
                         }
                     }
                 }
-                    }
+                }
 
-                print(paste("The consensus time is", mean(consensus.times)))
-                consensus.time <- c(consensus.time, mean(consensus.times))
+            print(paste("The consensus time is", median(consensus.times)))
+            consensus.time <- c(consensus.time, median(consensus.times))
+            bc.height <- c(bc.height, mean(bc.heights))
     
-            }
         }
     }
 
-    print(difficulty)
-    print(consensus.time)
-    print(strategy)
-    difficulty <- difficulty / (100 - difficulty)
+print(difficulty)
+print(bc.height)
+print(consensus.time)
+print(strategy)
+difficulty <- difficulty / (100 - difficulty)
 df <- data.frame(difficulty, consensus.time, strategy)
+df.bc <- data.frame(difficulty, bc.height, strategy)
 } else {
     ## Import fake data
     df <- read.csv(paste0(fake.data.dir, "fake_python_cons.csv"))
@@ -401,6 +462,11 @@ df <- data.frame(difficulty, consensus.time, strategy)
 plot.consensus.time.gg(df,
                        xlab=expression("Difficulty"), ylab="Consensus time / 10",
                        "consensustime_d_gg.pdf")
+
+
+plot.bc.height.gg(df.bc,
+                       xlab=expression("Difficulty"), ylab="Blockchain height",
+                       "blockchainheight_gg.pdf")
 
 
 }
