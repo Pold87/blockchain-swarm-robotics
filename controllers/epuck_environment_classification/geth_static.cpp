@@ -227,9 +227,31 @@ string exec_geth_cmd(int i, string command, int nodeInt, string datadirBase){
       throw;
       }
   
-  return res;
-  
+  return res;  
 }
+
+// Take a geth command, execute it on the selected robot, and return the result string
+void exec_geth_cmd_background(int i, string command, int nodeInt, string datadirBase){
+
+  ostringstream fullCommandStream;
+
+  /* Run geth command on this node  */
+  fullCommandStream << "ssh vstrobel@c" << rack << "-" << nodeInt << " \"";
+  
+  ReplaceStringInPlace(command, "\"", "\\\"");
+
+  /* The ampersand symol here makes the difference to the normal exec_geth_cmd function */
+  fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc\"&";
+  
+  std::string fullCommand = fullCommandStream.str();
+
+  //  if (DEBUG)
+  //  cout << "exec_geth_cmd: " << fullCommand << endl;
+  
+  system(fullCommand.c_str());
+
+}
+
 
 void geth_init(int i) {
   cout << "Calling geth_init for robot " << i << endl;
@@ -344,6 +366,7 @@ void start_geth(int i) {
   
   FILE* pipe = popen(fullCommandStream.str().c_str(), "r");
   pclose(pipe);
+  sleep(1);
 	  
 }
 
@@ -381,7 +404,8 @@ void start_geth(int i, int basePort, int nodeInt, string datadirBase) {
   cout << "Running command " << fullCommandStream.str() << endl;
   
   FILE* pipe = popen(fullCommandStream.str().c_str(), "r");
-  pclose(pipe);	  
+  pclose(pipe);
+  sleep(1);
 }
 
 
@@ -468,7 +492,19 @@ string start_mining(int i, int t, int nodeInt, std::string datadirBase) {
   string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);
 
   return res;
+
 }
+
+/* Start the mining process for robot i using t threads */
+void start_mining_bg(int i, int t, int nodeInt, std::string datadirBase) {
+
+  std::ostringstream fullCommandStream;
+  fullCommandStream << "miner.start(" << t << ")";
+  string cmd = fullCommandStream.str();
+  exec_geth_cmd_background(i, cmd, nodeInt, datadirBase);
+
+}
+
 
 /* Stop the mining process for robot i */
 string stop_mining(int i) {
@@ -483,6 +519,13 @@ string stop_mining(int i, int nodeInt, std::string datadirBase) {
   string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);
   return res;
 }
+
+/* Stop the mining process for robot i */
+void stop_mining_bg(int i, int nodeInt, std::string datadirBase) {
+  string cmd = "miner.stop()";
+  exec_geth_cmd_background(i, cmd, nodeInt, datadirBase);
+}
+
 
 // Add enode to robot i
 string add_peer(int i, string enode) {
@@ -513,6 +556,16 @@ string add_peer(int i, string enode, int nodeInt, string datadirBase) {
 }
 
 
+// Add enode to robot i
+void add_peer_bg(int i, string enode, int nodeInt, string datadirBase) {
+
+  std::ostringstream fullCommandStream;
+  fullCommandStream << "admin.addPeer(" << enode << ")";
+  string cmd = fullCommandStream.str();
+  exec_geth_cmd_background(i, cmd, nodeInt, datadirBase);
+}
+
+
 // Remove enode from robot i
 string remove_peer(int i, string enode) {
 
@@ -534,6 +587,19 @@ string remove_peer(int i, string enode, int nodeInt, string datadirBase) {
 
   return res;
 }
+
+
+
+// Remove enode from robot i
+void remove_peer_bg(int i, string enode, int nodeInt, string datadirBase) {
+
+  std::ostringstream fullCommandStream;
+  fullCommandStream << "admin.removePeer(" << enode << ")";
+  string cmd = fullCommandStream.str();
+  exec_geth_cmd_background(i, cmd, nodeInt, datadirBase);
+}
+
+
 
 // Get coinbase address of robot i
 std::string getCoinbase(int i){
@@ -840,6 +906,32 @@ std::string smartContractInterface(int i, string interface, string contractAddre
    //cout << "Result received from SC is: " << res << endl;
 
    return res;
+ }
+
+
+// Interact with a function of a smart contract
+// v: Amount of wei to send
+void smartContractInterfaceBg(int i, string interface, string contractAddress,
+				   string func, int args[], int argc, int v, int nodeInt, string datadirBase) {
+  
+  
+  ostringstream fullCommandStream;
+
+  fullCommandStream << "var cC = web3.eth.contract(" << interface << ");var c = cC.at(" << contractAddress << ");c." << func << "(";
+
+  
+  for(int k = 0; k < argc; k++) {
+    fullCommandStream << args[k] << ",";  
+  }
+  
+  fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '1000000'});";
+  
+  
+   std::string fullCommand = fullCommandStream.str();
+
+   exec_geth_cmd_background(i, fullCommand, nodeInt, datadirBase);
+   //cout << "Result received from SC is: " << res << endl;
+
  }
 
 

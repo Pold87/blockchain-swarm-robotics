@@ -78,6 +78,7 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "mapping_path", mappingPath);
     //    GetNodeAttribute(t_node, "mapping_byzantine_path", mappingByzantinePath);
     GetNodeAttribute(t_node, "use_multiple_nodes", useMultipleNodes);
+    GetNodeAttribute(t_node, "use_background_geth_calls", useBackgroundGethCalls);
     GetNodeAttribute(t_node, "blockchain_path", blockchainPath);
     GetNodeAttribute(t_node, "base_port", basePort);
     GetNodeAttribute(t_node, "use_classical_approach", useClassicalApproach);
@@ -148,19 +149,22 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
     int robotId = Id2Int(GetId());
     nodeInt = robotIdToNode[robotId];
     
+    
+    //isByzantine = true;
+    
     if (robotId == 0) {
-      
+
       if (simulationParams.useMultipleNodes) {
-      
+	
 	string bckiller = "bash " + simulationParams.blockchainPath + "/bckillerccall";
 	exec(bckiller.c_str());    
 	
       } else {
 	system("killall geth");
       }
-
+      
       std::ostringstream fullCommandStream;
-
+      
       /* The blockchain folder get moved to the data folder at the end
 	 of each run; therefore, this command is just to make sure that
 	 the directory is really empty */
@@ -280,7 +284,10 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
     //cout << endl;
     if (simulationParams.useMultipleNodes) {
       string e = get_enode(i, robotIdToNode[i], simulationParams.blockchainPath);
-      remove_peer(robotId, e, nodeInt, simulationParams.blockchainPath);
+      if (simulationParams.useBackgroundGethCalls)
+	remove_peer_bg(robotId, e, nodeInt, simulationParams.blockchainPath);
+      else
+	remove_peer(robotId, e, nodeInt, simulationParams.blockchainPath);
     } else {
       remove_peer(robotId, get_enode(i));
     }
@@ -294,7 +301,10 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
     // cout << endl;
     if (simulationParams.useMultipleNodes) {
       string e = get_enode(i, robotIdToNode[i], simulationParams.blockchainPath);
-      add_peer(robotId, e, nodeInt, simulationParams.blockchainPath);
+      if (simulationParams.useBackgroundGethCalls)
+	add_peer_bg(robotId, e, nodeInt, simulationParams.blockchainPath);
+      else
+	add_peer(robotId, e, nodeInt, simulationParams.blockchainPath);
     }
     else {
       add_peer(robotId, get_enode(i));
@@ -467,10 +477,11 @@ void EPuck_Environment_Classification::Explore() {
     //cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
     int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
 
+    string voteResult;
     if (simulationParams.useMultipleNodes)
-      string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt, nodeInt, simulationParams.blockchainPath);
+      smartContractInterfaceBg(robotId, interface, contractAddress, "vote", args, 2, opinionInt, nodeInt, simulationParams.blockchainPath);
     else
-      string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt);
+     voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt);
     
     //cout << "voteResult is " << voteResult << endl;
     
@@ -645,7 +656,7 @@ void EPuck_Environment_Classification::Diffusing() {
 	int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
 
 	if (simulationParams.useMultipleNodes)
-	  string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt, nodeInt, simulationParams.blockchainPath);
+	  smartContractInterfaceBg(robotId, interface, contractAddress, "vote", args, 2, opinionInt, nodeInt, simulationParams.blockchainPath);
 	else
 	  string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt);
 	

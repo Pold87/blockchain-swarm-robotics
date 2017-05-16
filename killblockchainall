@@ -1,5 +1,5 @@
 rack=3
-maxNode=5
+maxNode=12
 username=vstrobel
 
 for node in `seq 0 $maxNode`;

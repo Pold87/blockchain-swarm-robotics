@@ -45,6 +45,7 @@
 			       percent_red="PERCENT_RED"
 			       base_dir="BASEDIR"
 			       use_multiple_nodes="USEMULTIPLENODES"
+			       use_background_geth_calls="USEBACKGROUNDGETHCALLS"
 			       interface_path="interface.txt"
 			       mapping_path="MAPPINGPATH"
 			       base_port="BASEPORT"
