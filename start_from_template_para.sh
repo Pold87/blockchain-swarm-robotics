@@ -4,7 +4,7 @@ BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classi
 DATADIR='data/paratests/'
 BLOCKCHAINPATH='/home/vstrobel/eth_data_para/data' # always without '/' at the end!!
 MINERID=120
-NUMROBOTS=(1) # TODO: CHANGE BACK !!!
+NUMROBOTS=(20) 
 REPETITIONS=15
 DECISIONRULE=3
 PERCENT_BLACKS=(34 48)
@@ -13,6 +13,7 @@ MININGDIFF=1000000
 # never go with the difficulty below 131072! (see https://github.com/ethereum/go-ethereum/issues/3590)
 USEMULTIPLENODES=true
 MAPPINGPATH='/home/vstrobel/Documents/argdavide/experiments/config0.txt'
+MAPPINGBYZANTINEPATH='/home/vstrobel/Documents/argdavide/experiments/config_byzantine.txt'
 CHANGEDIFFIULTY=""
 USEDNODES=(0 6) # TODO: CHANGE BACK !!!
 BASEPORT=33000

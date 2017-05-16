@@ -94,6 +94,8 @@
 	  miner_node="MINERNODE"
 	  decision_rule="DECISIONRULE"
 	  base_port="BASEPORT"
+	  num_byzantine="NUMBYZANTINE"
+	  byzantine_style="BYZANTINESTYLE"
 	  blockchain_path="BLOCKCHAINPATH"/>
 
   </loop_functions>

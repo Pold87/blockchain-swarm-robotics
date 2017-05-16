@@ -76,10 +76,12 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "base_dir", baseDir);
     GetNodeAttribute(t_node, "interface_path", interfacePath);
     GetNodeAttribute(t_node, "mapping_path", mappingPath);
+    //    GetNodeAttribute(t_node, "mapping_byzantine_path", mappingByzantinePath);
     GetNodeAttribute(t_node, "use_multiple_nodes", useMultipleNodes);
     GetNodeAttribute(t_node, "use_background_geth_calls", useBackgroundGethCalls);
     GetNodeAttribute(t_node, "blockchain_path", blockchainPath);
     GetNodeAttribute(t_node, "base_port", basePort);
+    //    GetNodeAttribute(t_node, "num_byzantine", numByzantine);
   }
   catch(CARGoSException& ex) {
     THROW_ARGOSEXCEPTION_NESTED("Error initializing controller state parameters.", ex);
@@ -144,6 +146,9 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
   int robotId = Id2Int(GetId());
   nodeInt = robotIdToNode[robotId];
 
+  
+  //isByzantine = true;
+
   if (robotId == 0) {
 
     if (simulationParams.useMultipleNodes) {
@@ -206,6 +211,25 @@ void EPuck_Environment_Classification::readNodeMapping() {
  infile.close();
   
 }
+
+// void EPuck_Environment_Classification::readByzantineMapping() {
+
+//  int r_id;
+//  int r_byzantine;
+
+//  ifstream infile;
+
+//  infile.open(simulationParams.mappingByzantinePath.c_str());
+ 
+//  while (infile >> r_id >> r_byzantine)
+//    robotIdToByzantine[r_id] = r_byzantine;
+
+//  infile.close();
+  
+// }
+
+
+
 
 void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
 
