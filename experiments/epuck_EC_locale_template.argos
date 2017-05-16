@@ -49,6 +49,7 @@
 			       mapping_path="MAPPINGPATH"
 			       base_port="BASEPORT"
 			       blockchain_path="BLOCKCHAINPATH"
+			       use_classical_approach="USECLASSICALAPPROACH"
 			       percent_blue="PERCENT_BLUE"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
 							  1 = Voter model; 2 = Direct comparison; 3 = Majority Rule-->
  
@@ -93,8 +94,9 @@
 	  miner_node="MINERNODE"
 	  decision_rule="DECISIONRULE"
 	  base_port="BASEPORT"
+	  use_classical_approach="USECLASSICALAPPROACH"
 	  num_byzantine="NUMBYZANTINE"
-	  byzantine_style="BYZANTINESTYLE"
+	  byzantine_swarm_style="BYZANTINESWARMSTYLE"
 	  blockchain_path="BLOCKCHAINPATH"/>
 
   </loop_functions>

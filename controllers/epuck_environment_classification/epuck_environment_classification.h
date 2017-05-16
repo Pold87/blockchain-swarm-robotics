@@ -184,6 +184,15 @@ public:
      contractAddress = contractAddr;
    }
 
+   inline int getByzantineStyle() {
+     return byzantineStyle;
+   }
+
+   inline void setByzantineStyle(int style) {
+     byzantineStyle = style;
+   }
+   
+
    void UpdateNeighbors(std::set<int> newNeighbors);
 
 private:
@@ -226,6 +235,8 @@ private:
    int nodeInt;
    std::map<int, int> robotIdToNode;  
    bool mining;
+   int byzantineStyle;
+   bool useClassicalApproach;
    CColor red, blue, green;                    // Add here eventual additional color AGGIUNGERECOLORI
 //   int totalCounted, countedOfThisOpinion[N_COL];  USED JUST FOR STATISTICS, no more used
 };
