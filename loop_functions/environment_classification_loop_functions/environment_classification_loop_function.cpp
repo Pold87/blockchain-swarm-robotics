@@ -87,6 +87,8 @@ void CEnvironmentClassificationLoopFunctions::fillSettings(TConfigurationNode& t
       GetNodeAttribute(tEnvironment, "miner_node", minerNode);
       GetNodeAttribute(tEnvironment, "blockchain_path", blockchainPath);
       GetNodeAttribute(tEnvironment, "base_port", basePort);
+      GetNodeAttribute(tEnvironment, "num_byzantine", numByzantine);
+      GetNodeAttribute(tEnvironment, "byzantine_style", byzantineStyle);
       
     }
   catch(CARGoSException& ex) {

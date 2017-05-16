@@ -71,9 +71,11 @@ public:
 	    std::string baseDir; /* Basedir of the controller folder */
 	    std::string interfacePath;
 	    std::string mappingPath;
+	    //	    std::string mappingByzantinePath;
 	    std::string blockchainPath;
 	    std::string datadirBase;
 	    int basePort;
+	    //	    int numByzantine;
 	    UInt32 numPackSaved;
 	    UInt32 status;
 	    UInt32 LAMDA, turn;
@@ -188,6 +190,7 @@ private:
 
    void InitGeth(int robotId);
    void readNodeMapping();
+   //   void readByzantineMapping();
    void DistributeID();
    
    CCI_EPuckWheelsActuator* m_pcWheels;
