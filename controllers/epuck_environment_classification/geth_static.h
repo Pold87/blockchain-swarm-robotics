@@ -20,6 +20,9 @@ std::string exec(const char* cmd);
 std::string exec_geth_cmd(int i, std::string command);
 std::string exec_geth_cmd(int i, std::string command, int nodeInt, std::string datadirBase);
 
+void exec_geth_cmd_background(int i, std::string command, int nodeInt, std::string datadirBase);
+
+
 // Initialize geth
 void geth_init(int i);
 void geth_init(int i, int nodeInt, std::string datadirBase);
@@ -40,18 +43,22 @@ std::string get_enode(int i, int nodeInt, std::string datadirBase);
 // Start mining (robot i) using t threads
 std::string start_mining(int i, int t);
 std::string start_mining(int i, int t, int nodeInt, std::string datadirBase);
+void start_mining_bg(int i, int t, int nodeInt, std::string datadirBase);
 
 // Stop mining (robot i)
 std::string stop_mining(int i);
 std::string stop_mining(int i, int nodeInt, std::string datadirBase);
+void stop_mining_bg(int i, int nodeInt, std::string datadirBase);
 
 // Add a peer (specified via the enode) to robot i
 std::string add_peer(int i, std::string enode);
 std::string add_peer(int i, std::string enode, int nodeInt, std::string datadirBase);
+void add_peer_bg(int i, std::string enode, int nodeInt, std::string datadirBase);
 
 // Remove a peer (specified via the enode) from robot i
 std::string remove_peer(int i, std::string enode);
 std::string remove_peer(int i, std::string enode, int nodeInt, std::string datadirBase);
+void remove_peer_bg(int i, std::string enode, int nodeInt, std::string datadirBase);
 
 // Get coinbase address of robot i
 std::string getCoinbase(int i);
@@ -80,6 +87,7 @@ std::string sendEther(int i, std::string from, std::string to, int v, int nodeIn
 // Interact with a generic smart contract
 std::string smartContractInterface(int i, std::string interface, std::string contractAddress, std::string func, int args[], int argc, int v);
 std::string smartContractInterface(int i, std::string interface, std::string contractAddress, std::string func, int args[], int argc, int v, int nodeInt, std::string datadirBase);
+void smartContractInterfaceBg(int i, std::string interface, std::string contractAddress, std::string func, int args[], int argc, int v, int nodeInt, std::string datadirBase);
 
 /* Unlock account */
 std::string unlockAccount(int i, std::string pw);

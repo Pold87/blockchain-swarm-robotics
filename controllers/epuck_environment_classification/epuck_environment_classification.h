@@ -67,6 +67,7 @@ public:
 	    Real sigma;
 	    bool exitFlag;
 	    bool useMultipleNodes;
+	    bool useBackgroundGethCalls;
 	    std::string radix;
 	    std::string baseDir; /* Basedir of the controller folder */
 	    std::string interfacePath;

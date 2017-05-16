@@ -13,9 +13,9 @@ MININGDIFF=1000000
 USEMULTIPLENODES=true
 MAPPINGPATH='/home/vstrobel/Documents/argdavide/experiments/config3.txt'
 CHANGEDIFFIULTY=""
-USEDNODES=(4 5)
+USEDNODES=(5 12)
 BASEPORT=36000
-DATADIR="data/experiment1_decision${DECISIONRULE}/"
+DATADIR="data/experiment1_decision${DECISIONRULE}-aftercrash/"
 
 
  # Rebuild geth with another value in checkDifficulty
@@ -37,7 +37,7 @@ for k in "${NUMROBOTS[@]}"; do
 	PERCENT_BLACK=$p
 	PERCENT_WHITE=$(expr 100 - $PERCENT_BLACK)
 
-	for i in `seq 1 $REPETITIONS`; do
+	for i in `seq 2 $REPETITIONS`; do
 
 	    # The miner node is the first of the used nodes
 	    MINERNODE=${USEDNODES[0]}
