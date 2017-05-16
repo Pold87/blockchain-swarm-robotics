@@ -81,6 +81,7 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "use_background_geth_calls", useBackgroundGethCalls);
     GetNodeAttribute(t_node, "blockchain_path", blockchainPath);
     GetNodeAttribute(t_node, "base_port", basePort);
+    GetNodeAttribute(t_node, "use_classical_approach", useClassicalApproach);
     //    GetNodeAttribute(t_node, "num_byzantine", numByzantine);
   }
   catch(CARGoSException& ex) {
@@ -140,59 +141,62 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
 
   cout << "Percent red is " << simulationParams.percentRed << endl;
   cout << "Percent blue is " << simulationParams.percentBlue << endl;
+
   
   /* Ethereum */
-  cout << "ID Raw is: " << GetId() << endl;
-  int robotId = Id2Int(GetId());
-  nodeInt = robotIdToNode[robotId];
+  if (!useClassicalApproach) {
+    cout << "ID Raw is: " << GetId() << endl;
+    int robotId = Id2Int(GetId());
+    nodeInt = robotIdToNode[robotId];
+    
+    
+    //isByzantine = true;
+    
+    if (robotId == 0) {
 
-  
-  //isByzantine = true;
-
-  if (robotId == 0) {
-
+      if (simulationParams.useMultipleNodes) {
+	
+	string bckiller = "bash " + simulationParams.blockchainPath + "/bckillerccall";
+	exec(bckiller.c_str());    
+	
+      } else {
+	system("killall geth");
+      }
+      
+      std::ostringstream fullCommandStream;
+      
+      /* The blockchain folder get moved to the data folder at the end
+	 of each run; therefore, this command is just to make sure that
+	 the directory is really empty */
+      fullCommandStream << "rm -rf " << simulationParams.blockchainPath << "?*";
+      
+      std::string fullCommand = fullCommandStream.str();
+      system(fullCommand.c_str());     
+      interface = readStringFromFile(simulationParams.baseDir + simulationParams.interfacePath);
+    }
+    
+    
+    /* Find out on which cluster node this robot's geth process should be executed */
     if (simulationParams.useMultipleNodes) {
       
-       string bckiller = "bash " + simulationParams.blockchainPath + "/bckillerccall";
-      exec(bckiller.c_str());    
-
+      geth_init(robotId, nodeInt, simulationParams.blockchainPath);
+      start_geth(robotId, simulationParams.basePort, nodeInt, simulationParams.blockchainPath);
+      createAccount(robotId, nodeInt, simulationParams.blockchainPath);   
+      enodes[robotId] = get_enode(robotId, nodeInt, simulationParams.blockchainPath);
+      enode = enodes[robotId];
+      coinbaseAddresses[robotId] = getCoinbase(robotId, nodeInt, simulationParams.blockchainPath);
+      address = coinbaseAddresses[robotId];    
+      unlockAccount(robotId, "test", nodeInt, simulationParams.blockchainPath);
+      
     } else {
-      system("killall geth");
+      geth_init(robotId);
+      start_geth(robotId);
+      createAccount(robotId);   
+      enodes[robotId] = get_enode(robotId);
+      coinbaseAddresses[robotId] = getCoinbase(robotId);
+      address = coinbaseAddresses[robotId];    
+      unlockAccount(robotId, "test");
     }
-
-    std::ostringstream fullCommandStream;
-    
-    /* The blockchain folder get moved to the data folder at the end
-       of each run; therefore, this command is just to make sure that
-       the directory is really empty */
-    fullCommandStream << "rm -rf " << simulationParams.blockchainPath << "?*";
-    
-    std::string fullCommand = fullCommandStream.str();
-    system(fullCommand.c_str());     
-    interface = readStringFromFile(simulationParams.baseDir + simulationParams.interfacePath);
-      }
- 
-
-  /* Find out on which cluster node this robot's geth process should be executed */
-  if (simulationParams.useMultipleNodes) {
-
-    geth_init(robotId, nodeInt, simulationParams.blockchainPath);
-    start_geth(robotId, simulationParams.basePort, nodeInt, simulationParams.blockchainPath);
-    createAccount(robotId, nodeInt, simulationParams.blockchainPath);   
-    enodes[robotId] = get_enode(robotId, nodeInt, simulationParams.blockchainPath);
-    enode = enodes[robotId];
-    coinbaseAddresses[robotId] = getCoinbase(robotId, nodeInt, simulationParams.blockchainPath);
-    address = coinbaseAddresses[robotId];    
-    unlockAccount(robotId, "test", nodeInt, simulationParams.blockchainPath);
-    
-  } else {
-    geth_init(robotId);
-    start_geth(robotId);
-    createAccount(robotId);   
-    enodes[robotId] = get_enode(robotId);
-    coinbaseAddresses[robotId] = getCoinbase(robotId);
-    address = coinbaseAddresses[robotId];    
-    unlockAccount(robotId, "test");
   }
 }
 
@@ -339,16 +343,18 @@ void EPuck_Environment_Classification::ControlStep() {
     //for (UInt8 i = 1; i <= 10; i++) {
     //  currentNeighbors.insert(i);
     //}
-    UpdateNeighbors(currentNeighbors);
-
-    if (mining) {
-      cout << " STOP MINING -- robot" << robotId << endl;
-      mining = false;
-      if (simulationParams.useMultipleNodes)
-	stop_mining(robotId, nodeInt, simulationParams.blockchainPath);
-      else
-	stop_mining(robotId);
-    }    
+    if (!useClassicalApproach) {
+      UpdateNeighbors(currentNeighbors);
+      
+      if (mining) {
+	cout << " STOP MINING -- robot" << robotId << endl;
+	mining = false;
+	if (simulationParams.useMultipleNodes)
+	  stop_mining(robotId, nodeInt, simulationParams.blockchainPath);
+	else
+	  stop_mining(robotId);
+      }
+    }
     Explore();
     break;
   }
@@ -465,7 +471,7 @@ void EPuck_Environment_Classification::Explore() {
     collectedData.count = 1;
     m_sStateData.State = SStateData::STATE_DIFFUSING;
     
-    cout << "contract address is" << contractAddress << endl;
+    //cout << "contract address is" << contractAddress << endl;
 
     uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
     //cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;

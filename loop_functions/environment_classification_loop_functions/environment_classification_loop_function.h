@@ -180,7 +180,9 @@ private:
 	std::string datadirBase;
 	bool useMultipleNodes;
 	int basePort;
-
+	int numByzantine;
+	int byzantineSwarmStyle;
+	bool useClassicalApproach;
 };
 
 

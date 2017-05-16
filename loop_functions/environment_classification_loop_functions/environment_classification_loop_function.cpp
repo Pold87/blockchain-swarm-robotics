@@ -88,7 +88,8 @@ void CEnvironmentClassificationLoopFunctions::fillSettings(TConfigurationNode& t
       GetNodeAttribute(tEnvironment, "blockchain_path", blockchainPath);
       GetNodeAttribute(tEnvironment, "base_port", basePort);
       GetNodeAttribute(tEnvironment, "num_byzantine", numByzantine);
-      GetNodeAttribute(tEnvironment, "byzantine_style", byzantineStyle);
+      GetNodeAttribute(tEnvironment, "byzantine_swarm_style", byzantineSwarmStyle);
+      GetNodeAttribute(tEnvironment, "use_classical_approach", useClassicalApproach);      
       
     }
   catch(CARGoSException& ex) {
@@ -353,8 +354,12 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
   TConfigurationNode& tEnvironment = GetNode(t_node, "cells");
   fillSettings(tEnvironment);
 
-  /* Initialize miner, distribute Ethereum, and more */
-  InitEthereum();
+  if (!useClassicalApproach) {
+    /* Initialize miner, distribute Ethereum, and more */
+    InitEthereum();
+  }
+
+  miningNotWorkingAnymore = false;
 
   time_t ti;
   time(&ti);
@@ -365,9 +370,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
   m_strOutput = dataDir + passedRadix +"-timestart.RUN" + nRuns;
   timeFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
   timeFile << ti << std::endl;
-  
   incorrectParameters = false;
-  miningNotWorkingAnymore = false;
   m_pcRNG = CRandom::CreateRNG("argos");
 
 	/* Setting variables according with the parameters of the configuration file (XML) */
@@ -453,6 +456,30 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 
 		i = 0;
 
+		/* Initialize Byzantine robots */
+		int remainingByzantineBlacks;
+		int remainingByzantineWhites;
+
+		/* TODO: could be changed to switch case */
+		
+		if (byzantineSwarmStyle == 0) { // No Byzantine robots
+		  remainingByzantineWhites = 0;
+		  remainingByzantineBlacks = 0;
+		} else if (byzantineSwarmStyle == 1) { // White Byzantine robots
+		  remainingByzantineWhites = numByzantine;
+		  remainingByzantineBlacks = 0;
+		} else if (byzantineSwarmStyle == 2) { // Black Byzantine robots
+		  remainingByzantineWhites = 0;
+		  remainingByzantineBlacks = numByzantine;   
+		} else if (byzantineSwarmStyle == 3) { // White + black Byzantine robots
+		  remainingByzantineWhites = numByzantine / 2;
+		  remainingByzantineBlacks = numByzantine / 2;
+		} else {
+		  cout << "Unknown Byzantine style";
+		  throw;
+		}
+		  
+
 		CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
 		for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
 			/* Get handle to e-puck entity and controller */
@@ -471,6 +498,13 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 			opinion.actualOpinion = opinionsToAssign[i];
 			i++;
 
+			/* Decide if the robot should be Byzantine */
+			if (remainingByzantineWhites > 0 && opinion.actualOpinion == 0) {
+			  cController.setByzantineStyle(1); // always vote for white
+			} else if (remainingByzantineBlacks > 0 && opinion.actualOpinion == 2) {
+			  cController.setByzantineStyle(2); // always vote for black
+			}
+			
 			opinion.countedCellOfActualOpinion = 0;
 			collectedData.count = 1;
 			if(opinion.actualOpinion == 0)
@@ -495,7 +529,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 		}
 
 		/* Blockchain Statistics */
-		if(blockChainFileFlag) {
+		if((!useClassicalApproach) && blockChainFileFlag) {
 
 		  std::stringstream ss;
 		  ss << number_of_runs;
@@ -640,16 +674,7 @@ bool CEnvironmentClassificationLoopFunctions::allSameBCHeight() {
 
 void CEnvironmentClassificationLoopFunctions::Reset() {
 
-  ///* Blockchain related */
-  //if (useMultipleNodes) {
-  //  string bckiller = "bash " + blockchainPath + "/bckillerccall";
-  //  exec(bckiller.c_str());    
-  //} else {
-  //  exec("killall geth");
-  //  system("rm -rf ~/Documents/eth_data/*");     
-  //}
-
-  /* Simulation related */
+   /* Simulation related */
   written_qualities = 0;
 
   m_pcRNG->SetSeed((int)m_pcRNG->Uniform(bigRange));
@@ -852,7 +877,7 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 	    int robotNodeInt = cController.getNodeInt();
 	    
 	    /* Blockchain height per robot */
-	    if (useMultipleNodes)
+	    if ((!useClassicalApproach) && useMultipleNodes)
 	      blockChainFile << "\t" << getBlockChainLength(robotId, robotNodeInt, blockchainPath);
 	    else
 	      blockChainFile << "\t" << getBlockChainLength(robotId);
