@@ -27,7 +27,7 @@ num.byzantines = 0:10
 if (do.difficulty) {
 
     E.Ns <- c()
-    strategies <- c(1, 2)
+    strategies <- c(1, 2, 3)
     strategy <- c()
     nodes <- 0:20
     runs <- c()
@@ -86,7 +86,7 @@ if (do.difficulty) {
 }
     
 
-strategies <- c(1, 2)
+strategies <- c(1, 2, 3)
 strategy <- c()
 k <- num.robots
 
