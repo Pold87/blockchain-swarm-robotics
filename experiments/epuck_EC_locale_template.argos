@@ -98,6 +98,7 @@
 	  use_classical_approach="USECLASSICALAPPROACH"
 	  num_byzantine="NUMBYZANTINE"
 	  byzantine_swarm_style="BYZANTINESWARMSTYLE"
+	  subswarm_consensus="SUBSWARMCONSENSUS"
 	  blockchain_path="BLOCKCHAINPATH"/>
 
   </loop_functions>

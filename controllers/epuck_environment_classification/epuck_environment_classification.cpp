@@ -144,7 +144,7 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
 
   
   /* Ethereum */
-  if (!useClassicalApproach) {
+  if (!simulationParams.useClassicalApproach) {
     cout << "ID Raw is: " << GetId() << endl;
     int robotId = Id2Int(GetId());
     nodeInt = robotIdToNode[robotId];
@@ -343,7 +343,7 @@ void EPuck_Environment_Classification::ControlStep() {
     //for (UInt8 i = 1; i <= 10; i++) {
     //  currentNeighbors.insert(i);
     //}
-    if (!useClassicalApproach) {
+    if (!simulationParams.useClassicalApproach) {
       UpdateNeighbors(currentNeighbors);
       
       if (mining) {
@@ -473,15 +473,17 @@ void EPuck_Environment_Classification::Explore() {
     
     //cout << "contract address is" << contractAddress << endl;
 
-    uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
-    //cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
-    int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
+    if (!simulationParams.useClassicalApproach) {
+      uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
+      //cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
+      int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
 
-    string voteResult;
-    if (simulationParams.useMultipleNodes)
-      smartContractInterfaceBg(robotId, interface, contractAddress, "vote", args, 2, opinionInt, nodeInt, simulationParams.blockchainPath);
-    else
-     voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt);
+      string voteResult;
+      if (simulationParams.useMultipleNodes)
+	smartContractInterfaceBg(robotId, interface, contractAddress, "vote", args, 2, opinionInt, nodeInt, simulationParams.blockchainPath);
+      else
+	voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt);
+    }
     
     //cout << "voteResult is " << voteResult << endl;
     
@@ -539,26 +541,70 @@ void EPuck_Environment_Classification::Diffusing() {
   //  int nodeInt = robotIdToNode[robotId];
   
   /* remainingDiffusingTime>0 means that is still time to perform diffusing state */
-  if (m_sStateData.remainingDiffusingTime > 0)
-    {
+  if (m_sStateData.remainingDiffusingTime > 0) {
 
 
-      /* Every received data is stored in IC variable (helping var). Each IC variable will be
-       * inserted in receivedOpinions array if has not been sensed yet and it's not a 0,0,0 one.
-       * It will be used to choose the next opinion, basing on decision rules. After a decision
-       * has been taken this array will be emptied for the next diffusing state. */
-      const CCI_EPuckRangeAndBearingSensor::TPackets& tPackets = m_pcRABS->GetPackets();
-      
-      set<int> currentNeighbors;
-      
-      for(size_t i = 0; i < tPackets.size() ; ++i) {
-            
-	IC.senderID = tPackets[i]->Data[3];
-      
-	/* Update Ethereum neighbors */
-	if(tPackets[i]->Data[0] != 5) /* 5 signals empty data */
-	  currentNeighbors.insert(IC.senderID);   	      
-      }
+      /* In the 3 lasts seconds (30 ticks) the robot starts listening to other opinions
+       * and diffusing its own opinion, quality and ID */
+      if(  m_sStateData.remainingDiffusingTime < 30 ) {
+
+
+	/* Every received data is stored in IC variable (helping var). Each IC variable will be
+	 * inserted in receivedOpinions array if has not been sensed yet and it's not a 0,0,0 one.
+	 * It will be used to choose the next opinion, basing on decision rules. After a decision
+	 * has been taken this array will be emptied for the next diffusing state. */
+	
+	/* TODO: check!! Davide has this function in the next condition,
+	   that is, (if( m_sStateData.remainingDiffusingTime < 30 )) */
+	
+	set<int> currentNeighbors;
+	
+	const CCI_EPuckRangeAndBearingSensor::TPackets& tPackets = m_pcRABS->GetPackets();
+	
+	for(size_t i = 0; i < tPackets.size() ; ++i) {
+	  
+	  bool saved = false;   // saved = variable to not save opinions twice: if saved == true -> don't save the datas
+	  
+	  /*
+	   * IC = Helping variable for sensed opinions, if the received opinion is 5 then not save it (5 is the default value
+	   * of the RAB actuators, if you receive 5 then the sender robot wasn't ready to send a new opinion
+	   */
+	  IC.receivedOpinion = tPackets[i]->Data[0];
+	  if(IC.receivedOpinion == 5)
+	    saved = true;
+	  
+	  IC.senderID = tPackets[i]->Data[3];
+	  
+	  
+	  /* Loop for sense quality value: quality has been sent using 3 cells of RAB datas,
+	     so here it will converted in a Real number */
+	  IC.receivedQuality=0;
+	  for ( UInt32 j = 1; j<3 ; ++j)
+	    IC.receivedQuality = IC.receivedQuality*100 + tPackets[i]->Data[j];
+	  IC.receivedQuality = (Real) IC.receivedQuality / 10000;
+	  
+	  /* If the incoming value has already been listened then not save it */
+	  for(UInt32 j = 0; j < receivedOpinions.size(); ++j)
+	    if(receivedOpinions[j].senderID == IC.senderID)
+	      saved = true;
+	  
+	  /*
+	   * Don't want to save 0,0,0 values (values sent casually before to add 555 value, probably no
+	   * more used now.
+	   */
+	  //	if((IC.senderID == 0) && (IC.receivedQuality==0) && (IC.receivedOpinion==0))
+	  //	  saved = true;
+	  
+	  /* Save value if it has not been already saved and it's not 5,5,5 or 0,0,0 value  */
+	  if(!saved) {
+	    if (simulationParams.useClassicalApproach)
+	      receivedOpinions.push_back(IC);
+	    else /* Update Ethereum neighbors */
+	      currentNeighbors.insert(IC.senderID);   	      
+	  }
+	  
+	}
+
 
       	/* Listen to other opinions */
 	/* In my implementation, robots in the diffusing state are
@@ -566,24 +612,19 @@ void EPuck_Environment_Classification::Diffusing() {
 	   bilateral protocol and one cannot only receive but not send
 	   or vice versa */
 
-      UpdateNeighbors(currentNeighbors);
-
-
-      /* In the 3 lasts seconds (30 ticks) the robot starts listening to other opinions
-       * and diffusing its own opinion, quality and ID */
-      if(  m_sStateData.remainingDiffusingTime < 30 )
-	{
-
-	if (!mining) {
-	  cout << " START MINING -- robot" << robotId << endl;
-	  mining = true;
-	  if (simulationParams.useMultipleNodes)
-	    start_mining(robotId, 1, nodeInt, simulationParams.blockchainPath);
-	  else
-	    start_mining(robotId, 1);
-	}    
-		  
+	if (!simulationParams.useClassicalApproach) {
+	  UpdateNeighbors(currentNeighbors);
+	
+	  if (!mining) {
+	    cout << " START MINING -- robot" << robotId << endl;
+	    mining = true;
+	    if (simulationParams.useMultipleNodes)
+	      start_mining(robotId, 1, nodeInt, simulationParams.blockchainPath);
+	    else
+	      start_mining(robotId, 1);
+	  }    	  
 	}
+      }
 
       /* LEDS must be lighted with intermittence in diffusing state */
       if(m_sStateData.remainingDiffusingTime%3)
@@ -625,51 +666,53 @@ void EPuck_Environment_Classification::Diffusing() {
 
       /* Send datas and decrement the diffusing time left */
       m_pcRABA->SetData(toSend);
+      m_sStateData.remainingDiffusingTime--;
 
       /* Send opinion via Ethereum */
+      if (!simulationParams.useClassicalApproach) {
 
-      /* TODO: I think the direct modulation can be implemented
-	 exactly as the other opinions, therefore, I'll keep that here
-	 for a backup */
-      if (simulationParams.decision_rule == 100) {
-	/* Send transaction to all neighbors */
-	/* TODO: I should check if this rule coul;d be really
-	   implemented with real robots in a p2p way */
 
-	//std::set<UInt8>::iterator it;
-	//for (it = currentNeighbors.begin(); it != currentNeighbors.end(); ++it) {
-	//  UInt8 i = *it;
-	//  std::string newTxHash = sendRawTransaction(i, rawTx);
-	//  cout << "rawTx is" << rawTx << endl;
-	//  cout << "Robot " << i << "txHash is: " << newTxHash << endl;
-	//}
-      } else if (simulationParams.decision_rule == 2) {
-
-	/* Don't do anything */
-	
-      } else if (simulationParams.decision_rule == 1 || simulationParams.decision_rule == 3) {
-
-	/* Create a transaction in each time step */    
-	
-	uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
-	//cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
-	int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
-
-	if (simulationParams.useMultipleNodes)
-	  smartContractInterfaceBg(robotId, interface, contractAddress, "vote", args, 2, opinionInt, nodeInt, simulationParams.blockchainPath);
-	else
-	  string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt);
-	
-      } else if (simulationParams.decision_rule == 4) {
-	/* Switch blockchain versions, i.e., mine on a different
-	   blockchain */
-	throw;
-
-      } else {
-	throw;
+	/* TODO: I think the direct modulation can be implemented
+	   exactly as the other opinions, therefore, I'll keep that here
+	   for a backup */
+	if (simulationParams.decision_rule == 100) {
+	  /* Send transaction to all neighbors */
+	  /* TODO: I should check if this rule coul;d be really
+	     implemented with real robots in a p2p way */
+	  
+	  //std::set<UInt8>::iterator it;
+	  //for (it = currentNeighbors.begin(); it != currentNeighbors.end(); ++it) {
+	  //  UInt8 i = *it;
+	  //  std::string newTxHash = sendRawTransaction(i, rawTx);
+	  //  cout << "rawTx is" << rawTx << endl;
+	  //  cout << "Robot " << i << "txHash is: " << newTxHash << endl;
+	  //}
+	} else if (simulationParams.decision_rule == 2) {
+	  
+	  /* Don't do anything */
+	  
+	} else if (simulationParams.decision_rule == 1 || simulationParams.decision_rule == 3) {
+	  
+	  /* Create a transaction in each time step */    
+	  
+	  uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
+	  //cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
+	  int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
+	  
+	  if (simulationParams.useMultipleNodes)
+	    smartContractInterfaceBg(robotId, interface, contractAddress, "vote", args, 2, opinionInt, nodeInt, simulationParams.blockchainPath);
+	  else
+	    string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt);
+	  
+	} else if (simulationParams.decision_rule == 4) {
+	  /* Switch blockchain versions, i.e., mine on a different
+	     blockchain */
+	  throw;
+	  
+	} else {
+	  throw;
+	}
       }
-
-      m_sStateData.remainingDiffusingTime--;
     }
   else // Time to change to exploration state
     {
@@ -716,19 +759,178 @@ void EPuck_Environment_Classification::Diffusing() {
 void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
 {
 
-  int robotId = Id2Int(GetId());
-  //  int nodeInt = robotIdToNode[robotId];
+  /*  */
+  if (byzantineStyle > 0) {
 
-  uint opinionInt = (uint) (opinion.quality * 100);
-  int args[4] = {decision_rule, opinion.actualOpinion / 2, opinionInt, simulationParams.numPackSaved};
-  string sNewOpinion;
-  if (simulationParams.useMultipleNodes)
-    sNewOpinion = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 4, 0, nodeInt, simulationParams.blockchainPath);
-  else
-    sNewOpinion = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 4, 0);
-  int newOpinion = atoi(sNewOpinion.c_str());
-  opinion.actualOpinion = newOpinion * 2; // Is implemented as 0 and 1 in the smart contract
-  
+    switch(byzantineStyle) {
+      case 1 : opinion.actualOpinion = 0;
+	       break;
+      case 2 : opinion.actualOpinion = 2;
+	       break;
+    }
+    
+  } else if (simulationParams.useClassicalApproach) {
+
+    switch(decision_rule) {
+
+    case 0: {
+      NotWeightedDirectComparison();
+      break;
+    }
+    case 1: {
+      VoterModel();
+      break;
+    }
+    case 2: {
+      DirectComparison();
+      break;
+    }
+    case 3: {
+      MajorityRule();
+      break;
+    }
+  }    
+    
+  } else {
+
+    int robotId = Id2Int(GetId());
+    //  int nodeInt = robotIdToNode[robotId];
+
+    uint opinionInt = (uint) (opinion.quality * 100);
+    int args[4] = {decision_rule, opinion.actualOpinion / 2, opinionInt, simulationParams.numPackSaved};
+    string sNewOpinion;
+    if (simulationParams.useMultipleNodes)
+      sNewOpinion = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 4, 0, nodeInt, simulationParams.blockchainPath);
+    else
+      sNewOpinion = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 4, 0);
+    int newOpinion = atoi(sNewOpinion.c_str());
+    opinion.actualOpinion = newOpinion * 2; // Is implemented as 0 and 1 in the smart contract
+  }    
+}
+
+void EPuck_Environment_Classification::NotWeightedDirectComparison(){
+
+	size_t size = receivedOpinions.size();
+	std::vector<informationCollected> opinionsValuated;  // Set of information collected in every diffusing states
+
+	if(receivedOpinions.size()>simulationParams.numPackSaved){
+		for(size_t j=0; j<simulationParams.numPackSaved; j++){
+			opinionsValuated.push_back(receivedOpinions[size-1-j]);
+		}
+	}
+	else
+	        for(size_t j=0; j<receivedOpinions.size(); j++)
+		    opinionsValuated.push_back(receivedOpinions[j]);
+
+	size = opinionsValuated.size();
+	if(size > 0){
+		CRange<Real> sizeRange(0,size);
+		UInt32 index = (UInt32)Floor(m_pcRNG->Uniform(sizeRange));
+		if ( opinionsValuated[index].receivedQuality > opinion.quality )
+			opinion.actualOpinion = opinionsValuated[index].receivedOpinion;
+	}
+}
+/* Randomly trust in one sensed opinion: receivedOpinions it's an array containing all the sensed opinions
+ * relatively to the last diffusing state listening. With VoterModel, a robot randomly choose an opinion 
+ * and uses it. 
+ */
+
+void EPuck_Environment_Classification::VoterModel(){
+
+	size_t size = receivedOpinions.size();
+	std::vector<informationCollected> opinionsValuated;  // Set of information collected in every diffusing states
+
+	if(receivedOpinions.size()>simulationParams.numPackSaved){
+		for(size_t j=0; j<simulationParams.numPackSaved; j++){
+			opinionsValuated.push_back(receivedOpinions[size-1-j]);
+		}
+	}
+	else
+	        for(size_t j=0; j<receivedOpinions.size(); j++)
+		    opinionsValuated.push_back(receivedOpinions[j]);
+
+	size = opinionsValuated.size();
+
+	if(size > 0){
+		CRange<Real> sizeRange(0,size);
+		UInt32 index = (UInt32)Floor(m_pcRNG->Uniform(sizeRange));
+		opinion.actualOpinion = opinionsValuated[index].receivedOpinion;
+	} 
+}
+
+/* Randomly trust in one sensed opinion: receivedOpinions it's an array containing all the sensed opinions
+ * relatively to the last diffusing state listening. With DirecComparison, a robot randomly choose an opinion 
+ * and compare this opinion with his previous one. If it's stronger he uses this opinion. 
+ */
+void EPuck_Environment_Classification::DirectComparison(){
+
+	size_t size = receivedOpinions.size();
+	std::vector<informationCollected> opinionsValuated;  // Set of information collected in every diffusing states
+
+	if(receivedOpinions.size()>simulationParams.numPackSaved){
+		for(size_t j=0; j<simulationParams.numPackSaved; j++){
+			opinionsValuated.push_back(receivedOpinions[size-1-j]);
+		}
+	}
+	else
+	        for(size_t j=0; j<receivedOpinions.size(); j++)
+		    opinionsValuated.push_back(receivedOpinions[j]);
+	size = opinionsValuated.size();
+	if(size > 0){
+		CRange<Real> sizeRange(0,size);
+		UInt32 index = (UInt32)Floor(m_pcRNG->Uniform(sizeRange));
+		if ( opinionsValuated[index].receivedQuality > opinion.quality )
+			opinion.actualOpinion = opinionsValuated[index].receivedOpinion;
+	}
+}
+
+/* Randomly trust in one sensed opinion: receivedOpinions it's an array containing all the sensed opinions
+ * relatively to the last diffusing state listening. With MajorityRule, a robot counts the opinions and uses
+ * the more present one. 
+ */
+void EPuck_Environment_Classification::MajorityRule(){
+
+	UInt32 numberOpinionsReceived[N_COL];
+	std::vector<informationCollected> opinionsValuated;  // Set of information collected in every diffusing states
+	IC.receivedOpinion=opinion.actualOpinion;
+
+	size_t size = receivedOpinions.size();
+	if(receivedOpinions.size()>simulationParams.numPackSaved){
+		for(size_t j=0; j<simulationParams.numPackSaved; j++){
+			opinionsValuated.push_back(receivedOpinions[size-1-j]);
+		}
+	}
+	else
+	        for(size_t j=0; j<receivedOpinions.size(); j++)
+		    opinionsValuated.push_back(receivedOpinions[j]);
+	opinionsValuated.push_back(IC);
+	/* Setting majority array to 0 */
+	for ( UInt32 c = 0; c < N_COL; c++ )
+		numberOpinionsReceived[c] = 0;
+
+	/* For each received opinion, increment the correspondent cell. numberOpinionsReceived it's simply a contator for each color */
+	for ( size_t i = 0; i<opinionsValuated.size(); i++ )
+		numberOpinionsReceived[opinionsValuated[i].receivedOpinion]++;
+
+	for( UInt32 i = 0; i<3; i++)
+		opinion.actualOpinion = FindMaxOpinionReceived(numberOpinionsReceived, opinion.actualOpinion);
+}
+
+
+UInt32 EPuck_Environment_Classification::FindMaxOpinionReceived(UInt32 numberOpinionsReceived[], UInt32 actualOpinion){
+
+	UInt32 max = 0, index = 0;
+
+	for( UInt32 i = 0; i<N_COL; i++)
+		if( numberOpinionsReceived[i] > max )
+		{
+			max = numberOpinionsReceived[i];
+			index = i;
+		}
+	if(max == 0)
+		return actualOpinion;
+	else
+		return index;
 }
 
 

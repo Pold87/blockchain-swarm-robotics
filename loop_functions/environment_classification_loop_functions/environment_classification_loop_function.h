@@ -61,7 +61,7 @@ public:
 	virtual void Reset();
 	virtual bool IsExperimentFinished();
 	virtual void PreStep();
-	virtual void UpdateStatistics(EPuck_Environment_Classification::Opinion& opinion, EPuck_Environment_Classification::SStateData& sStateData);
+	virtual void UpdateStatistics(EPuck_Environment_Classification::Opinion& opinion, EPuck_Environment_Classification::SStateData& sStateData, bool isByzantine);
 	virtual void Destroy();
 	virtual void RandomWalk(EPuck_Environment_Classification::Movement& movement);
 	virtual void UpdateCount(EPuck_Environment_Classification::CollectedData& CollectedData,UInt32 cell, CVector2 cPos, EPuck_Environment_Classification::Opinion& opinion, EPuck_Environment_Classification::SStateData& sStateData, std::string& id, EPuck_Environment_Classification::SimulationState& simulationParam);
@@ -123,8 +123,13 @@ private:
 	bool blockChainFileFlag;
 
 	/* Counters for the number of robots in each state for every colour */
-	UInt32 robotsInExplorationCounter[N_COL], robotsInDiffusionCounter[N_COL];
+	UInt32 robotsInExplorationCounter[N_COL];
+	UInt32 robotsInDiffusionCounter[N_COL];
 
+	/* Byzantine counters for the number of robots in each state for every colour */	
+	UInt32 byzantineRobotsInExplorationCounter[N_COL];
+	UInt32 byzantineRobotsInDiffusionCounter[N_COL];
+	
 	/* When consensousReached is equal to the number of the colors the swarm reached a consensous */
 	UInt32 consensousReached;
 
@@ -183,6 +188,7 @@ private:
 	int numByzantine;
 	int byzantineSwarmStyle;
 	bool useClassicalApproach;
+	bool subswarmConsensus;
 };
 
 

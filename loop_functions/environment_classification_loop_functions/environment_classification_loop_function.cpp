@@ -89,7 +89,9 @@ void CEnvironmentClassificationLoopFunctions::fillSettings(TConfigurationNode& t
       GetNodeAttribute(tEnvironment, "base_port", basePort);
       GetNodeAttribute(tEnvironment, "num_byzantine", numByzantine);
       GetNodeAttribute(tEnvironment, "byzantine_swarm_style", byzantineSwarmStyle);
-      GetNodeAttribute(tEnvironment, "use_classical_approach", useClassicalApproach);      
+      GetNodeAttribute(tEnvironment, "use_classical_approach", useClassicalApproach);
+      GetNodeAttribute(tEnvironment, "use_classical_approach", useClassicalApproach);
+      GetNodeAttribute(tEnvironment, "subswarm_consensus", subswarmConsensus);      
       
     }
   catch(CARGoSException& ex) {
@@ -501,8 +503,12 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 			/* Decide if the robot should be Byzantine */
 			if (remainingByzantineWhites > 0 && opinion.actualOpinion == 0) {
 			  cController.setByzantineStyle(1); // always vote for white
+			  remainingByzantineWhites--;
 			} else if (remainingByzantineBlacks > 0 && opinion.actualOpinion == 2) {
 			  cController.setByzantineStyle(2); // always vote for black
+			  remainingByzantineBlacks--;
+			} else {
+			  cController.setByzantineStyle(0); // doe normaal
 			}
 			
 			opinion.countedCellOfActualOpinion = 0;
@@ -524,7 +530,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 			std::string nRuns = ss.str();
 			m_strOutput = dataDir + passedRadix +".RUN"+nRuns;
 			everyTicksFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
-			everyTicksFile << "clock\texploringWhite\tdiffusingWhite\texploringGreen\tdiffusingGreen\texploringBlack\tdiffusingBlack\t" << std::endl;
+			everyTicksFile << "clock\texploringWhite\tdiffusingWhite\texploringGreen\tdiffusingGreen\texploringBlack\tdiffusingBlack\tbyzantineExploringWhite\tbyzantineDiffusingWhite\tbyzantineExploringGreen\tbyzantineDiffusingGreen\tbyzantineExploringBlack\tbyzantineDiffusingBlack\t" << std::endl;
 
 		}
 
@@ -685,7 +691,12 @@ void CEnvironmentClassificationLoopFunctions::Reset() {
   
   for(size_t i = 0; i<N_COL; i++){
     robotsInExplorationCounter[i] = 0;
-		robotsInDiffusionCounter[i] = 0;
+    robotsInDiffusionCounter[i] = 0;
+
+    //    if (byzantineSwarmStyle != 0) {
+    byzantineRobotsInExplorationCounter[i] = 0;
+    byzantineRobotsInDiffusionCounter[i] = 0;
+      //    }
   }
   
   /* Shuffling GRID vector (cells colours) to redistribuite them */
@@ -1103,8 +1114,14 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 	... */
 
 	for ( UInt32 c=0; c<N_COL; c++ ){
-		robotsInExplorationCounter[c] = 0;
-		robotsInDiffusionCounter[c] = 0;
+	  robotsInExplorationCounter[c] = 0;
+	  robotsInDiffusionCounter[c] = 0;
+
+	  //if (byzantineSwarmStyle != 0) {
+	  byzantineRobotsInExplorationCounter[c] = 0;
+	  byzantineRobotsInDiffusionCounter[c] = 0;
+	    //}
+
 	}
 	CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
 	for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
@@ -1132,24 +1149,37 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 		EPuck_Environment_Classification::SimulationState& simulationParam = cController.GetSimulationState();
 
 		/* Update statistics about the robot opinions*/
-		UpdateStatistics(opinion,sStateData);
+		bool isByzantine = (bool) cController.getByzantineStyle();
+		UpdateStatistics(opinion, sStateData, isByzantine);
 		if(cController.IsExploring())
 			UpdateCount(collectedData, cell, cPos, opinion, sStateData, id, simulationParam);
 		RandomWalk(movement);
 	}
 
 	/* Check if a consensous has been reached (i.e.: if every robots agree with a colour) */
-	for ( UInt32 c = 0; c < N_COL ; c++ )
-		if( robotsInExplorationCounter[c] + robotsInDiffusionCounter[c] == n_robots )
-			consensousReached = c;
+	for ( UInt32 c = 0; c < N_COL ; c++ ) {
+
+	  if (subswarmConsensus) {
+	    /* If the non-Byzantine robots agree on a color */
+	    if ( robotsInExplorationCounter[c] + robotsInDiffusionCounter[c] == (n_robots - numByzantine) )
+	      consensousReached = c;
+	  } else {
+	    if ( robotsInExplorationCounter[c] + robotsInDiffusionCounter[c] == n_robots )
+	      consensousReached = c;
+	  }
+	}
 
 	/* EVERYTICKSFILE: Write this statistics only if the file is open and it's the right timeStep (multiple of timeStep) */
 	if ( ! (GetSpace().GetSimulationClock() % timeStep) ) {
 	  if (everyTicksFile.is_open())
 	    {
 	      everyTicksFile << (GetSpace().GetSimulationClock())/10 << "\t";
-	      for ( UInt32 c = 0; c < N_COL; c++ )
+	      for ( UInt32 c = 0; c < N_COL; c++ ) {
 		everyTicksFile << robotsInExplorationCounter[c] << "\t\t" << robotsInDiffusionCounter[c]  << "\t\t";
+	      }
+	      for ( UInt32 c = 0; c < N_COL; c++ ) {
+		everyTicksFile << byzantineRobotsInExplorationCounter[c] << "\t\t" << byzantineRobotsInDiffusionCounter[c]  << "\t\t";
+	      }
 	      everyTicksFile << std::endl;
 	    }
 
@@ -1251,13 +1281,22 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 }
 
 
-void CEnvironmentClassificationLoopFunctions::UpdateStatistics(EPuck_Environment_Classification::Opinion& opinion, EPuck_Environment_Classification::SStateData& sStateData) {
+void CEnvironmentClassificationLoopFunctions::UpdateStatistics(EPuck_Environment_Classification::Opinion& opinion,
+							       EPuck_Environment_Classification::SStateData& sStateData, bool isByzantine) {
 
-	/* Increment counters of the opinions and states of the robots */
-	if(sStateData.State == EPuck_Environment_Classification::SStateData::STATE_EXPLORING)
-		robotsInExplorationCounter[opinion.actualOpinion]++;
-	if(sStateData.State == EPuck_Environment_Classification::SStateData::STATE_DIFFUSING)
-		robotsInDiffusionCounter[opinion.actualOpinion]++;
+  /* Increment counters of the opinions and states of the robots */
+  
+  if (isByzantine) {
+    if (sStateData.State == EPuck_Environment_Classification::SStateData::STATE_EXPLORING)
+      byzantineRobotsInExplorationCounter[opinion.actualOpinion]++;
+    if (sStateData.State == EPuck_Environment_Classification::SStateData::STATE_DIFFUSING)
+      byzantineRobotsInDiffusionCounter[opinion.actualOpinion]++;   
+  } else {
+    if (sStateData.State == EPuck_Environment_Classification::SStateData::STATE_EXPLORING)
+      robotsInExplorationCounter[opinion.actualOpinion]++;
+    if (sStateData.State == EPuck_Environment_Classification::SStateData::STATE_DIFFUSING)
+      robotsInDiffusionCounter[opinion.actualOpinion]++;
+  }
 }
 
 /* Update count of the total number of cells and of the cells according with the opinion*/

@@ -80,6 +80,7 @@ public:
 	    UInt32 numPackSaved;
 	    UInt32 status;
 	    UInt32 LAMDA, turn;
+	    bool useClassicalApproach;
 	    UInt32 numRobots; /* total amount of robots in the experiment */
 	     void Init(TConfigurationNode& t_node);
 	  };
@@ -237,7 +238,6 @@ private:
    std::map<int, int> robotIdToNode;  
    bool mining;
    int byzantineStyle;
-   bool useClassicalApproach;
    CColor red, blue, green;                    // Add here eventual additional color AGGIUNGERECOLORI
 //   int totalCounted, countedOfThisOpinion[N_COL];  USED JUST FOR STATISTICS, no more used
 };
