@@ -482,6 +482,8 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 		}
 		  
 
+		cout << "remainingByzantineBlacks is " << remainingByzantineBlacks << " and white " << remainingByzantineWhites << endl; 
+		
 		CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
 		for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
 			/* Get handle to e-puck entity and controller */
@@ -503,12 +505,15 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 			/* Decide if the robot should be Byzantine */
 			if (remainingByzantineWhites > 0 && opinion.actualOpinion == 0) {
 			  cController.setByzantineStyle(1); // always vote for white
+			  cout << "setting byz style 1" << endl;
 			  remainingByzantineWhites--;
 			} else if (remainingByzantineBlacks > 0 && opinion.actualOpinion == 2) {
 			  cController.setByzantineStyle(2); // always vote for black
 			  remainingByzantineBlacks--;
+			  cout << "setting byz style 2" << endl;
 			} else {
 			  cController.setByzantineStyle(0); // doe normaal
+			  cout << "setting byz style 0" << endl;
 			}
 			
 			opinion.countedCellOfActualOpinion = 0;
@@ -1149,7 +1154,13 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 		EPuck_Environment_Classification::SimulationState& simulationParam = cController.GetSimulationState();
 
 		/* Update statistics about the robot opinions*/
+
+		cout << "getByzantineStyle returned: " << cController.getByzantineStyle() << endl;
+		
 		bool isByzantine = (bool) cController.getByzantineStyle();
+
+		cout << "getByzantineStyle after boolean conversion is: " << isByzantine << endl;
+		
 		UpdateStatistics(opinion, sStateData, isByzantine);
 		if(cController.IsExploring())
 			UpdateCount(collectedData, cell, cPos, opinion, sStateData, id, simulationParam);
