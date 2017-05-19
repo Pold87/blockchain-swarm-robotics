@@ -1,7 +1,8 @@
 # Usage: bash start_xyz.sh <node1> <node2> <decision_rule>
 TEMPLATE='experiments/epuck_EC_locale_template.argos'
 OUTFILE="experiments/epuck$1.argos"
-BASEDIR='/home/volker/Documents/bc_collective/controllers/epuck_environment_classification/'
+#BASEDIR='/home/volker/Documents/bc_collective/controllers/epuck_environment_classification/'
+BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
 BLOCKCHAINPATH="/home/vstrobel/eth_data_para$1/data" # always without '/' at the end!!
 MINERID=$(expr 120 + $1)
 echo "MINERID is ${MINERID}"
@@ -21,7 +22,7 @@ USEDNODES=($1 $2)
 echo "USEDNODES is ${USEDNODES}"
 BASEPORT=$((31000 + $1 * 200))
 echo "BASEPORT is ${BASEPORT}"
-DATADIR="data/experiment1_decision${DECISIONRULE}-node$1-local/"
+DATADIR="data/experiment1_decision${DECISIONRULE}-node$1-classical/"
 
 # The miner node is the first of the used nodes
 MINERNODE=${USEDNODES[0]}
