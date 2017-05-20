@@ -21,17 +21,17 @@ ground.truth <- "Blacks"
 tol4qualitative=c("#4477AA", "#117733", "#DDCC77", "#CC6677")
 #difficulty <- c(34, 36, 38, 40, 42, 44, 46, 48) # Make sure to match it with metastarter.sh
 
-num.byzantines = 0:10
+num.byzantines = 0:9
 
 # As a function of Byzantine robots, easy and difficult setup
 if (do.difficulty) {
 
     E.Ns <- c()
-    strategies <- c(1, 2, 3)
+    strategies <- c(0)
     strategy <- c()
-    nodes <- 0:20
+    nodes <- 0:2
     runs <- c()
-    d = 48
+    d = 34
     
     ## Exit probability: As a function of Byzantine robots
     
@@ -47,7 +47,7 @@ if (do.difficulty) {
 
                     
                     for (node in nodes) {
-                        trials.name <- sprintf("%s/experiment1_decision%s-node%s-local/num%d_black%d_byz%d_run", data.dir, s, node, k, d, b)    
+                        trials.name <- sprintf("%s/experiment1_decision%s-node%s-classical/num%d_black%d_byz%d_run", data.dir, s, node, k, d, b)    
                     
         ## For all trials
         for (i in 1:max.trials) {
@@ -81,19 +81,19 @@ if (do.difficulty) {
     ## Save as PDF
     plot.exit.prob.gg(df,
                       xlab="Number of Byzantine robots", ylab="Exit probability",
-                      sprintf("exit_prob_d_%d_gg.pdf", k))
+                      sprintf("exit_prob_d_%d_gg_diff%d.pdf", k, d))
     
 }
     
 
-strategies <- c(1, 2, 3)
+strategies <- c(0)
 strategy <- c()
 k <- num.robots
 
 ## Consensus time: As a function of the difficulty of the task
 if (do.difficulty) {
 
-    d = 48
+    d = 34
     
     consensus.time <- c()
     strategy <- c()
@@ -112,15 +112,20 @@ if (do.difficulty) {
                 
                 for (node in nodes) {
 
-                    trials.name <- sprintf("%s/experiment1_decision%s-node%s-local/num%d_black%d_byz%d_run", data.dir, s, node, k, d, b)    
+                    trials.name <- sprintf("%s/experiment1_decision%s-node%s-classical/num%d_black%d_byz%d_run", data.dir, s, node, k, d, b)    
                 
                 ## For all trials
                 for (i in 1:max.trials) {
                     f <- paste0(trials.name, i, ".RUNS")
                     f.bc <- paste0(trials.name, i, "-blockchain.RUN1")
 
+                    print(f)
+                    
                     # Consensus time
                     if (file.exists(f)) {
+
+
+                        
                         X <- read.table(f, header=T)
                         if (!is.na(X[1, "ExitTime"])){ # Check that the run was completed
 
@@ -141,9 +146,8 @@ if (do.difficulty) {
                     }
                 }
                 }
-
-            print(paste("The consensus time is", median(consensus.times)))
-            consensus.time <- c(consensus.time, median(consensus.times))
+            print(paste("The consensus time is", mean(consensus.times)))
+            consensus.time <- c(consensus.time, mean(consensus.times))
             ## bc.height <- c(bc.height, mean(bc.heights))
 #            runs <- c(runs, length(successes))
     
@@ -160,5 +164,5 @@ if (do.difficulty) {
     names(df) <- c("difficulty", "consensus.time", "strategy")
 plot.consensus.time.gg(df,
                        xlab=expression("Difficulty"), ylab="Consensus time / 10",
-                       "consensustime_d_gg_byzantine.pdf")
+                       sprintf("consensustime_d_gg_byzantine_diff%d.pdf", d))
 }
