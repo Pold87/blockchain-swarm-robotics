@@ -79,7 +79,7 @@
 	  save_global_stat_flag="true"
 	  radix="RADIX"
 	  number_of_robots="NUMROBOTS"
-	  number_of_runs="1"
+	  number_of_runs="NUMRUNS"
           number_of_qualities="2"
           r_0="R0"
 	  b_0="B0"
