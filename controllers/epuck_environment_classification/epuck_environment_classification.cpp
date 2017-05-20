@@ -510,7 +510,7 @@ void EPuck_Environment_Classification::Explore() {
      * direct comparison then the next diffusing time is weighted with the ideal quality of the best opinion
      */
 
-    if (simulationParams.decision_rule == 2) {
+    if (simulationParams.decision_rule == 0 || simulationParams.decision_rule == 2) {
 
       m_sStateData.remainingDiffusingTime = (m_pcRNG->Exponential(((Real)simulationParams.g)*((Real)simulationParams.percentRed)))+30;
 

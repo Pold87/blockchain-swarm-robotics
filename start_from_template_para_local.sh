@@ -7,7 +7,7 @@ BLOCKCHAINPATH="/home/vstrobel/eth_data_para$1/data" # always without '/' at the
 MINERID=$(expr 120 + $1)
 echo "MINERID is ${MINERID}"
 NUMROBOTS=(20) 
-REPETITIONS=30
+REPETITIONS=50
 DECISIONRULE=$3
 PERCENT_BLACKS=(34 48)
 # the one I did all the tests with:
@@ -29,7 +29,7 @@ MINERNODE=${USEDNODES[0]}
 
 USECLASSICALAPPROACH=true
 # TODO:
-NUMBYZANTINE=(1 2 3 4 5 6 7 8 9)
+NUMBYZANTINE=(0 1 2 3 4 5 6 7 8 9)
 BYZANTINESWARMSTYLE=1
 SUBSWARMCONSENSUS=true # Determines if all N robots have to agree or
 		       # only the beneficial subswarm.
