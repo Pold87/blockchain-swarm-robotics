@@ -461,10 +461,10 @@ void EPuck_Environment_Classification::Explore() {
   else{ 
     opinion.quality = (Real)((Real)(opinion.countedCellOfActualOpinion)/(Real)(collectedData.count));
     
-    std::cout<<"Qual "<<opinion.quality<<std::endl;
-    std::cout<<"Op "<<opinion.actualOpinion<<std::endl;
-    std::cout<<"actOp "<<	opinion.countedCellOfActualOpinion <<std::endl;
-    std::cout<<"Count "<< collectedData.count<<std::endl;
+    //std::cout<<"Qual "<<opinion.quality<<std::endl;
+    //std::cout<<"Op "<<opinion.actualOpinion<<std::endl;
+    //std::cout<<"actOp "<<	opinion.countedCellOfActualOpinion <<std::endl;
+    // std::cout<<"Count "<< collectedData.count<<std::endl;
     
     opinion.countedCellOfActualOpinion = 0;
     receivedOpinions.clear();
@@ -526,7 +526,7 @@ void EPuck_Environment_Classification::Explore() {
 
     }
 
-    cout << "Remaining diffusing time is: " << m_sStateData.remainingDiffusingTime << " and opinion is " << opinion.actualOpinion << endl;
+    //cout << "Remaining diffusing time is: " << m_sStateData.remainingDiffusingTime << " and opinion is " << opinion.actualOpinion << endl;
 
     m_sStateData.diffusingDurationTime = m_sStateData.remainingDiffusingTime;
   }
@@ -895,27 +895,45 @@ void EPuck_Environment_Classification::MajorityRule(){
 	IC.receivedOpinion=opinion.actualOpinion;
 
 	size_t size = receivedOpinions.size();
-	if(receivedOpinions.size()>simulationParams.numPackSaved){
-		for(size_t j=0; j<simulationParams.numPackSaved; j++){
-			opinionsValuated.push_back(receivedOpinions[size-1-j]);
-		}
-	}
-	else
-	        for(size_t j=0; j<receivedOpinions.size(); j++)
-		    opinionsValuated.push_back(receivedOpinions[j]);
-	opinionsValuated.push_back(IC);
-	/* Setting majority array to 0 */
-	for ( UInt32 c = 0; c < N_COL; c++ )
-		numberOpinionsReceived[c] = 0;
 
-	/* For each received opinion, increment the correspondent cell. numberOpinionsReceived it's simply a contator for each color */
-	for ( size_t i = 0; i<opinionsValuated.size(); i++ )
-		numberOpinionsReceived[opinionsValuated[i].receivedOpinion]++;
+	cout << "receivedOpinions.size() is " << size << endl;
+	
+	if (receivedOpinions.size() > simulationParams.numPackSaved){
+	  for(size_t j=0; j < simulationParams.numPackSaved; j++){
+	    opinionsValuated.push_back(receivedOpinions[size-1-j]);
+	  }
+	} else {
+	  for(size_t j=0; j<receivedOpinions.size(); j++) {
+	    opinionsValuated.push_back(receivedOpinions[j]);
+	  }
 
-	for( UInt32 i = 0; i<3; i++)
-		opinion.actualOpinion = FindMaxOpinionReceived(numberOpinionsReceived, opinion.actualOpinion);
+	  /* Add the robot's own opinion */
+	  opinionsValuated.push_back(IC);
+	  /* Setting majority array to 0 */
+
+	  for ( UInt32 c = 0; c < N_COL; c++ ) {
+	    numberOpinionsReceived[c] = 0;
+	  }
+
+	  /* For each received opinion, increment the correspondent cell. numberOpinionsReceived it's simply a contator for each color */
+	  for ( size_t i = 0; i < opinionsValuated.size(); i++ ) {
+	    numberOpinionsReceived[opinionsValuated[i].receivedOpinion]++;
+	  }
+
+	  for (UInt32 i = 0; i < N_COL; i++ ) {
+	    cout << "i is " << i << " and numberOpinionsReceived[i] is " << numberOpinionsReceived[i] << endl;
+	  }
+
+
+	  // Loop seems to be unncessary
+	  //	  for( UInt32 i = 0; i<3; i++) {
+	  cout << "Prev. opinion was" << opinion.actualOpinion << endl;
+	  opinion.actualOpinion = FindMaxOpinionReceived(numberOpinionsReceived, opinion.actualOpinion);
+	  cout << "New opinion is" << opinion.actualOpinion << endl;
+		
+		
+	  }
 }
-
 
 UInt32 EPuck_Environment_Classification::FindMaxOpinionReceived(UInt32 numberOpinionsReceived[], UInt32 actualOpinion){
 

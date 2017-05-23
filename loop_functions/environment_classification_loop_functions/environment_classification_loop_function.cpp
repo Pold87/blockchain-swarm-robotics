@@ -535,7 +535,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 			std::string nRuns = ss.str();
 			m_strOutput = dataDir + passedRadix +".RUN"+nRuns;
 			everyTicksFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
-			everyTicksFile << "clock\texploringWhite\tdiffusingWhite\texploringGreen\tdiffusingGreen\texploringBlack\tdiffusingBlack\tbyzantineExploringWhite\tbyzantineDiffusingWhite\tbyzantineExploringGreen\tbyzantineDiffusingGreen\tbyzantineExploringBlack\tbyzantineDiffusingBlack\t" << std::endl;
+			everyTicksFile << "clock\trun\texploringWhite\tdiffusingWhite\texploringGreen\tdiffusingGreen\texploringBlack\tdiffusingBlack\tbyzantineExploringWhite\tbyzantineDiffusingWhite\tbyzantineExploringGreen\tbyzantineDiffusingGreen\tbyzantineExploringBlack\tbyzantineDiffusingBlack\t" << std::endl;
 
 		}
 
@@ -1185,6 +1185,8 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 	  if (everyTicksFile.is_open())
 	    {
 	      everyTicksFile << (GetSpace().GetSimulationClock())/10 << "\t";
+	      everyTicksFile << number_of_runs << "\t";
+	      
 	      for ( UInt32 c = 0; c < N_COL; c++ ) {
 		everyTicksFile << robotsInExplorationCounter[c] << "\t\t" << robotsInDiffusionCounter[c]  << "\t\t";
 	      }
