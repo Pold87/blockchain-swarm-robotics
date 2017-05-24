@@ -896,7 +896,7 @@ void EPuck_Environment_Classification::MajorityRule(){
 
 	size_t size = receivedOpinions.size();
 
-	cout << "receivedOpinions.size() is " << size << endl;
+	//cout << "receivedOpinions.size() is " << size << endl;
 	
 	if (receivedOpinions.size() > simulationParams.numPackSaved){
 	  for(size_t j=0; j < simulationParams.numPackSaved; j++){
@@ -920,16 +920,17 @@ void EPuck_Environment_Classification::MajorityRule(){
 	    numberOpinionsReceived[opinionsValuated[i].receivedOpinion]++;
 	  }
 
-	  for (UInt32 i = 0; i < N_COL; i++ ) {
-	    cout << "i is " << i << " and numberOpinionsReceived[i] is " << numberOpinionsReceived[i] << endl;
-	  }
+	  //for (UInt32 i = 0; i < N_COL; i++ ) {
+	  //  cout << "i is " << i << " and numberOpinionsReceived[i] is " << numberOpinionsReceived[i] << endl;
+	  //}
 
 
 	  // Loop seems to be unncessary
-	  //	  for( UInt32 i = 0; i<3; i++) {
-	  cout << "Prev. opinion was" << opinion.actualOpinion << endl;
+
+	  //cout << "Prev. opinion was" << opinion.actualOpinion << endl;
+	  	  //	  for( UInt32 i = 0; i<3; i++) {
 	  opinion.actualOpinion = FindMaxOpinionReceived(numberOpinionsReceived, opinion.actualOpinion);
-	  cout << "New opinion is" << opinion.actualOpinion << endl;
+	  //cout << "New opinion is" << opinion.actualOpinion << endl;
 		
 		
 	  }
@@ -937,18 +938,35 @@ void EPuck_Environment_Classification::MajorityRule(){
 
 UInt32 EPuck_Environment_Classification::FindMaxOpinionReceived(UInt32 numberOpinionsReceived[], UInt32 actualOpinion){
 
+  /* TODO: There was a bug in here: in case of a tie, always white was
+     favored, resulting in a exit probability of 0; for now, I've
+     fixed the bug by returning the previous opinion in case of a
+     tie. As soon as we use three different colors, we need a
+     different approach: find out which colors contribute to the tie
+     and either randomly break them if they are not part of the
+     current opinion, or keep the current opinion if it's part of the
+     tie */
+
+  /* According to Davide, ties should be broken as follows: "If in the
+     set of received opinions there is a tie, i.e., there is not a
+     majority, then the robot keeps its own opinion." */
+  
 	UInt32 max = 0, index = 0;
 
-	for( UInt32 i = 0; i<N_COL; i++)
-		if( numberOpinionsReceived[i] > max )
-		{
-			max = numberOpinionsReceived[i];
-			index = i;
-		}
-	if(max == 0)
-		return actualOpinion;
+	bool tie = false;
+	
+	for( UInt32 i = 0; i<N_COL; i++) {
+	  if( numberOpinionsReceived[i] > max ) {
+	    max = numberOpinionsReceived[i];
+	    index = i;
+	  } else if (numberOpinionsReceived[i] == max) {	    
+	    tie = true;
+	  }
+	}
+	if(max == 0 || tie)
+	  return actualOpinion;
 	else
-		return index;
+	  return index;
 }
 
 
