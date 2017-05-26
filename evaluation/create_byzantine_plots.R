@@ -44,10 +44,9 @@ if (do.difficulty) {
 
                     successes <- c()                                        
                     strategy <- c(strategy, s)
-
                     
                     for (node in nodes) {
-                        trials.name <- sprintf("%s/experiment1_decision%s-node%s-classical/num%d_black%d_byz%d_run", data.dir, s, node, k, d, b)    
+                        trials.name <- sprintf("%s/experiment1_decision%s-node%s-classical-afterbugfix/num%d_black%d_byz%d_run", data.dir, s, node, k, d, b)    
                     
         ## For all trials
         for (i in 1:max.trials) {

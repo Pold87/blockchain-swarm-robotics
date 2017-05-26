@@ -1,8 +1,8 @@
 # Usage: bash start_xyz.sh <node1> <node2> <decision_rule>
 TEMPLATE='experiments/epuck_EC_locale_template.argos'
 OUTFILE="experiments/epuck$1.argos"
-#BASEDIR='/home/volker/Documents/bc_collective/controllers/epuck_environment_classification/'
-BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
+BASEDIR='/home/volker/Documents/bc_collective/controllers/epuck_environment_classification/'
+#BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
 BLOCKCHAINPATH="/home/vstrobel/eth_data_para$1/data" # always without '/' at the end!!
 MINERID=$(expr 120 + $1)
 echo "MINERID is ${MINERID}"
@@ -17,7 +17,7 @@ USEMULTIPLENODES=true
 USEBACKGROUNDGETHCALLS=true
 MAPPINGPATH="/home/vstrobel/Documents/argdavide/experiments/config$1.txt"
 CHANGEDIFFIULTY=""
-NUMRUNS=100
+NUMRUNS=10
 
 USEDNODES=($1 $2)
 echo "USEDNODES is ${USEDNODES}"

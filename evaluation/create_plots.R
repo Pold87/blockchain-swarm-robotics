@@ -43,8 +43,6 @@ if (do.difficulty) {
     runs <- c()
     
 ## Exit probability: As a function of difficulties
-if (!use.fake.data) {
-
     strategy <- c()
     used.difficulties <- c()
     
@@ -55,7 +53,6 @@ if (!use.fake.data) {
                     used.difficulties <- c(used.difficulties, d)
                     successes <- c()                                        
                     strategy <- c(strategy, s)
-
                     
                     for (node in nodes) {
         ## For metastarter.sh
@@ -63,12 +60,16 @@ if (!use.fake.data) {
 
         ## For start_from_template.sh
         ## TODO: should include the name of the strategy in the filename
-        trials.name <- sprintf("%s/experiment1_decision%s-node%s/num%d_black%d", data.dir, s, node, k, d)    
+                        trials.name <- sprintf("%s/experiment1_decision%s-node%s/num%d_black%d", data.dir, s, node, k, d)
 
+ ##                       trials.name <- sprintf("%s/experiment1_decision%s-node%s-classical-afterbugfix/num%d_black%d_byz0_run", data.dir, s, node, k, d)
+
+                        
                     
         ## For all trials
-        for (i in 1:max.trials) {
+        for (i in 0:max.trials) {
             f <- paste0(trials.name, i, ".RUNS")
+            #print(f)
             if (file.exists(f)) {
                 X <- read.table(f, header=T)
                 if (!is.na(X[1, ground.truth])){ # Check that the run was completed
@@ -96,7 +97,7 @@ if (!use.fake.data) {
     #strategy <- strategy[!(is.na(E.Ns))]
     #E.Ns <- E.Ns[!(is.na(E.Ns))]
 
-    used.difficulties <- used.difficulties / (100 - used.difficulties)
+    #used.difficulties <- used.difficulties / (100 - used.difficulties)
     df <- data.frame(used.difficulties, E.Ns, strategy, runs)
 
     names(df) <- c("difficulty", "E.Ns", "strategy", "runs")
@@ -107,20 +108,7 @@ if (!use.fake.data) {
     ##               sprintf("exit_prob_d_%d.pdf", k))
     plot.exit.prob.gg(df,
                       xlab="Difficulty", ylab="Exit probability",
-                      sprintf("exit_prob_d_%d_gg.pdf", k))
-    
-    } else {
-    ## Import fake data
-    df <- read.csv(paste0(fake.data.dir, "fake_python.csv"))
-        ## Save as PDF
-        plot.exit.prob(df$difficulty, df$E.Ns,
-                       xlab="Percentage white", ylab="Exit probability",
-                       "exit_prob_d_fake.pdf")
-        plot.exit.prob.gg(df,
-                          xlab=expression(paste("Problem difficulty (", rho["w"]^'*', ")")), ylab=expression(paste("Exit probability (EN)")),
-                          "exit_prob_d_fake.pdf")
-    }
-    
+                      sprintf("exit_prob_d_%d_gg.pdf", k))    
 }
     
 
@@ -207,11 +195,11 @@ k <- num.robots
 
 ## Consensus time: As a function of the difficulty of the task
 if (do.difficulty) {
-if (!use.fake.data) {
 
     consensus.time <- c()
     strategy <- c()
     bc.height <- c()
+    runs <- c()
     for (s in strategies) {
         for (d in difficulty) {
 
@@ -236,9 +224,9 @@ if (!use.fake.data) {
                         if (!is.na(X[1, "ExitTime"])){ # Check that the run was completed
 
                             # Just for finding out why voter model is different with medium difficulty
-                            if (d == 42) {
-                                print(paste("strat is", s, "d is", d, "node is", node, "consensus time is", X[1, "ExitTime"]))
-                            }
+#                            if (d == 42) {
+#                                print(paste("strat is", s, "d is", d, "node is", node, "consensus time is", X[1, "ExitTime"]))
+#                            }
                             
                             consensus.times <- c(consensus.times, X[1, "ExitTime"])
 
@@ -255,6 +243,7 @@ if (!use.fake.data) {
 
             print(paste("The consensus time is", median(consensus.times)))
             consensus.time <- c(consensus.time, median(consensus.times))
+            runs <- c(runs, length(consensus.times))
             bc.height <- c(bc.height, mean(bc.heights))
     
         }
@@ -264,13 +253,9 @@ print(difficulty)
 print(bc.height)
 print(consensus.time)
 print(strategy)
-difficulty <- difficulty / (100 - difficulty)
-df <- data.frame(difficulty, consensus.time, strategy)
-df.bc <- data.frame(difficulty, bc.height, strategy)
-} else {
-    ## Import fake data
-    df <- read.csv(paste0(fake.data.dir, "fake_python_cons.csv"))
-}
+#difficulty <- difficulty / (100 - difficulty)
+df <- data.frame(difficulty, consensus.time, strategy, runs)
+df.bc <- data.frame(difficulty, bc.height, strategy, runs)
 
 ## Save in PDF
 #plot.consensus.time(df$difficulty, df$consensus.time,
