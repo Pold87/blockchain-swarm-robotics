@@ -955,8 +955,9 @@ UInt32 EPuck_Environment_Classification::FindMaxOpinionReceived(UInt32 numberOpi
 
 	bool tie = false;
 	
-	for( UInt32 i = 0; i<N_COL; i++) {
-	  if( numberOpinionsReceived[i] > max ) {
+	for( UInt32 i = 0; i < N_COL; i++) {
+	  
+	  if( (i == 0) || numberOpinionsReceived[i] > max ) {
 	    max = numberOpinionsReceived[i];
 	    index = i;
 	  } else if (numberOpinionsReceived[i] == max) {	    
@@ -968,6 +969,24 @@ UInt32 EPuck_Environment_Classification::FindMaxOpinionReceived(UInt32 numberOpi
 	else
 	  return index;
 }
+
+
+UInt32 EPuck_Environment_Classification::FindMaxOpinionReceivedWithBug(UInt32 numberOpinionsReceived[], UInt32 actualOpinion){
+
+	UInt32 max = 0, index = 0;
+
+	for( UInt32 i = 0; i<N_COL; i++)
+		if( numberOpinionsReceived[i] > max )
+		{
+			max = numberOpinionsReceived[i];
+			index = i;
+		}
+	if(max == 0)
+		return actualOpinion;
+	else
+		return index;
+}
+
 
 
 /************************************************* MOVEMENT ****************************************************/

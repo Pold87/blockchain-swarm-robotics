@@ -85,7 +85,7 @@
 	  b_0="B0"
 	  g_0="0"
 	  length_of_runs="10"
-	  g="2"
+	  g="10"
 	  sigma="10"
 	  lamda="100"
 	  turn="45"

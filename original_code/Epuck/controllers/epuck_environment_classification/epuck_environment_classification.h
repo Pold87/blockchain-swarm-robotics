@@ -114,7 +114,9 @@ public:
    void MajorityRule();
    void Move();
    void TurnLeds();
-   UInt32  FindMaxOpinionReceived(UInt32 numberOpinionsReceived[], UInt32 actualOpinion);
+   UInt32 FindMaxOpinionReceived(UInt32 numberOpinionsReceived[], UInt32 actualOpinion);
+   UInt32 FindMaxOpinionReceivedWithBug(UInt32 numberOpinionsReceived[], UInt32 actualOpinion);
+   
    Real ExponentialFormula(Real mean){
 
 	   CRange<Real> cRange(0.0,1.0);
