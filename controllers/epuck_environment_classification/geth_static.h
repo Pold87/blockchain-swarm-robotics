@@ -1,3 +1,6 @@
+#ifndef GETH_STATIC_H
+#define GETH_STATIC_H
+
 #include <string>
 
 uint Id2Int(std::string id);
@@ -107,7 +110,7 @@ std::string deploy_contract(int i, std::string interfacePath, std::string dataPa
 
 /* Check account balance of robot i (in wei)*/
 int check_balance(int i);
-long check_balance(int i, int nodeInt, std::string datadirBase);
+long long check_balance(int i, int nodeInt, std::string datadirBase);
 
 /* Get the raw transaction based on the tx hash */
 std::string getRawTransaction(int i, std::string txHash);
@@ -123,3 +126,5 @@ int getNodeInt(int i);
 
 /* Convert the hostname of a node to its ip */
 std::string hostname2ip(std::string hostname);
+
+#endif

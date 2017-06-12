@@ -25,4 +25,4 @@ with open(outfile, 'w') as f:
 
     #f.write(str(miner_id) + ' ' + str(used_nodes[1]))
             
-    
+print("Created node mapping")    

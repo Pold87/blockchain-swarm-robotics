@@ -29,9 +29,9 @@
  * With this statement, you save typing argos:: every time.
  */
 using namespace argos;
- 
-class EPuck_Environment_Classification : public CCI_Controller {
 
+class EPuck_Environment_Classification : public CCI_Controller {
+  
 public:
 	 struct CollectedData {
 	     CColor readColor;
@@ -72,6 +72,7 @@ public:
 	    std::string baseDir; /* Basedir of the controller folder */
 	    std::string interfacePath;
 	    std::string mappingPath;
+	    std::string regenerateFile;
 	    //	    std::string mappingByzantinePath;
 	    std::string blockchainPath;
 	    std::string datadirBase;
@@ -116,6 +117,7 @@ public:
    virtual void RandomWalk();
    virtual void Reset() {};
    void fromLoopFunctionRes();
+   void killGethAndRemoveFolders(std::string bcPath, std::string regenFile);
    void Explore();
    void Diffusing();   
    void Listening();
@@ -197,6 +199,7 @@ public:
    
 
    void UpdateNeighbors(std::set<int> newNeighbors);
+   
 
 private:
 
@@ -235,6 +238,9 @@ private:
    std::string rawTx;
    std::set<int> neighbors;
    std::string enode;
+
+   std::string blockchainPath;
+   
    int nodeInt;
    std::map<int, int> robotIdToNode;  
    bool mining;

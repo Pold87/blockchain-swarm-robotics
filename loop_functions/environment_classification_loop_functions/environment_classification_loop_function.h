@@ -22,6 +22,8 @@
 
 using namespace argos;
 
+extern bool gethStaticErrorOccurred;	
+
 class CEnvironmentClassificationLoopFunctions : public CLoopFunctions {
 
 public:
@@ -59,6 +61,7 @@ public:
 	}
  
 	virtual void Reset();
+	virtual bool InitRobots();
 	virtual bool IsExperimentFinished();
 	virtual void PreStep();
 	virtual void UpdateStatistics(EPuck_Environment_Classification::Opinion& opinion, EPuck_Environment_Classification::SStateData& sStateData, bool isByzantine);
@@ -73,8 +76,9 @@ private:
 	virtual void setContractAddressAndDistributeEther(std::string contractAddress, std::string minerAddress);
 	virtual bool allSameBCHeight();
 	virtual void connectMore(std::vector<int> allRobotIds);
+	virtual void connectMinerToEveryone();
 	virtual void disconnectAll(std::vector<int> allRobotIds);
-	virtual void CheckEtherReceived();
+	virtual bool CheckEtherReceived();
 	virtual void fillSettings(TConfigurationNode& tEnvironment);
 	virtual std::vector<int> getAllRobotIds();
 	
@@ -112,7 +116,6 @@ private:
 
 	std::ofstream timeFile; // Save the consensus time in seconds
 	std::ofstream timeFileEnd; // Save the consensus time in seconds
-	
 
 	/* Flags to decide if save or not the files */
 	bool everyTicksFileFlag;
@@ -141,6 +144,10 @@ private:
 
 	/* If after a significant amount of time, there are still no new block, there's a problem with the mining process and this flag is set to true */
 	bool miningNotWorkingAnymore;
+
+
+	/* If an error somewhere occured */
+	bool errorOccurred;
 
 	/* True  -> Use percentage to assign the colors of the floor
 	 * False -> Use absolute numbers */
@@ -180,6 +187,7 @@ private:
 	int minerId;
 	int minerNode;
 	std::string blockchainPath;
+	std::string regenerateFile;
 	std::string baseDirLoop;
 	std::string dataDir;
 	std::string datadirBase;

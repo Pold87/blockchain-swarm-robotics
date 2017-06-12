@@ -7,6 +7,7 @@
 #include <sstream>
 #include <fstream>
 #include <limits>
+#include "geth_static.h"
 
 #define DEBUG true
 #define USE_MULTIPLE_NODES true
@@ -19,6 +20,7 @@ const int rpc_base_port = 8300;
 const int ipc_base_port = 33500;
 const int maxtrials = 3000;
 const string rack = "3";
+bool gethStaticErrorOccurred;
 
 /*
   Convert a robot Id (fbxxx) to an integer (xxx)
@@ -213,18 +215,34 @@ string exec_geth_cmd(int i, string command, int nodeInt, string datadirBase){
   string res = exec(fullCommand.c_str());
 
   //cout << "res in exec_geth_cmd is " << res << endl; 
-  
-  if ( (res.find("Fatal") != string::npos) || (res.find("Error") != string::npos)) {
+
+  int trials = 5;
+  // Retry to execute the command if it failed
+    while ( (res.find("Fatal") != string::npos) || (res.find("Error") != string::npos)) {
     cout << "exec_geth_cmd: " << fullCommand << endl;
     cout << "Result of exec_geth_cmd: " << res << endl;
+
+
+    sleep(1); // Wait for a second and retry
+    res = exec(fullCommand.c_str());
+
+    if (trials == 0)
+      break;
+
+    trials --;
+    
   }
 
-  /* If a transaction hash was generated, i.e., neither true nor false nor Error were found */
+    // TODO: if everything is implemented correctly and safely, I can
+    //    let fatal errors occur both with Fatal error and normal
+    //    errors if (res.find("Fatal") != string::npos || (res.find("Error") != string::npos)) {
     if (res.find("Fatal") != string::npos) {
       cout << "Fatal error!!!" << endl;
-      string bckiller = "bash " + datadirBase + "/bckillerccall";
-      exec(bckiller.c_str());    
-      throw;
+      cout << "res was " << res << endl;
+      gethStaticErrorOccurred = true;
+      //string bckiller = "bash " + datadirBase + "/bckillerccall";
+      //exec(bckiller.c_str());    
+      //throw;
       }
   
   return res;  
@@ -245,6 +263,10 @@ void exec_geth_cmd_background(int i, string command, int nodeInt, string datadir
   
   std::string fullCommand = fullCommandStream.str();
 
+
+  /* TODO: I cannot check for errors here since it is a background
+     call; maybe I can come up with some error handling */
+  
   //  if (DEBUG)
   //  cout << "exec_geth_cmd: " << fullCommand << endl;
   
@@ -671,12 +693,13 @@ std::string getContractAddress(int i, std::string txHash) {
     
   if (res.find("undefined") != string::npos) {
     cout << "Contract address not specified! Exiting" << endl;
-    if (USE_MULTIPLE_NODES) {
-      exec("bash killallgeths");
-    } else { 
-      exec("killall geth");
-    }
-    throw;
+    gethStaticErrorOccurred = true;
+    //if (USE_MULTIPLE_NODES) {
+    //  exec("bash killallgeths");
+    //} else { 
+    //  exec("killall geth");
+    //}
+    //throw;
   }
 
   return res;
@@ -977,11 +1000,12 @@ std::string deploy_contract(int i, string interfacePath, string dataPath, string
 
   /* If the maximum number of trials is reached */
   cout << "Maximum number of trials is reached!" << endl;
-  if (USE_MULTIPLE_NODES)
-    exec("bash killallgeths");
-  else
-    exec("killall geth");
-  throw;
+  //if (USE_MULTIPLE_NODES)
+  //  exec("bash killallgeths");
+  //else
+  //  exec("killall geth");
+  //throw;
+  gethStaticErrorOccurred = true;
 
 }
 
@@ -1027,15 +1051,16 @@ std::string deploy_contract(int i, string interfacePath, string dataPath, string
   /* If the maximum number of trials is reached */
   cout << "Maximum number of trials is reached!" << endl;
 
-  string bckiller = "bash " + datadirBase + "/bckillerccall";
-  exec(bckiller.c_str());    
+  //string bckiller = "bash " + datadirBase + "/bckillerccall";
+  //exec(bckiller.c_str());    
   
-  throw;
+  //throw;
+  gethStaticErrorOccurred = true;
 }
 
 
 /* Check account balance of robot i (in wei)*/
-long check_balance(int i) {
+int check_balance(int i) {
   string cmd = "eth.getBalance(eth.coinbase)";
   string res = exec_geth_cmd(i, cmd);
   long balance;
@@ -1047,12 +1072,12 @@ long check_balance(int i) {
 
 
 /* Check account balance of robot i (in wei) */
-long check_balance(int i, int nodeInt, string datadirBase) {
+long long check_balance(int i, int nodeInt, string datadirBase) {
   string cmd = "eth.getBalance(eth.coinbase)";
   string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);  
-  long balance;// = atoi(res.c_str());
+  long long balance;// = atoi(res.c_str());
 
-  if (res.find("true") != string::npos) {
+  if (res.find("true") != string::npos || res.find("Error") != string::npos) {
     balance = 0;
   } else {  
     istringstream ss(res);

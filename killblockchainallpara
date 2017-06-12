@@ -6,7 +6,7 @@ do
   prefix="ssh ${username}@c${rack}-${node}"
   pid=`$prefix ps -ef | grep -v "grep" | grep -m 1 "metastarter" | awk '{print $2}'`
   $prefix kill $pid
-  pid2=`$prefix ps -ef | grep -v "grep" | grep -m 1 "start_from_template" | awk '{print $2}'`
+  pid2=`$prefix ps -ef | grep -v "grep" | grep -m 1 "start_" | awk '{print $2}'`
   $prefix kill $pid2
   $prefix killall argos3
   $prefix killall -HUP geth
