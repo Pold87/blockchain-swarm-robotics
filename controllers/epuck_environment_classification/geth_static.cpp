@@ -195,8 +195,42 @@ string exec_geth_cmd(int i, string command){
 }
 
 
-// Take a geth command, execute it on the selected robot, and return the result string
 string exec_geth_cmd(int i, string command, int nodeInt, string datadirBase){
+
+  string res = exec_geth_cmd_helper(i, command, nodeInt, datadirBase);
+  
+  int trials = 20;
+  // Retry to execute the command if it failed
+  while ( (res.find("Fatal") != string::npos) || (res.find("Error") != string::npos)) {
+    cout << "exec_geth_cmd: " << fullCommand << endl;
+    cout << "Result of exec_geth_cmd: " << res << endl;    
+    
+    sleep(1); // Wait for a second and retry
+    res = exec_geth_cmd_helper(i, command, nodeInt, datadirBase);
+    
+    if (trials == 0)
+      break;
+    
+    trials --;
+    
+  }
+
+  // TODO: if everything is implemented correctly and safely, I can
+  //    let fatal errors occur both with Fatal error and normal
+  //    errors if (res.find("Fatal") != string::npos || (res.find("Error") != string::npos)) {
+  if (res.find("Fatal") != string::npos) {
+    cout << "Fatal error!!!" << endl;
+    cout << "res was " << res << endl;
+    gethStaticErrorOccurred = true;
+  }
+  
+  return res;
+
+}
+
+
+// Take a geth command, execute it on the selected robot, and return the result string
+string exec_geth_cmd_helper(int i, string command, int nodeInt, string datadirBase){
 
   ostringstream fullCommandStream;
 
@@ -209,44 +243,49 @@ string exec_geth_cmd(int i, string command, int nodeInt, string datadirBase){
   
   std::string fullCommand = fullCommandStream.str();
 
-  //  if (DEBUG)
-  //  cout << "exec_geth_cmd: " << fullCommand << endl;
-  
   string res = exec(fullCommand.c_str());
 
-  //cout << "res in exec_geth_cmd is " << res << endl; 
+  return res;  
+}
 
-  int trials = 5;
+string exec_geth_cmd_with_geth_restart(int i, string command, int nodeInt, int basePort, string datadirBase) {
+
+  string res = exec_geth_cmd_helper(i, command, nodeInt, datadirBase);
+  
+  int trials = 20;
   // Retry to execute the command if it failed
-    while ( (res.find("Fatal") != string::npos) || (res.find("Error") != string::npos)) {
+  while ( (res.find("Fatal") != string::npos) || (res.find("Error") != string::npos)) {
     cout << "exec_geth_cmd: " << fullCommand << endl;
-    cout << "Result of exec_geth_cmd: " << res << endl;
+    cout << "Result of exec_geth_cmd: " << res << endl;    
 
-
+    if (res.find("no such file") != string::npos) {
+      /* Init geth again */
+      start_geth(i, nodeInt, basePort, datadirBase);
+    }
+    
     sleep(1); // Wait for a second and retry
-    res = exec(fullCommand.c_str());
-
+    res = exec_geth_cmd_helper(i, command, nodeInt, datadirBase);
+    
     if (trials == 0)
       break;
-
+    
     trials --;
     
   }
 
-    // TODO: if everything is implemented correctly and safely, I can
-    //    let fatal errors occur both with Fatal error and normal
-    //    errors if (res.find("Fatal") != string::npos || (res.find("Error") != string::npos)) {
-    if (res.find("Fatal") != string::npos) {
-      cout << "Fatal error!!!" << endl;
-      cout << "res was " << res << endl;
-      gethStaticErrorOccurred = true;
-      //string bckiller = "bash " + datadirBase + "/bckillerccall";
-      //exec(bckiller.c_str());    
-      //throw;
-      }
+  // TODO: if everything is implemented correctly and safely, I can
+  //    let fatal errors occur both with Fatal error and normal
+  //    errors if (res.find("Fatal") != string::npos || (res.find("Error") != string::npos)) {
+  if (res.find("Fatal") != string::npos) {
+    cout << "Fatal error!!!" << endl;
+    cout << "res was " << res << endl;
+    gethStaticErrorOccurred = true;
+  }
   
-  return res;  
+  return res;
+  
 }
+
 
 // Take a geth command, execute it on the selected robot, and return the result string
 void exec_geth_cmd_background(int i, string command, int nodeInt, string datadirBase){
@@ -312,7 +351,7 @@ void geth_init(int i) {
 }
 
 
-void geth_init(int i, int nodeInt, string datadirBase) {
+void geth_init(int i, int nodeInt, int basePort, string datadirBase) {
   cout << "Calling geth_init for robot " << i << endl;
 
   std::ostringstream datadirStream;
@@ -392,7 +431,7 @@ void start_geth(int i) {
 	  
 }
 
-void start_geth(int i, int basePort, int nodeInt, string datadirBase) {
+void start_geth(int i, int nodeInt, int basePort, string datadirBase) {
   
   sleep(1);
   cout << "Starting geth for robot " << i << endl;
@@ -440,7 +479,7 @@ void createAccount(int i) {
 
 }
 
-void createAccount(int i, int nodeInt, string datadirBase) {
+void createAccount(int i, int nodeInt, int basePort, string datadirBase) {
   sleep(1);
   string cmd = "personal.newAccount(\"test\")";
   string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);
@@ -469,7 +508,7 @@ string get_enode(int i) {
   
 }
 
-string get_enode(int i, int nodeInt, string datadirBase) {
+string get_enode(int i, int nodeInt, int basePort, string datadirBase) {
 
   string cmd = "admin.nodeInfo.enode";
   string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);
@@ -564,7 +603,7 @@ string add_peer(int i, string enode) {
 }
 
 // Add enode to robot i
-string add_peer(int i, string enode, int nodeInt, string datadirBase) {
+string add_peer(int i, string enode, int nodeInt, int basePort, string datadirBase) {
 
   std::ostringstream fullCommandStream;
   fullCommandStream << "admin.addPeer(" << enode << ")";
@@ -741,7 +780,7 @@ std::string unlockAccount(int i, std::string pw) {
 
 
 /* Unlock account */
-std::string unlockAccount(int i, std::string pw, int nodeInt, string datadirBase) {
+std::string unlockAccount(int i, std::string pw, int nodeInt, int basePort, string datadirBase) {
   std::ostringstream fullCommandStream;
 
   fullCommandStream << "personal.unlockAccount(eth.coinbase, \"" << pw << "\", 0)";

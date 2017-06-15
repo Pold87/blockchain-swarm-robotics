@@ -23,25 +23,29 @@ std::string exec(const char* cmd);
 std::string exec_geth_cmd(int i, std::string command);
 std::string exec_geth_cmd(int i, std::string command, int nodeInt, std::string datadirBase);
 
+std::string exec_geth_cmd_helper(int i, std::string command, int nodeInt, std::string datadirBase);
+std::string exec_geth_cmd_with_geth_restart(int i, std::string command, int nodeInt, int basePort, std::string datadirBase);
+
+
 void exec_geth_cmd_background(int i, std::string command, int nodeInt, std::string datadirBase);
 
 
 // Initialize geth
 void geth_init(int i);
-void geth_init(int i, int nodeInt, std::string datadirBase);
+void geth_init(int i, int nodeInt, int basePort, std::string datadirBase);
 
 // Run geth for robot i
 void start_geth(int i);
-void start_geth(int i, int basePort, int nodeInt, std::string datadirBase);
+void start_geth(int i, int nodeInt, int basePort, std::string datadirBase);
 
 /* Create a new account for robot i */
 void createAccount(int i);
-void createAccount(int i, int nodeInt, std::string datadirBase);
+void createAccount(int i, int nodeInt, int basePort, std::string datadirBase);
 
 
 // Get the enode information for robot i
 std::string get_enode(int i);
-std::string get_enode(int i, int nodeInt, std::string datadirBase);
+std::string get_enode(int i, int nodeInt, int basePort, std::string datadirBase);
 
 // Start mining (robot i) using t threads
 std::string start_mining(int i, int t);
@@ -55,7 +59,7 @@ void stop_mining_bg(int i, int nodeInt, std::string datadirBase);
 
 // Add a peer (specified via the enode) to robot i
 std::string add_peer(int i, std::string enode);
-std::string add_peer(int i, std::string enode, int nodeInt, std::string datadirBase);
+std::string add_peer(int i, std::string enode, int nodeInt, int basePort, std::string datadirBase);
 void add_peer_bg(int i, std::string enode, int nodeInt, std::string datadirBase);
 
 // Remove a peer (specified via the enode) from robot i
@@ -65,7 +69,7 @@ void remove_peer_bg(int i, std::string enode, int nodeInt, std::string datadirBa
 
 // Get coinbase address of robot i
 std::string getCoinbase(int i);
-std::string getCoinbase(int i, int nodeInt, std::string datadirBase);
+std::string getCoinbase(int i, int nodeInt, int basePort, std::string datadirBase);
 
 // Get blockchain length of robot i
 int getBlockChainLength(int i);
@@ -94,7 +98,7 @@ void smartContractInterfaceBg(int i, std::string interface, std::string contract
 
 /* Unlock account */
 std::string unlockAccount(int i, std::string pw);
-std::string unlockAccount(int i, std::string pw, int nodeInt, std::string datadirBase);
+std::string unlockAccount(int i, std::string pw, int nodeInt, int basePort, std::string datadirBase);
 
 // Get contract address from transaction receipt
 std::string getContractAddress(int i, std::string txHash);

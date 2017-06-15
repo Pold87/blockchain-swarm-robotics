@@ -233,7 +233,7 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
     //cout << i << " ";
     //cout << endl;
     if (simulationParams.useMultipleNodes) {
-      string e = get_enode(i, robotIdToNode[i], simulationParams.blockchainPath);
+      string e = get_enode(i, robotIdToNode[i], simulationParams.basePort, simulationParams.blockchainPath);
       if (simulationParams.useBackgroundGethCalls)
 	remove_peer_bg(robotId, e, nodeInt, simulationParams.blockchainPath);
       else
@@ -250,11 +250,11 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
     //cout << i << " ";
     // cout << endl;
     if (simulationParams.useMultipleNodes) {
-      string e = get_enode(i, robotIdToNode[i], simulationParams.blockchainPath);
+      string e = get_enode(i, robotIdToNode[i], simulationParams.basePort, simulationParams.blockchainPath);
       if (simulationParams.useBackgroundGethCalls)
 	add_peer_bg(robotId, e, nodeInt, simulationParams.blockchainPath);
       else
-	add_peer(robotId, e, nodeInt, simulationParams.blockchainPath);
+	add_peer(robotId, e, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
     }
     else {
       add_peer(robotId, get_enode(i));
@@ -1102,14 +1102,14 @@ void EPuck_Environment_Classification::fromLoopFunctionRes(){
     /* Find out on which cluster node this robot's geth process should be executed */
     if (simulationParams.useMultipleNodes) {
       
-      geth_init(robotId, nodeInt, simulationParams.blockchainPath);
-      start_geth(robotId, simulationParams.basePort, nodeInt, simulationParams.blockchainPath);
-      createAccount(robotId, nodeInt, simulationParams.blockchainPath);   
-      enodes[robotId] = get_enode(robotId, nodeInt, simulationParams.blockchainPath);
+      geth_init(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
+      start_geth(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
+      createAccount(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);   
+      enodes[robotId] = get_enode(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
       enode = enodes[robotId];
-      coinbaseAddresses[robotId] = getCoinbase(robotId, nodeInt, simulationParams.blockchainPath);
+      coinbaseAddresses[robotId] = getCoinbase(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
       address = coinbaseAddresses[robotId];    
-      unlockAccount(robotId, "test", nodeInt, simulationParams.blockchainPath);
+      unlockAccount(robotId, "test", nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
       
     } else {
       geth_init(robotId);

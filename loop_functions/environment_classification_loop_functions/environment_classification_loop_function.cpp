@@ -279,13 +279,13 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
   std::string minerAddress;
   if (useMultipleNodes) {
     /* Initialize the miner */
-    geth_init(minerId, minerNode, blockchainPath);
+    geth_init(minerId, minerNode, basePort, blockchainPath);
     sleep(1);
-    start_geth(minerId, basePort, minerNode, blockchainPath);
-    createAccount(minerId, minerNode, blockchainPath);
-    unlockAccount(minerId, "test", minerNode, blockchainPath);
+    start_geth(minerId, minerNode, basePort, blockchainPath);
+    createAccount(minerId, minerNode, basePort, blockchainPath);
+    unlockAccount(minerId, "test", minerNode, basePort, blockchainPath);
     start_mining(minerId, 4, minerNode, blockchainPath);	
-    minerAddress = getCoinbase(minerId, minerNode, blockchainPath);
+    minerAddress = getCoinbase(minerId, minerNode, basePort, blockchainPath);
   } else {
     /* Initialize the miner */
     geth_init(minerId);
