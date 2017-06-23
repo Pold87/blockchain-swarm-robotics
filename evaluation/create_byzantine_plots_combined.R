@@ -21,7 +21,7 @@ ground.truth <- "Blacks"
 tol4qualitative=c("#4477AA", "#117733", "#DDCC77", "#CC6677")
 #difficulty <- c(34, 36, 38, 40, 42, 44, 46, 48) # Make sure to match it with metastarter.sh
 
-num.byzantines = 0:9
+num.byzantines = 1:4
 
 # As a function of Byzantine robots
 if (do.difficulty) {
@@ -35,14 +35,17 @@ if (do.difficulty) {
     strategy <- c()
     node <- 2
     runs <- c()
-    d = 34
+    d = 48
+    dates <- c("21-06-2017", "22-06-2017")
     
     for (s in strategies) {
-            for (b in num.byzantines) {
+        for (b in num.byzantines) {
+            for (date in dates) {
                
                 ## sprintf assumes that each strategy is executed on
                 ## the corresponding node, e.g., strategy 2 -> node 2
-                    f <- sprintf("%s/experiment1_decision%d-node%d-classical/num%d_black%d_byz%d_run0.RUNS", data.dir, s, s, k, d, b)    
+                f <- sprintf("%s/experiment1_decision%d-node%d-byzexp-%s/num%d_black%d_byz%d_run0.RUNS", data.dir, s, s, date, k, d, b)    
+                #f <- sprintf("%s/experiment1_decision%d-node%d-classical/num%d_black%d_byz%d_run0.RUNS", data.dir, s, s, k, d, b)    
                     
                     if (file.exists(f)) {                
                             
@@ -74,12 +77,18 @@ if (do.difficulty) {
                             }
                             consensus.time <- c(consensus.time, m)
                         }
-                        
-                        E.Ns <- c(E.Ns, mean(successes))
+
+                        if (length(successes) == 0) {
+                            E.Ns <- c(E.Ns, 0)
+                            
+                        } else {
+                            E.Ns <- c(E.Ns, mean(successes))
+                        }
 
                         strategy <- c(strategy, s)
                         num.byz <- c(num.byz, b)
                         
+                    }
             }
         }
     }
