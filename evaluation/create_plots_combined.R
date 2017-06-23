@@ -51,7 +51,7 @@ if (do.difficulty) {
         for (k in num.robots) {    
             for (d in difficulty) {
                 
-                f <- sprintf("%s/experiment1_decision%s-node%s-classical-afterbugfix/num%d_black%d_byz0_run0.RUNS", data.dir, s, s, k, d)
+                f <- sprintf("%s/experiment1_decision%s-node%s-classical-withbug/num%d_black%d_byz0_run0.RUNS", data.dir, s, s, k, d)
 
                 
                 if (file.exists(f)) { 
@@ -72,8 +72,7 @@ if (do.difficulty) {
                     consensus.time <- c(consensus.time, m)
                     
                     ## Number of runs
-                    runs <- c(runs, length(successes))
-                    
+                    runs <- c(runs, length(successes))                    
                     
                 }
             }
@@ -96,9 +95,9 @@ if (do.difficulty) {
     plot.consensus.time.gg(df,
                            xlab="Difficulty",
                            ylab="Consensus time / 10",
-                           sprintf("consensustime_%d.pdf", k))
+                           sprintf("consensustime_%d-withbug.pdf", k))
     plot.exit.prob.gg(df,
                       xlab="Difficulty", ylab="Exit probability",
-                      sprintf("exit_prob_d_%d_gg.pdf", k))
+                      sprintf("exit_prob_d_%d_gg-withbug.pdf", k))
         
 }

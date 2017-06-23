@@ -14,7 +14,7 @@ report.dir <- "~/Dropbox/mypapers/technical_report_collective/img/"
 data.dir <- "../data/"
 
 do.difficulty <- TRUE
-do.consensus.on.correct.outcomes.only <- TRUE
+do.consensus.on.correct.outcomes.only <- FALSE
 max.trials <- 45
 num.robots <- 20
 ground.truth <- "Blacks"
@@ -23,30 +23,37 @@ tol4qualitative=c("#4477AA", "#117733", "#DDCC77", "#CC6677")
 
 num.byzantines = 0:9
 
+
+
 # As a function of Byzantine robots
 if (do.difficulty) {
     
     E.Ns <- c()
     consensus.time <- c()
     num.byz <- c()
-    strategies <- c(1, 2, 3)
+    strategies <- c(1, 2) ## TODO: Change back to c(1, 2, 3)
     k = num.robots
     
     strategy <- c()
     node <- 2
     runs <- c()
-    d = 34
+    d = 48
+
     
     for (s in strategies) {
             for (b in num.byzantines) {
                
                 ## sprintf assumes that each strategy is executed on
                 ## the corresponding node, e.g., strategy 2 -> node 2
-                    f <- sprintf("%s/experiment1_decision%d-node%d-classical/num%d_black%d_byz%d_run0.RUNS", data.dir, s, s, k, d, b)    
-                    
+                    f <- sprintf("%s/experiment1_decision%d-node%d-byzexp-next/num%d_black%d_byz%d_run0.RUNS", data.dir, s, s, k, d, b)    
+
+
                     if (file.exists(f)) {                
-                            
+
+                        print(f)
+                        
                         X <- read.table(f, header=T)
+
                         print(X)
 
                         successes <- X[, ground.truth] == (num.robots - b)
@@ -73,6 +80,13 @@ if (do.difficulty) {
                                 m <-  mean(X.correct.outcome[, "ExitTime"])
                             }
                             consensus.time <- c(consensus.time, m)
+                        } else {
+                            if (nrow(X) == 0) {
+                                m <- 0                                
+                            } else {
+                                m <-  mean(X[, "ExitTime"])
+                            }
+                            consensus.time <- c(consensus.time, m)
                         }
                         
                         E.Ns <- c(E.Ns, mean(successes))
@@ -80,21 +94,26 @@ if (do.difficulty) {
                         strategy <- c(strategy, s)
                         num.byz <- c(num.byz, b)
                         
+                        ## Number of runs
+                        runs <- c(runs, length(successes))                    
+
+                        
+                        
             }
         }
     }
 
-    df <- data.frame(num.byz, strategy, E.Ns, consensus.time)
+    df <- data.frame(num.byz, strategy, E.Ns, consensus.time, runs)
 
     plot.consensus.time.gg.byz(df,
                            xlab=expression("Number of Byzantine robots"),
                            ylab="Consensus time / 10",
-                           sprintf("consensustime_byz_diff%d.pdf", d))
+                           sprintf("consensustime_blockchain_byz_diff%d.pdf", d))
 
     plot.exit.prob.gg.byz(df,
                       xlab="Number of Byzantine robots",
                       ylab="Exit probability",
-                      sprintf("exitprob_byz_diff%d.pdf", d))    
+                      sprintf("exitprob_blockchain_byz_diff%d.pdf", d))    
 
     
     
