@@ -36,6 +36,7 @@ static const int maxContractAddressTrials = 300; /* Repeats getting the contract
 static const int trialsMiningNotWorking = 40; /* If after x trials the number of white votes is still zero  */
 
 std::string contractAddress;
+std::string minerAddressGlobal;
 std::string interface; // Smart contract interface
 
 
@@ -187,13 +188,14 @@ void CEnvironmentClassificationLoopFunctions::setContractAddressAndDistributeEth
     if (useMultipleNodes) {
       //      string e = get_enode(robotId, minerNode, blockchainPath);
       string e = cController.getEnode();
-      add_peer(minerId, e, minerNode, blockchainPath);
+      add_peer(minerId, e, minerNode, basePort, blockchainPath);
       /* Distribute ether among the robots */
-      sendEther(minerId, minerAddress, address, 4, minerNode, blockchainPath);
+      /* Sending is not necessary anymore */
+      //sendEther(minerId, minerAddress, address, 20, minerNode, blockchainPath);
     } else {
       string e = get_enode(robotId);
       add_peer(minerId, e);
-      sendEther(minerId, minerAddress, address, 4);
+      //sendEther(minerId, minerAddress, address, 4);
     }
     cout << "Sent ether to address: " << address;
   }  
@@ -219,7 +221,7 @@ void CEnvironmentClassificationLoopFunctions::connectMinerToEveryone() {
       string e = cController.getEnode();
 
       cout << "enode in connecttominer is" << e << endl;
-      add_peer(minerId, e, minerNode, blockchainPath);
+      add_peer(minerId, e, minerNode, basePort, blockchainPath);
       } else {
       string e = get_enode(robotId);
       add_peer(minerId, e);
@@ -238,8 +240,8 @@ void CEnvironmentClassificationLoopFunctions::connectMore(vector<int> allRobotId
     cout << "it1 is" << *it1 << " and it2 is " << *it2 << endl;
     if (useMultipleNodes) {
       
-      string e = get_enode(*it2, minerNode, blockchainPath);
-      add_peer(*it1, e, minerNode, blockchainPath);
+      string e = get_enode(*it2, minerNode, basePort, blockchainPath);
+      add_peer(*it1, e, minerNode, basePort, blockchainPath);
     } else {
       string e = get_enode(*it2);
       add_peer(*it1, e);
@@ -259,7 +261,7 @@ void CEnvironmentClassificationLoopFunctions::disconnectAll(vector<int> allRobot
       
     cout << "it 1 is " << *it1 << " and it2 is " << *it2 << endl;
     if (useMultipleNodes) {
-      string e = get_enode(*it2, minerNode, blockchainPath);
+      string e = get_enode(*it2, minerNode, basePort, blockchainPath);
       remove_peer(*it1, e, minerNode, blockchainPath);
     } else {
       string e = get_enode(*it2);
@@ -268,24 +270,30 @@ void CEnvironmentClassificationLoopFunctions::disconnectAll(vector<int> allRobot
   }
 }
 
-/* Set up the miner, deploy the smart contract, etc. */
-void CEnvironmentClassificationLoopFunctions::InitEthereum() {
+void CEnvironmentClassificationLoopFunctions::PreinitMiner() {
 
   cout << "Initializing miner" << endl;
 
   /* Change mining difficulty and rebuild geth */
 
+  string genesisRaw = "~/genesis/genesis1.json";
+
+  ostringstream genesisPathStream;
+  genesisPathStream << "/home/vstrobel/genesis/genesis" << basePort << ".json";
+  string genesisPath = genesisPathStream.str();
+    
   std::ostringstream fullCommandStream;
   std::string minerAddress;
   if (useMultipleNodes) {
     /* Initialize the miner */
-    geth_init(minerId, minerNode, basePort, blockchainPath);
+    geth_init(minerId, minerNode, basePort, blockchainPath, genesisRaw);
     sleep(1);
     start_geth(minerId, minerNode, basePort, blockchainPath);
     createAccount(minerId, minerNode, basePort, blockchainPath);
-    unlockAccount(minerId, "test", minerNode, basePort, blockchainPath);
-    start_mining(minerId, 4, minerNode, blockchainPath);	
     minerAddress = getCoinbase(minerId, minerNode, basePort, blockchainPath);
+    minerAddressGlobal = minerAddress;
+    prepare_for_new_genesis(minerId, minerNode, basePort, blockchainPath);
+    
   } else {
     /* Initialize the miner */
     geth_init(minerId);
@@ -297,16 +305,44 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
     minerAddress = getCoinbase(minerId);
   }
 
+  
+}
+
+/* Set up the miner, deploy the smart contract, etc. */
+void CEnvironmentClassificationLoopFunctions::InitEthereum() {
+
+  string genesisRaw = "~/genesis/genesis1.json";
+
+  ostringstream genesisPathStream;
+  genesisPathStream << "~/genesis/genesis" << basePort << ".json";
+  string genesisPath = genesisPathStream.str();
+    
+  std::ostringstream fullCommandStream;
+  std::string minerAddress;
+  
+  /* Start geth again after the preallocation */
+  geth_init(minerId, minerNode, basePort, blockchainPath, genesisPath);
+  sleep(1);
+  start_geth(minerId, minerNode, basePort, blockchainPath);
+  
+  unlockAccount(minerId, "test", minerNode, basePort, blockchainPath);
+
+  minerAddress = getCoinbase(minerId, minerNode, basePort, blockchainPath);
+  
+  start_mining(minerId, 4, minerNode, blockchainPath);	
+
+  
   /* Wait until at least x blocks are mined */
-  int bHeight;
-  do {
-    if (useMultipleNodes)
-      bHeight = getBlockChainLength(minerId, minerNode, blockchainPath);
-    else
-      bHeight = getBlockChainLength(minerId);
-    cout << "Checking block chain height. It is " << bHeight << endl;
-    sleep(1);
-  } while (bHeight < 16);
+  /* This part should be replaced by the preallocation*/
+  //int bHeight;
+  //do {
+  //  if (useMultipleNodes)
+  //    bHeight = getBlockChainLength(minerId, minerNode, blockchainPath);
+  //  else
+  //    bHeight = getBlockChainLength(minerId);
+  //  cout << "Checking block chain height. It is " << bHeight << endl;
+  //  sleep(1);
+  //} while (bHeight < (n_robots));
   
   /* Deploy contract */  
   string interfacePath = baseDirLoop + "interface.txt";
@@ -335,6 +371,8 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
     u++;
   } while (u < maxContractAddressTrials && contractAddress.find("TypeError") == 0);
 
+  stop_mining(minerId, minerNode, blockchainPath);
+  
   /* Remove space in contract address */
   contractAddress.erase(std::remove(contractAddress.begin(), 
 				    contractAddress.end(), '\n'),
@@ -377,7 +415,7 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
     }
   }
 
-  stop_mining(minerId, minerNode, blockchainPath);
+
 
   cout << "Waiting until all robots have the same blockchain" << endl;
 
@@ -400,8 +438,9 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
     
     allSameHeight = allSameBCHeight();
 
-    if (trialssameheight > 30) {
+    if (trialssameheight > 40) {
       errorOccurred = true;
+      cout << "Fatal Error: more than 30 trials in allSameBCHeight" << endl;
       IsExperimentFinished();
     }
     trialssameheight++;	
@@ -430,6 +469,12 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
 
   miningNotWorkingAnymore = false;
   errorOccurred = false;
+
+  if (!useClassicalApproach) {
+    /* Preallocate money to the miner */
+    PreinitMiner();
+  }
+
   
   /* Resetting number of opinions that have to be written */
   written_qualities = 0;
@@ -549,8 +594,8 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
       opinion.actualOpCol = CColor::BLUE;
     /* Setting robots initial states: exploring state */
 
-    cController.fromLoopFunctionRes();
-
+    cController.fromLoopFunctionResPrepare();
+    
     
     if( gethStaticErrorOccurred ) {    
       cout << "gethStaticErrorOccurred was true in InitRobots" << endl;
@@ -561,6 +606,10 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
 
     
   }
+
+  PreallocateEther();
+  
+  RestartGeths();
   
   AssignNewStateAndPosition();
 
@@ -570,6 +619,59 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
   }
 
   
+}
+
+
+void CEnvironmentClassificationLoopFunctions::PreallocateEther() {
+
+  ostringstream genesisBlockStream;
+
+  
+  genesisBlockStream << "{\n\"nonce\": \"0x0000000000000001\",\n\"mixhash\": \"0x0000000000000000000000000000000000000000000000000000000000000000\",\n\"difficulty\": \"0x1000\",\n\"alloc\": {\n";
+
+
+  CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
+
+  for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
+
+    CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
+    EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
+    
+    std::string id = cController.GetId();
+    int robotId = Id2Int(id);
+
+    cout << "Coinbase address is " << coinbaseAddresses[robotId] << endl;
+    
+    genesisBlockStream << removeSpace(coinbaseAddresses[robotId]) << ": {\n\"balance\": \"100000000000000000000000\"\n},";
+    
+  }
+  
+  genesisBlockStream << removeSpace(minerAddressGlobal) << ": {\n\"balance\": \"100000000000000000000000\"\n}";
+  
+  genesisBlockStream << "\n},\n\"coinbase\": \"0xcbfbd4c79728b83eb7c3aa50455a78ba724c53ae\",\n\"timestamp\": \"0x00\",\n\"parentHash\": \"0x0000000000000000000000000000000000000000000000000000000000000000\",\n\"extraData\": \"0x\",\n\"gasLimit\": \"0x8000000\"\n}";
+  
+  
+  string genesisBlock = genesisBlockStream.str();
+  ostringstream genesisPathStream;  
+  genesisPathStream << "/home/vstrobel/genesis/genesis" << basePort  << ".json";
+  string genesisPath = genesisPathStream.str();
+  ofstream out(genesisPath.c_str());
+  out << genesisBlock;
+  out.close();
+}
+
+
+void CEnvironmentClassificationLoopFunctions::RestartGeths() {
+  CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
+
+    for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
+
+      CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
+      EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
+
+      cController.fromLoopFunctionResStart();
+
+    }
 }
 
 void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
@@ -790,6 +892,7 @@ bool CEnvironmentClassificationLoopFunctions::allSameBCHeight() {
 	else
 	  b = getBlockChainLength(robotId);
     	if (a != b) {
+	  cout << "a is " << a << " and b is " << b << endl;      
     	  canExit = false;
 	  success = false;
 	  break;
@@ -1214,6 +1317,9 @@ void CEnvironmentClassificationLoopFunctions::Destroy(){
 
 void CEnvironmentClassificationLoopFunctions::PreStep() {
 
+
+  //double begin_prestep = get_wall_time();
+  
   //cout << "gethStaticErrorOccurred = " << gethStaticErrorOccurred << endl;
   
 
@@ -1395,6 +1501,9 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 		  //blockChainLast2Votes << std::endl;
 	    }
 	}
+
+	//measure_time(begin_prestep, "Prestep");
+	
 }
 
 
