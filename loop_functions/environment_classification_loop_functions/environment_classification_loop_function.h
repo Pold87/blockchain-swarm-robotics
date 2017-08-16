@@ -22,7 +22,8 @@
 
 using namespace argos;
 
-extern bool gethStaticErrorOccurred;	
+extern bool gethStaticErrorOccurred;
+extern std::map<int, std::string> coinbaseAddresses;	
 
 class CEnvironmentClassificationLoopFunctions : public CLoopFunctions {
 
@@ -72,7 +73,10 @@ public:
 	virtual void AssignNewStateAndPosition();
 private:
 
+	virtual void PreallocateEther();
+	virtual void RestartGeths();
 	virtual void InitEthereum();
+	virtual void PreinitMiner();
 	virtual void setContractAddressAndDistributeEther(std::string contractAddress, std::string minerAddress);
 	virtual bool allSameBCHeight();
 	virtual void connectMore(std::vector<int> allRobotIds);

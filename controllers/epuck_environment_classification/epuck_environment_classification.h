@@ -66,6 +66,7 @@ public:
 	    Real g;
 	    Real sigma;
 	    bool exitFlag;
+	    bool profiling;
 	    bool useMultipleNodes;
 	    bool useBackgroundGethCalls;
 	    std::string radix;
@@ -116,7 +117,8 @@ public:
    virtual void ControlStep();
    virtual void RandomWalk();
    virtual void Reset() {};
-   void fromLoopFunctionRes();
+   void fromLoopFunctionResPrepare();
+   void fromLoopFunctionResStart();
    void killGethAndRemoveFolders(std::string bcPath, std::string regenFile);
    void Explore();
    void Diffusing();   

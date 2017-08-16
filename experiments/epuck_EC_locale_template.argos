@@ -6,11 +6,11 @@
   <!-- ************************* -->
   <framework>
    
-    <system threads="0" />
+    <system threads="THREADS" />
 
     <experiment length="0"
                 ticks_per_second="10"
-                random_seed="23" />
+                random_seed="0" />
 
   </framework>
 
@@ -40,6 +40,7 @@
 			       turn="45"
 			       lamda="100"
 			       exitFlag="true"
+			       profiling="true"
 			       decision_rule="DECISIONRULE"
 			       num_pack_saved="2"
 			       percent_red="PERCENT_RED"
@@ -72,11 +73,11 @@
 	  percent_blue="PERCENT_BLUE"
 	  percent_green="0"
 	  save_every_ticks="100"
-	  save_every_ticks_flag="true"
+	  save_every_ticks_flag="false"
 	  save_every_run_flag="true"
-	  save_blockchain_flag="true"
-	  save_every_robot_flag="true"
-	  save_every_quality_flag="true"
+	  save_blockchain_flag="false"
+	  save_every_robot_flag="false"
+	  save_every_quality_flag="false"
 	  save_global_stat_flag="true"
 	  radix="RADIX"
 	  number_of_robots="NUMROBOTS"

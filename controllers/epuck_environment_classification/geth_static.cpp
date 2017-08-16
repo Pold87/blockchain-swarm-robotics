@@ -7,6 +7,12 @@
 #include <sstream>
 #include <fstream>
 #include <limits>
+#include <algorithm>
+
+#include <time.h>
+#include <sys/time.h>
+
+
 #include "geth_static.h"
 
 #define DEBUG true
@@ -16,11 +22,22 @@ using namespace std;
 
 string datadir_base =  "~/Documents/eth_data/data";
 const string genesis = "~/genesis/genesis1.json ";
+const string genesisTemplate = "~/genesis/genesis_template.json ";
 const int rpc_base_port = 8300;
 const int ipc_base_port = 33500;
 const int maxtrials = 3000;
 const string rack = "3";
 bool gethStaticErrorOccurred;
+
+
+double get_wall_time(){
+  struct timeval time;
+  if (gettimeofday(&time,NULL)){
+    //  Handle error
+    return 0;
+  }
+  return (double)time.tv_sec + (double)time.tv_usec * .000001;
+}
 
 /*
   Convert a robot Id (fbxxx) to an integer (xxx)
@@ -34,6 +51,16 @@ uint Id2Int(std::string id) {
     return idConversion;
 }
 
+std::string removeSpace(std::string str) {
+
+  string noSpace = str;
+	  
+  noSpace.erase(std::remove(noSpace.begin(), 
+			    noSpace.end(), '\n'),
+		       noSpace.end());
+
+  return noSpace;
+}
 
 /* Replace the pattern from with to in the string str  */
 bool replace(std::string& str, const std::string& from, const std::string& to) {
@@ -197,13 +224,29 @@ string exec_geth_cmd(int i, string command){
 
 string exec_geth_cmd(int i, string command, int nodeInt, string datadirBase){
 
+
+  
   string res = exec_geth_cmd_helper(i, command, nodeInt, datadirBase);
   
   int trials = 20;
   // Retry to execute the command if it failed
   while ( (res.find("Fatal") != string::npos) || (res.find("Error") != string::npos)) {
-    cout << "exec_geth_cmd: " << fullCommand << endl;
-    cout << "Result of exec_geth_cmd: " << res << endl;    
+
+    /* Reconstruct the full command stream */
+    ostringstream fullCommandStream;
+    
+    /* Run geth command on this node  */
+    fullCommandStream << "ssh vstrobel@c" << rack << "-" << nodeInt << " \"";
+    
+    //ReplaceStringInPlace(command, "\"", "\\\"");
+    
+    fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc\"";
+    
+    std::string fullCommand = fullCommandStream.str();
+
+    
+    //cout << "exec_geth_cmd: " << fullCommand << endl;
+    //cout << "Result of exec_geth_cmd: " << res << endl;    
     
     sleep(1); // Wait for a second and retry
     res = exec_geth_cmd_helper(i, command, nodeInt, datadirBase);
@@ -221,6 +264,10 @@ string exec_geth_cmd(int i, string command, int nodeInt, string datadirBase){
   if (res.find("Fatal") != string::npos) {
     cout << "Fatal error!!!" << endl;
     cout << "res was " << res << endl;
+    cout << "Called exec_geth_cmd with" << i << " " << command << endl; 
+    
+    sendMail(res);
+    
     gethStaticErrorOccurred = true;
   }
   
@@ -243,6 +290,8 @@ string exec_geth_cmd_helper(int i, string command, int nodeInt, string datadirBa
   
   std::string fullCommand = fullCommandStream.str();
 
+  //cout << "Command in helper is: " << fullCommand << endl;
+  
   string res = exec(fullCommand.c_str());
 
   return res;  
@@ -251,12 +300,25 @@ string exec_geth_cmd_helper(int i, string command, int nodeInt, string datadirBa
 string exec_geth_cmd_with_geth_restart(int i, string command, int nodeInt, int basePort, string datadirBase) {
 
   string res = exec_geth_cmd_helper(i, command, nodeInt, datadirBase);
-  
+
   int trials = 20;
   // Retry to execute the command if it failed
   while ( (res.find("Fatal") != string::npos) || (res.find("Error") != string::npos)) {
-    cout << "exec_geth_cmd: " << fullCommand << endl;
-    cout << "Result of exec_geth_cmd: " << res << endl;    
+
+    /* Reconstruct the full command stream */
+    ostringstream fullCommandStream;
+    
+    /* Run geth command on this node  */
+    fullCommandStream << "ssh vstrobel@c" << rack << "-" << nodeInt << " \"";
+    
+    //ReplaceStringInPlace(command, "\"", "\\\"");
+    
+    fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc\"";
+    
+    std::string fullCommand = fullCommandStream.str();
+    
+    //cout << "exec_geth_cmd: " << fullCommand << endl;
+    //cout << "Result of exec_geth_cmd: " << res << endl;    
 
     if (res.find("no such file") != string::npos) {
       /* Init geth again */
@@ -277,13 +339,40 @@ string exec_geth_cmd_with_geth_restart(int i, string command, int nodeInt, int b
   //    let fatal errors occur both with Fatal error and normal
   //    errors if (res.find("Fatal") != string::npos || (res.find("Error") != string::npos)) {
   if (res.find("Fatal") != string::npos) {
+   
     cout << "Fatal error!!!" << endl;
     cout << "res was " << res << endl;
+    cout << "Called exec_geth_cmd with" << i << " " << command << endl; 
+    sendMail(res);
     gethStaticErrorOccurred = true;
   }
   
   return res;
   
+}
+
+void sendMail(string body){
+
+  // string bodyToSend = body;
+  
+  // bodyToSend.erase(std::remove(bodyToSend.begin(), 
+  // 			 bodyToSend.end(), '\n'),
+  // 	     bodyToSend.end());
+
+
+  ofstream out("mail.txt");
+  out << body;
+  out.close();
+  
+  ostringstream fullCommandStream;
+
+  /* Run geth command on this node  */
+  //fullCommandStream << "echo " << body << " | mail -s Clustererror volker.strobel87@gmail.com";
+  cout << "Sending mail" << endl;
+  fullCommandStream << "mail -s Clustererror volker.strobel87@gmail.com < mail.txt";
+  std::string fullCommand = fullCommandStream.str();  
+  system(fullCommand.c_str());
+
 }
 
 
@@ -307,7 +396,7 @@ void exec_geth_cmd_background(int i, string command, int nodeInt, string datadir
      call; maybe I can come up with some error handling */
   
   //  if (DEBUG)
-  //  cout << "exec_geth_cmd: " << fullCommand << endl;
+  //cout << "exec_geth_cmd_background: " << fullCommand << endl;
   
   system(fullCommand.c_str());
 
@@ -351,7 +440,7 @@ void geth_init(int i) {
 }
 
 
-void geth_init(int i, int nodeInt, int basePort, string datadirBase) {
+void geth_init(int i, int nodeInt, int basePort, string datadirBase, string genesisPath) {
   cout << "Calling geth_init for robot " << i << endl;
 
   std::ostringstream datadirStream;
@@ -363,7 +452,7 @@ void geth_init(int i, int nodeInt, int basePort, string datadirBase) {
 
   /* Run geth command on this node  */
   fullCommandStream << "ssh vstrobel@c" << rack << "-" << nodeInt << " \"";  
-  fullCommandStream << "geth" << nodeInt << " --verbosity 3" << " --datadir " << str_datadir << " init " << genesis << "\"";
+  fullCommandStream << "geth" << nodeInt << " --verbosity 3" << " --datadir " << str_datadir << " init " << genesisPath << "\"";
   
   string commandStream = fullCommandStream.str();
 
@@ -482,7 +571,7 @@ void createAccount(int i) {
 void createAccount(int i, int nodeInt, int basePort, string datadirBase) {
   sleep(1);
   string cmd = "personal.newAccount(\"test\")";
-  string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);
+  string res = exec_geth_cmd_with_geth_restart(i, cmd, nodeInt, basePort, datadirBase);
 }
 
 
@@ -511,7 +600,7 @@ string get_enode(int i) {
 string get_enode(int i, int nodeInt, int basePort, string datadirBase) {
 
   string cmd = "admin.nodeInfo.enode";
-  string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);
+  string res = exec_geth_cmd_with_geth_restart(i, cmd, nodeInt, basePort, datadirBase);
 
   // Print the received enode
   cout << "The enode is " << res << endl;
@@ -676,11 +765,11 @@ std::string getCoinbase(int i){
 }
 
 // Get coinbase address of robot i
-std::string getCoinbase(int i, int nodeInt, string datadirBase){
+std::string getCoinbase(int i, int nodeInt, int basePort, string datadirBase){
   std::ostringstream fullCommandStream;
   fullCommandStream << "eth.coinbase";
   string cmd = fullCommandStream.str();
-  string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);
+  string res = exec_geth_cmd_with_geth_restart(i, cmd, nodeInt, basePort, datadirBase);
 
     if (DEBUG)
       cout << "DEBUG  -- getCoinbase " << "(robot " << i << "): " << res << endl;
@@ -786,7 +875,7 @@ std::string unlockAccount(int i, std::string pw, int nodeInt, int basePort, stri
   fullCommandStream << "personal.unlockAccount(eth.coinbase, \"" << pw << "\", 0)";
   
   string cmd = fullCommandStream.str();
-  string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);
+  string res = exec_geth_cmd_with_geth_restart(i, cmd, nodeInt, basePort, datadirBase);
 
   if (DEBUG)
     cout << "DEBUG -- unlockAccount: " << res << endl;
@@ -848,7 +937,7 @@ std::string kill_geth_thread(int i) {
 }
 
 
-std::string kill_geth_thread(int i, int basePort, int nodeInt, string datadirBase) { 
+void kill_geth_thread(int i, int basePort, int nodeInt, string datadirBase) { 
 
   int port = basePort + i;
 
@@ -860,9 +949,10 @@ std::string kill_geth_thread(int i, int basePort, int nodeInt, string datadirBas
   
   string cmd = fullCommandStream.str();
   string res = exec(cmd.c_str());
+  //system(cmd.c_str());
   
-  if (DEBUG)
-    cout << "DEBUG -- kill_geth_thread (1st call) -- command:" << cmd << " result: " << res << endl;
+  //if (DEBUG)
+  //  cout << "DEBUG -- kill_geth_thread (1st call) -- command:" << cmd << " result: " << res << endl;
 
   /* Only get the first word, i.e., the PID from the command */
   istringstream iss(res);
@@ -876,10 +966,12 @@ std::string kill_geth_thread(int i, int basePort, int nodeInt, string datadirBas
   fullCommandStream2 << "kill -HUP " << pid;
   cmd2 = fullCommandStream2.str();
 
-  res = exec(cmd2.c_str());
+  //res = exec(cmd2.c_str());
+  system(cmd2.c_str());
+
   
-  if (DEBUG)
-    cout << "DEBUG -- kill_geth_thread (2nd call) -- command:" << cmd2 << " result: " << res << endl;
+  //if (DEBUG)
+  //  cout << "DEBUG -- kill_geth_thread (2nd call) -- command:" << cmd2 << " result: " << res << endl;
 
 
   /* Kill again locally */
@@ -891,10 +983,11 @@ std::string kill_geth_thread(int i, int basePort, int nodeInt, string datadirBas
   fullCommandStream3 << "kill -HUP " << pid2;
   cmd3 = fullCommandStream3.str();
 
-  res = exec(cmd3.c_str());
+  //res = exec(cmd3.c_str());
+  system(cmd3.c_str());
 
-  if (DEBUG)
-    cout << "DEBUG -- kill_geth_thread (3rd call) -- command:" << cmd3 << " result: " << res << endl;  
+  //if (DEBUG)
+  //  cout << "DEBUG -- kill_geth_thread (3rd call) -- command:" << cmd3 << " result: " << res << endl;  
   
   /* And again via SSH */
   string cmd4;
@@ -902,12 +995,13 @@ std::string kill_geth_thread(int i, int basePort, int nodeInt, string datadirBas
   fullCommandStream4 << "ssh vstrobel@c" << rack << "-" << nodeInt << " ";
   fullCommandStream4 << "kill -HUP " << pid2;
   cmd4 = fullCommandStream4.str();
-  res = exec(cmd4.c_str());
+  //res = exec(cmd4.c_str());
+  system(cmd4.c_str());
   
-  if (DEBUG)
-    cout << "DEBUG -- kill_geth_thread (4th call) -- command:" << cmd4 << " result: " << res << endl;
+  //if (DEBUG)
+  //  cout << "DEBUG -- kill_geth_thread (4th call) -- command:" << cmd4 << " result: " << res << endl;
   
-  return res;
+  //return res;
   
 }
 
@@ -1151,6 +1245,7 @@ int getBlockChainLength(int i, int nodeInt, string datadirBase) {
   /* TODO: A check would be better. Sometime eth.blockNumber returns
      true which is converted to 32515 */
   if (res.find("true") != string::npos) {
+    cout << "Result in getBlockChainLength was " << res << endl;
     blockNumber = -1;
   } else {  
     istringstream ss(res);
@@ -1282,3 +1377,49 @@ int getLast2Votes(int i, int nodeInt, string datadirBase) {
   return resInt;
 }
 
+/* Measure time and print it */
+double measure_time(double ref_time, string part_name) {
+
+  string alarm = "";
+  double diff = get_wall_time() - ref_time;
+
+  if (diff > 0.5)
+    alarm = " ALARM";
+  
+  cout << fixed << part_name << " took (ms): " << diff << alarm << endl;
+
+  return get_wall_time();
+  
+}
+
+void generate_genesis(std::string address, int basePort) {
+
+  ostringstream fullCommandStream;
+
+  string addressNoSpace = address;
+	  
+  addressNoSpace.erase(std::remove(addressNoSpace.begin(), 
+				   addressNoSpace.end(), '\n'),
+		       addressNoSpace.end());
+  
+  cout << "Generating new genesis file" << endl;
+  fullCommandStream << "bash replace_genesis.sh " << addressNoSpace << " " << basePort;
+  std::string fullCommand = fullCommandStream.str();
+  cout << fullCommand << endl;
+  system(fullCommand.c_str());
+}
+
+
+void prepare_for_new_genesis(int i, int nodeInt, int basePort, string blockchainPath) {
+
+  /* Kill miner geth thread to replace genesis block */
+  kill_geth_thread(i, basePort, nodeInt, blockchainPath);
+  /* And a second time (since ssh creates two processes) */
+  kill_geth_thread(i, basePort, nodeInt, blockchainPath);
+  
+  /* Remove all files except for the keystore */
+  std::ostringstream rmFilesStream;
+  rmFilesStream << "rm -rf " << blockchainPath << i << "/geth*";
+  std::string rmFilesStreamCmd = rmFilesStream.str();
+  system(rmFilesStreamCmd.c_str());
+}
