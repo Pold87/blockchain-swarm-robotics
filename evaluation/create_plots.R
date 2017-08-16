@@ -4,7 +4,7 @@ source("myplothelpers.R")
 trials.base <- "volker"
 
 use.fake.data <- FALSE
-report.dir <- "~/Dropbox/mypapers/technical_report_collective/img/"
+report.dir <- "~/Dropbox/mypapers/RAR/img/"
 #data.dir <- "../data/experiment1_decision3-run3/"
 ## Blockchain experiments
 data.dir <- "../data/"
@@ -35,24 +35,27 @@ do.initial.amount <- FALSE
 
 # As a function of the difficulty of the task, easy and difficult setup
 if (do.difficulty) {
+    for (do.consensus.on.correct.outcomes.only in c(TRUE, FALSE)) {
 
-    E.Ns <- c()
-    strategies <- c(1, 2, 3)
-    strategy <- c()
-    nodes <- 0:20
-    runs <- c()
-    
-## Exit probability: As a function of difficulties
-    strategy <- c()
-    used.difficulties <- c()
-    
-    for (s in strategies) {
+        E.Ns <- c()
+        strategies <- c(1, 2, 3)
+        strategy <- c()
+        nodes <- 0:20
+        runs <- c()
+        consensus.time <- c()
+        
+        ## Exit probability: As a function of difficulties
+        strategy <- c()
+        used.difficulties <- c()
+        
+        for (s in strategies) {
             for (k in num.robots) {    
                 for (d in difficulty) {
-
+                
                     used.difficulties <- c(used.difficulties, d)
                     successes <- c()                                        
                     strategy <- c(strategy, s)
+                    consensus.times <- c()
                     
                     for (node in nodes) {
         ## For metastarter.sh
@@ -69,10 +72,23 @@ if (do.difficulty) {
         ## For all trials
         for (i in 0:max.trials) {
             f <- paste0(trials.name, i, ".RUNS")
-            #print(f)
+            print(f)
             if (file.exists(f)) {
                 X <- read.table(f, header=T)
+
+                print(paste("strat is", s))
+                
                 if (!is.na(X[1, ground.truth])){ # Check that the run was completed
+
+                    if (do.consensus.on.correct.outcomes.only) {
+
+                        if (X[1, ground.truth] == k) {
+                            consensus.times <- c(consensus.times, X[1, "ExitTime"])
+                        } 
+                    } else {
+                        consensus.times <- c(consensus.times, X[1, "ExitTime"])
+                    }
+                    
                     if (X[1, ground.truth] == num.robots) {
                         successes <- c(successes, 1)
                     } else {
@@ -82,11 +98,19 @@ if (do.difficulty) {
             }
         }
                     }
-        ## E.N is the exit probability
-        print(paste("num.trials is", length(successes)))                
-        print(paste("The exit probability is", mean(successes)))
-        E.Ns <- c(E.Ns, mean(successes))
-        runs <- c(runs, length(successes))
+                    ## E.N is the exit probability
+                                        #print(paste("The consensus time is", median(consensus.times)))
+                    if (length(consensus.times) != 0) {
+                        consensus.time <- c(consensus.time, median(consensus.times))
+                    } else {
+                        consensus.time <- c(consensus.time, 0)
+                    }
+                    
+                    #print(paste("num.trials is", length(successes)))                
+                    #print(paste("The exit probability is", mean(successes)))
+                    E.Ns <- c(E.Ns, mean(successes))
+                    runs <- c(runs, length(successes))
+
             }
         }
     }
@@ -97,20 +121,27 @@ if (do.difficulty) {
     #strategy <- strategy[!(is.na(E.Ns))]
     #E.Ns <- E.Ns[!(is.na(E.Ns))]
 
-    #used.difficulties <- used.difficulties / (100 - used.difficulties)
-    df <- data.frame(used.difficulties, E.Ns, strategy, runs)
-
-    names(df) <- c("difficulty", "E.Ns", "strategy", "runs")
+    ##used.difficulties <- used.difficulties / (100 - used.difficulties)
+    df <- data.frame(used.difficulties, E.Ns, strategy, consensus.time, runs)
+            
+    names(df) <- c("difficulty", "E.Ns", "strategy", "consensus.time", "runs")
+    df$strat.names <- sapply(df$strategy, strat2strat.name)
+    print(df)
     
     ## Save as PDF
     ##plot.exit.prob(df$difficulty, df$E.Ns,
     ##               xlab="Percentage white cells", ylab="Exit probability",
     ##               sprintf("exit_prob_d_%d.pdf", k))
+
+    plot.consensus.time.gg(df,
+                           xlab=expression("Difficulty"), ylab="Consensus time / 10",
+                           sprintf("consensustime_blockchain_difficulty_correctonly%d.pdf", do.consensus.on.correct.outcomes.only))
+    
     plot.exit.prob.gg(df,
                       xlab="Difficulty", ylab="Exit probability",
-                      sprintf("exit_prob_d_%d_gg.pdf", k))    
-}
-    
+                      sprintf("exit_prob_blockchain_difficulty_correctonly%d.pdf", do.consensus.on.correct.outcomes.only))    
+    }
+}    
 
 ## if (do.number.of.robots) {
 ## ## Exit probability: As a function of the number of robots
@@ -194,7 +225,7 @@ strategy <- c()
 k <- num.robots
 
 ## Consensus time: As a function of the difficulty of the task
-if (do.difficulty) {
+if (FALSE) {
 
     consensus.time <- c()
     strategy <- c()
@@ -249,13 +280,13 @@ if (do.difficulty) {
         }
     }
 
-print(difficulty)
-print(bc.height)
-print(consensus.time)
-print(strategy)
+#print(difficulty)
+#print(bc.height)
+#print(consensus.time)
+#print(strategy)
 #difficulty <- difficulty / (100 - difficulty)
-df <- data.frame(difficulty, consensus.time, strategy, runs)
-df.bc <- data.frame(difficulty, bc.height, strategy, runs)
+#df <- data.frame(difficulty, consensus.time, strategy, runs)
+#df.bc <- data.frame(difficulty, bc.height, strategy, runs)
 
 ## Save in PDF
 #plot.consensus.time(df$difficulty, df$consensus.time,
@@ -263,14 +294,13 @@ df.bc <- data.frame(difficulty, bc.height, strategy, runs)
 #       "consensustime_d.pdf")
 
 
-plot.consensus.time.gg(df,
-                       xlab=expression("Difficulty"), ylab="Consensus time / 10",
-                       "consensustime_d_gg.pdf")
-
-
-plot.bc.height.gg(df.bc,
-                       xlab=expression("Difficulty"), ylab="Blockchain height",
-                       "blockchainheight_gg.pdf")
+#plot.consensus.time.gg(df,
+#                       xlab=expression("Difficulty"), ylab="Consensus time / 10",
+#                       "consensustime_d_gg.pdf")
+    
+#plot.bc.height.gg(df.bc,
+#                       xlab=expression("Difficulty"), ylab="Blockchain height",
+#                       "blockchainheight_gg.pdf")
 
 
 }

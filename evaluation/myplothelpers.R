@@ -4,6 +4,17 @@ library(directlabels)
 library(grid)
 
 
+strat2strat.name <- function(strat){
+
+    if (strat == 1) {
+        return("DMVD")
+    } else if (strat == 2) {
+        return("DC")
+    } else if (strat == 3) {
+        return("DMMD")
+    }
+}
+
 base_breaks_x <- function(x){
   b <- x
   d <- data.frame(y=-Inf, yend=-Inf, x=min(b), xend=max(b))
@@ -45,10 +56,10 @@ dev.off()
 plot.exit.prob.gg <- function(df, xlab, ylab, out.name) {
 
     print(df)
-    df[, 'strategy'] <- as.factor(df[, 'strategy'])
-    p <- ggplot(df, aes(x=difficulty, y=E.Ns, group=strategy)) +
-        geom_line(aes(colour = strategy), size=1.1) +
-        geom_point(aes(colour = strategy, shape = strategy), size=3) +
+    df[, 'strat.names'] <- as.factor(df[, 'strat.names'])
+    p <- ggplot(df, aes(x=difficulty, y=E.Ns, group=strat.names)) +
+        geom_line(aes(colour = strat.names), size=1.1) +
+        geom_point(aes(colour = strat.names, shape = strat.names), size=3) +
         theme_classic() +
         theme(axis.text=element_text(size=17, colour="gray25"),
               axis.title=element_text(size=17, colour="gray25"),
@@ -70,7 +81,7 @@ plot.exit.prob.gg <- function(df, xlab, ylab, out.name) {
     expand_limits(x = 1.05)
 
     p <- direct.label(p, list(dl.trans(x=x+0.2, y=y),
-                              list("last.qp", cex=1.4)))
+                              list("angled.boxes", cex=1.0)))
 
     ## Code to turn off clipping
     gt1 <- ggplotGrob(p)
@@ -84,10 +95,10 @@ plot.exit.prob.gg <- function(df, xlab, ylab, out.name) {
 plot.exit.prob.gg.byz <- function(df, xlab, ylab, out.name) {
 
     print(df)
-    df[, 'strategy'] <- as.factor(df[, 'strategy'])
-    p <- ggplot(df, aes(x=num.byz, y=E.Ns, group=strategy)) +
-        geom_line(aes(colour = strategy), size=1.1) +
-        geom_point(aes(colour = strategy, shape = strategy), size=3) +
+    df[, 'strat.names'] <- as.factor(df[, 'strat.names'])
+    p <- ggplot(df, aes(x=num.byz, y=E.Ns, group=strat.names)) +
+        geom_line(aes(colour = strat.names), size=1.1) +
+        geom_point(aes(colour = strat.names, shape = strat.names), size=3) +
         theme_classic() +
         theme(axis.text=element_text(size=17, colour="gray25"),
               axis.title=element_text(size=17, colour="gray25"),
@@ -104,9 +115,12 @@ plot.exit.prob.gg.byz <- function(df, xlab, ylab, out.name) {
     base_breaks_y(seq(0.0, 1, 0.1)) + 
         
     expand_limits(x = 1.05)
+    #geom_dl(aes(colour = strat.names, label=strat.names),
+    #        method="lasso.labels",
+    #        position=list(dl.trans(x=x-0.2, y=y))
 
-    p <- direct.label(p, list(dl.trans(x=x+0.2, y=y),
-                              list("last.qp", cex=1.4)))
+    p <- direct.label(p, list(dl.trans(x=x, y=y),
+                              list("angled.boxes", cex=1.0)))
 
     ## Code to turn off clipping
     gt1 <- ggplotGrob(p)
@@ -140,10 +154,10 @@ dev.off()
 ## Plot conensus time
 plot.consensus.time.gg.byz <- function(df, xlab, ylab, out.name) {
 
-    df[, 'strategy'] <- as.factor(df[, 'strategy'])
-    p <- ggplot(df, aes(x=num.byz, y=consensus.time / 10, group=strategy)) +
-        geom_line(aes(colour = strategy), size=1.1) +
-        geom_point(aes(colour = strategy, shape = strategy), size=3) +
+    df[, 'strat.names'] <- as.factor(df[, 'strat.names'])
+    p <- ggplot(df, aes(x=num.byz, y=consensus.time / 10, group=strat.names)) +
+        geom_line(aes(colour = strat.names), size=1.1) +
+        geom_point(aes(colour = strat.names, shape = strat.names), size=3) +
         theme_classic() +
         theme(axis.text=element_text(size=17, colour="gray15"),
               axis.title=element_text(size=17, colour="gray15"),
@@ -165,8 +179,8 @@ plot.consensus.time.gg.byz <- function(df, xlab, ylab, out.name) {
         base_breaks_y(seq(0, 140, 20))# + expand_limits(x=25)
 
 
-    p <- direct.label(p, list(dl.trans(x=x+0.2, y=y),
-                              list("last.qp", cex=1.0)))
+    p <- direct.label(p, list(dl.trans(x=x, y=y),
+                              list("angled.boxes", cex=1.0)))
     
    # p <- direct.label(p, list(dl.trans(x=x-2.5, y=y+0.4), "last.qp"))
 
@@ -181,10 +195,13 @@ plot.consensus.time.gg.byz <- function(df, xlab, ylab, out.name) {
 ## Plot conensus time
 plot.consensus.time.gg <- function(df, xlab, ylab, out.name) {
 
-    df[, 'strategy'] <- as.factor(df[, 'strategy'])
-    p <- ggplot(df, aes(x=difficulty, y=consensus.time / 10, group=strategy)) +
-        geom_line(aes(colour = strategy), size=1.1) +
-        geom_point(aes(colour = strategy, shape = strategy), size=3) +
+    print("In function now (plot.consensus.time.gg)")
+    print(df)
+    
+    df[, 'strat.names'] <- as.factor(df[, 'strat.names'])
+    p <- ggplot(df, aes(x=difficulty, y=consensus.time / 10, group=strat.names)) +
+        geom_line(aes(colour = strat.names), size=1.1) +
+        geom_point(aes(colour = strat.names, shape = strat.names), size=3) +
         theme_classic() +
         theme(axis.text=element_text(size=17, colour="gray15"),
               axis.title=element_text(size=17, colour="gray15"),
@@ -206,8 +223,8 @@ plot.consensus.time.gg <- function(df, xlab, ylab, out.name) {
         base_breaks_y(seq(0, 140, 20))# + expand_limits(x=25)
 
 
-    p <- direct.label(p, list(dl.trans(x=x+0.2, y=y),
-                              list("last.qp", cex=1.0)))
+    p <- direct.label(p, list(dl.trans(x=x, y=y),
+                              list("angled.boxes", cex=1.0)))
     
    # p <- direct.label(p, list(dl.trans(x=x-2.5, y=y+0.4), "last.qp"))
 
@@ -250,8 +267,8 @@ plot.bc.height.gg <- function(df, xlab, ylab, out.name) {
         base_breaks_y(seq(0, 140, 20))# + expand_limits(x=25)
 
 
-    p <- direct.label(p, list(dl.trans(x=x+0.2, y=y),
-                              list("last.qp", cex=1.0)))
+    p <- direct.label(p, list(dl.trans(x=x+0.1, y=y),
+                              list("angled.boxes", cex=1.0)))
     
    # p <- direct.label(p, list(dl.trans(x=x-2.5, y=y+0.4), "last.qp"))
 
