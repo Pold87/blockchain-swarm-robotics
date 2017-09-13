@@ -43,7 +43,7 @@
 			       profiling="true"
 			       decision_rule="DECISIONRULE"
 			       num_pack_saved="2"
-			       percent_red="PERCENT_RED"
+			       percent_white="PERCENT_RED"
 			       base_dir="BASEDIR"
 			       use_multiple_nodes="USEMULTIPLENODES"
 			       use_background_geth_calls="USEBACKGROUNDGETHCALLS"
@@ -53,7 +53,7 @@
 			       blockchain_path="BLOCKCHAINPATH"
 			       use_classical_approach="USECLASSICALAPPROACH"
 			       regenerate_file="REGENERATEFILE"
-			       percent_blue="PERCENT_BLUE"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
+			       percent_black="PERCENT_BLUE"/> <!-- Sigma and G must be inserted in seconds, not in ticks; 
 							  1 = Voter model; 2 = Direct comparison; 3 = Majority Rule-->
  
       </params>
@@ -68,9 +68,9 @@
           number_of_green_cells="0"
 	  number_of_blue_cells="0"
 	  using_percentage="true"
-          percent_red="PERCENT_RED"
+          percent_white="PERCENT_RED"
 	  exit="true"            
-	  percent_blue="PERCENT_BLUE"
+	  percent_black="PERCENT_BLUE"
 	  percent_green="0"
 	  save_every_ticks="100"
 	  save_every_ticks_flag="false"

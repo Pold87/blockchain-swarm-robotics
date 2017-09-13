@@ -72,8 +72,8 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "turn", turn);
     GetNodeAttribute(t_node, "decision_rule", decision_rule);
     GetNodeAttribute(t_node, "exitFlag", exitFlag);
-    GetNodeAttribute(t_node, "percent_red", percentRed);
-    GetNodeAttribute(t_node, "percent_blue", percentBlue);
+    GetNodeAttribute(t_node, "percent_white", percentRed);
+    GetNodeAttribute(t_node, "percent_white", percentBlue);
     GetNodeAttribute(t_node, "num_pack_saved", numPackSaved);
     GetNodeAttribute(t_node, "base_dir", baseDir);
     GetNodeAttribute(t_node, "interface_path", interfacePath);
@@ -449,7 +449,7 @@ void EPuck_Environment_Classification::Explore() {
     if (!simulationParams.useClassicalApproach) {
       uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
       //cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
-      int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
+      int args[2] = {opinion.actualOpinion, simulationParams.decision_rule}; 
 
       string voteResult;
       
@@ -696,7 +696,7 @@ void EPuck_Environment_Classification::Diffusing() {
 	  
 	    uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
 	    //cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
-	    int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
+	    int args[2] = {opinion.actualOpinion, simulationParams.decision_rule}; 
 	  
 	    if (simulationParams.useMultipleNodes)
 	      smartContractInterfaceBg(robotId, interface, contractAddress, "vote", args, 2, opinionInt, nodeInt, simulationParams.blockchainPath);
@@ -792,7 +792,7 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
   if (byzantineStyle > 0) {
 
     switch(byzantineStyle) {
-      case 1 : opinion.actualOpinion = 0;
+      case 1 : opinion.actualOpinion = 1;
 	       break;
       case 2 : opinion.actualOpinion = 2;
 	       break;
@@ -826,14 +826,13 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
     //  int nodeInt = robotIdToNode[robotId];
 
     uint opinionInt = (uint) (opinion.quality * 100);
-    int args[4] = {decision_rule, opinion.actualOpinion / 2, opinionInt, simulationParams.numPackSaved};
+    int args[3] = {decision_rule, opinion.actualOpinion, opinionInt};
     string sNewOpinion;
     if (simulationParams.useMultipleNodes)
-      sNewOpinion = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 4, 0, nodeInt, simulationParams.blockchainPath);
+      sNewOpinion = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
     else
-      sNewOpinion = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 4, 0);
+      sNewOpinion = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0);
     int newOpinion = atoi(sNewOpinion.c_str());
-    opinion.actualOpinion = newOpinion * 2; // Is implemented as 0 and 1 in the smart contract
   }    
 }
 
@@ -843,13 +842,13 @@ void EPuck_Environment_Classification::NotWeightedDirectComparison(){
 	std::vector<informationCollected> opinionsValuated;  // Set of information collected in every diffusing states
 
 	if(receivedOpinions.size()>simulationParams.numPackSaved){
-		for(size_t j=0; j<simulationParams.numPackSaved; j++){
-			opinionsValuated.push_back(receivedOpinions[size-1-j]);
-		}
+	  for(size_t j=0; j<simulationParams.numPackSaved; j++){
+	    opinionsValuated.push_back(receivedOpinions[size-1-j]);
+	  }
 	}
 	else
-	        for(size_t j=0; j<receivedOpinions.size(); j++)
-		    opinionsValuated.push_back(receivedOpinions[j]);
+	  for(size_t j=0; j<receivedOpinions.size(); j++)
+	    opinionsValuated.push_back(receivedOpinions[j]);
 
 	size = opinionsValuated.size();
 	if(size > 0){
@@ -1044,27 +1043,25 @@ void EPuck_Environment_Classification::TurnLeds(){
 
   switch(opinion.actualOpinion) {
 
-  case 0: {
-
+  case 1: {
+    opinion.actualOpCol = CColor::WHITE;
+    m_pcLEDs->SetAllColors(CColor::WHITE);
+    break;
+  }
+  case 2: {
     opinion.actualOpCol = CColor::BLACK;
     m_pcLEDs->SetAllColors(CColor::BLACK);
     break;
   }
-  case 1: {
+  case 3: {
     opinion.actualOpCol = CColor::GREEN;
     m_pcLEDs->SetAllColors(CColor::GREEN);
-    break;
-  }
-  case 2: {
-    opinion.actualOpCol = CColor::WHITE;
-    m_pcLEDs->SetAllColors(CColor::WHITE);
     break;
   }
   }
 }
 
 void EPuck_Environment_Classification::killGethAndRemoveFolders(string bcPath, string regenFile){
-
 
   // Kill all geth processes  
   string bckiller = "bash " + bcPath + "/bckillerccall";

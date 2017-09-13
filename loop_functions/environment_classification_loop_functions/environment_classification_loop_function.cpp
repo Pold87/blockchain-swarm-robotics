@@ -51,9 +51,9 @@ void CEnvironmentClassificationLoopFunctions::fillSettings(TConfigurationNode& t
       GetNodeAttribute(tEnvironment, "number_of_red_cells", colorOfCell[0]);
       GetNodeAttribute(tEnvironment, "number_of_green_cells", colorOfCell[1]);
       GetNodeAttribute(tEnvironment, "number_of_blue_cells",colorOfCell[2]);
-      GetNodeAttribute(tEnvironment, "percent_red", percentageOfColors[0]);
-      GetNodeAttribute(tEnvironment, "percent_green", percentageOfColors[1]);
-      GetNodeAttribute(tEnvironment, "percent_blue", percentageOfColors[2]);
+      GetNodeAttribute(tEnvironment, "percent_green", percentageOfColors[0]);
+      GetNodeAttribute(tEnvironment, "percent_white", percentageOfColors[1]);
+      GetNodeAttribute(tEnvironment, "percent_black", percentageOfColors[2]);
       GetNodeAttribute(tEnvironment, "using_percentage", using_percentage);
       GetNodeAttribute(tEnvironment, "exit", exitFlag);
       
@@ -589,29 +589,24 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
     
     opinion.countedCellOfActualOpinion = 0;
     collectedData.count = 1;
-    if(opinion.actualOpinion == 0)
-      opinion.actualOpCol = CColor::RED;
+    if(opinion.actualOpinion == 1)
+      opinion.actualOpCol = CColor::WHITE;
     if(opinion.actualOpinion == 2)
-      opinion.actualOpCol = CColor::BLUE;
+      opinion.actualOpCol = CColor::BLACK;
     /* Setting robots initial states: exploring state */
 
     cController.fromLoopFunctionResPrepare();
-    
     
     if( gethStaticErrorOccurred ) {    
       cout << "gethStaticErrorOccurred was true in InitRobots" << endl;
       Reset();
       cout << "Finished Reset, returning true now" << endl;
       return true;
-    }
-
-    
+    }    
   }
 
-  PreallocateEther();
-  
-  RestartGeths();
-  
+  PreallocateEther();  
+  RestartGeths();  
   AssignNewStateAndPosition();
 
     if (!useClassicalApproach) {
