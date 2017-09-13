@@ -9,7 +9,7 @@ echo "MINERID is ${MINERID}"
 NUMROBOTS=(20) 
 #REPETITIONS=50
 DECISIONRULE=$3
-PERCENT_BLACKS=(34 36 38 40 42 44 46 48)
+PERCENT_BLACKS=(30)
 # the one I did all the tests with:
 MININGDIFF=1000000
 # never go with the difficulty below 131072! (see https://github.com/ethereum/go-ethereum/issues/3590)

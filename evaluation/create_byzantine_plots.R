@@ -22,16 +22,16 @@ tol4qualitative=c("#4477AA", "#117733", "#DDCC77", "#CC6677")
 #difficulty <- c(34, 36, 38, 40, 42, 44, 46, 48) # Make sure to match it with metastarter.sh
 
 num.byzantines = 0:9
+diffs <- c(34, 48)
 
 # As a function of Byzantine robots, easy and difficult setup
 if (do.difficulty) {
-
+    for (d in diffs) {
     E.Ns <- c()
     strategies <- c(0)
     strategy <- c()
     nodes <- 0:2
     runs <- c()
-    d = 34
     
     ## Exit probability: As a function of Byzantine robots
     
