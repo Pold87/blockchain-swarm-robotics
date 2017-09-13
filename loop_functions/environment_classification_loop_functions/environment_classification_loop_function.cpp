@@ -38,6 +38,7 @@ static const int trialsMiningNotWorking = 40; /* If after x trials the number of
 std::string contractAddress;
 std::string minerAddressGlobal;
 std::string interface; // Smart contract interface
+double begin_prestep = get_wall_time();
 
 
 /************************************************* INIT ********************************************************/
@@ -1318,7 +1319,9 @@ void CEnvironmentClassificationLoopFunctions::Destroy(){
 void CEnvironmentClassificationLoopFunctions::PreStep() {
 
 
-  //double begin_prestep = get_wall_time();
+  cout << "Passed time is (ms):" << get_wall_time() - begin_prestep << endl;
+  begin_prestep = get_wall_time();
+  
   
   //cout << "gethStaticErrorOccurred = " << gethStaticErrorOccurred << endl;
   
