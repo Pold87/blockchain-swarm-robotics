@@ -1182,9 +1182,10 @@ void EPuck_Environment_Classification::fromLoopFunctionResPrepare(){
   string sBlocknumber = sBlocknumberBlockhash.substr(0, sBlocknumberBlockhash.find(","));
   sBlocknumber.erase(0, 1);
   string sBlockhash = sBlocknumberBlockhash.substr(1, sBlocknumberBlockhash.find(","));
-  sBlockhash = sBlockhash.substr(1, sBlockhash.size() - 3);  
-  blockWithHash.blockNumber = atoi(sBlocknumber.c_str());
-  blockWithHash.hash = sBlockhash;
+  sBlockhash = sBlockhash.substr(1, sBlockhash.size() - 3);
+  blockWithHash bwh;
+  bwh.blockNumber = atoi(sBlocknumber.c_str());
+  bwh.hash = sBlockhash;
 
   cout << "blockWithHash.blockNumber: " << blockWithHash.blockNumber << " blockWithHash.hash:" << blockWithHash.hash << endl;
 
@@ -1224,9 +1225,10 @@ void EPuck_Environment_Classification::fromLoopFunctionResStart(){
   string sBlocknumber = sBlocknumberBlockhash.substr(0, sBlocknumberBlockhash.find(","));
   sBlocknumber.erase(0, 1);
   string sBlockhash = sBlocknumberBlockhash.substr(1, sBlocknumberBlockhash.find(","));
-  sBlockhash = sBlockhash.substr(1, sBlockhash.size() - 3);  
-  blockWithHash.blockNumber = atoi(sBlocknumber.c_str());
-  blockWithHash.hash = sBlockhash;
+  sBlockhash = sBlockhash.substr(1, sBlockhash.size() - 3);
+  blockWithHash bwh;
+  bwh.blockNumber = atoi(sBlocknumber.c_str());
+  bwh.hash = sBlockhash;
 
   cout << "blockWithHash.blockNumber: " << blockWithHash.blockNumber << " blockWithHash.hash:" << blockWithHash.hash << endl;
 
