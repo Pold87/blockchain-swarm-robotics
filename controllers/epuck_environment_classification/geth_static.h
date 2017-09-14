@@ -3,6 +3,11 @@
 
 #include <string>
 
+struct blockWithHash {
+  int blockNumber;
+  string hash;
+};
+
 double get_wall_time();
 
 uint Id2Int(std::string id);

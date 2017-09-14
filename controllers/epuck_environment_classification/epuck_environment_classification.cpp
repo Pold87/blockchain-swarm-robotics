@@ -827,11 +827,24 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
 
     uint opinionInt = (uint) (opinion.quality * 100);
     int args[3] = {decision_rule, opinion.actualOpinion, opinionInt};
-    string sNewOpinion;
+    string sOpinionBlocknumberBlockhash;
     if (simulationParams.useMultipleNodes)
-      sNewOpinion = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
+      sOpinionBlocknumberBlockhash = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
     else
-      sNewOpinion = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0);
+      sOpinionBlocknumberBlockhash = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0);
+
+    // Parse the smart contract output
+    std::string sNewOpinion = sOpinionBlocknumberBlockhash.substr(0, sOpinionBlocknumberBlockhash.find(","));
+    // Remove first character
+    sNewOpinion.erase(0, 1);
+    std::string sBlock = sOpinionBlocknumberBlockhash.substr(1, sOpinionBlocknumberBlockhash.find(","));
+    std::string sBlockhash = sOpinionBlocknumberBlockhash.substr(2, sOpinionBlocknumberBlockhash.find(","));
+    // Remove first and last two characters
+    sBlockhash = sBlockhash.substr(1, sBlockhash.size() - 3);
+    cout << "sNewOpinion is " << sNewOpinion << endl;
+    cout << "sBlock is " << sBlock << endl;
+    cout << "sBlockhash is " << sBlockhash << endl;
+    
     int newOpinion = atoi(sNewOpinion.c_str());
   }    
 }
@@ -1158,7 +1171,24 @@ void EPuck_Environment_Classification::fromLoopFunctionResPrepare(){
       address = coinbaseAddresses[robotId];    
       
       prepare_for_new_genesis(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
-      
+
+
+
+
+  int args[1] = {opinion.actualOpinion}; 
+  string sBlocknumberBlockhash = smartContractInterface(robotId, interface,
+	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
+
+  string sBlocknumber = sBlocknumberBlockhash.substr(0, sBlocknumberBlockhash.find(","));
+  sBlocknumber.erase(0, 1);
+  string sBlockhash = sBlocknumberBlockhash.substr(1, sBlocknumberBlockhash.find(","));
+  sBlockhash = sBlockhash.substr(1, sBlockhash.size() - 3);  
+  blockWithHash.blockNumber = atoi(sBlocknumber.c_str());
+  blockWithHash.hash = sBlockhash;
+
+  cout << "blockWithHash.blockNumber: " << blockWithHash.blockNumber << " blockWithHash.hash:" << blockWithHash.hash << endl;
+
+
       
     } else {
       geth_init(robotId);
@@ -1185,6 +1215,21 @@ void EPuck_Environment_Classification::fromLoopFunctionResStart(){
   enodes[robotId] = get_enode(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
   enode = enodes[robotId];
   unlockAccount(robotId, "test", nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
+
+  
+  int args[1] = {opinion.actualOpinion}; 
+  string sBlocknumberBlockhash = smartContractInterface(robotId, interface,
+	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
+
+  string sBlocknumber = sBlocknumberBlockhash.substr(0, sBlocknumberBlockhash.find(","));
+  sBlocknumber.erase(0, 1);
+  string sBlockhash = sBlocknumberBlockhash.substr(1, sBlocknumberBlockhash.find(","));
+  sBlockhash = sBlockhash.substr(1, sBlockhash.size() - 3);  
+  blockWithHash.blockNumber = atoi(sBlocknumber.c_str());
+  blockWithHash.hash = sBlockhash;
+
+  cout << "blockWithHash.blockNumber: " << blockWithHash.blockNumber << " blockWithHash.hash:" << blockWithHash.hash << endl;
+
 
 }
 
