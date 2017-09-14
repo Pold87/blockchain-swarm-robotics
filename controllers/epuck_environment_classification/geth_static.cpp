@@ -1059,7 +1059,7 @@ std::string smartContractInterface(int i, string interface, string contractAddre
    std::string fullCommand = fullCommandStream.str();
 
    string res = exec_geth_cmd(i, fullCommand, nodeInt, datadirBase);
-   //cout << "Result received from SC is: " << res << endl;
+   cout << "Result received from SC is: " << res << endl;
 
    return res;
  }
