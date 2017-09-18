@@ -99,10 +99,12 @@ void EPuck_Environment_Classification::registerRobot() {
   string sBlocknumberBlockhash = smartContractInterface(robotId, interface,
 	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
 
+  cout << "sBlocknumberBlockhash is: " << sBlocknumberBlockhash << endl;
+  
   string sBlocknumber = sBlocknumberBlockhash.substr(0, sBlocknumberBlockhash.find(","));
   sBlocknumber.erase(0, 1);
   string sBlockhash = sBlocknumberBlockhash.substr(1, sBlocknumberBlockhash.find(","));
-  sBlockhash = sBlockhash.substr(1, sBlockhash.size() - 3);
+  sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 1);
   bwh.blockNumber = atoi(sBlocknumber.c_str());
   bwh.hash = sBlockhash;
 
@@ -867,7 +869,7 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
     std::string sBlock = sOpinionBlocknumberBlockhash.substr(1, sOpinionBlocknumberBlockhash.find(","));
     std::string sBlockhash = sOpinionBlocknumberBlockhash.substr(2, sOpinionBlocknumberBlockhash.find(","));
     // Remove first and last two characters
-    sBlockhash = sBlockhash.substr(1, sBlockhash.size() - 3);
+    sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 1);
     cout << "sNewOpinion is " << sNewOpinion << endl;
     cout << "sBlock is " << sBlock << endl;
     cout << "sBlockhash is " << sBlockhash << endl;
