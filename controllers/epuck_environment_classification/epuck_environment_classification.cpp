@@ -482,7 +482,8 @@ void EPuck_Environment_Classification::Explore() {
       //cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
       string args[4] = {NumberToString(opinion.actualOpinion),
 			NumberToString(simulationParams.decision_rule),
-			NumberToString(bwh.blockNumber), bwh.hash}; 
+			NumberToString(bwh.blockNumber),
+			bwh.hash}; 
 
       string voteResult;
       
@@ -863,8 +864,10 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
     uint opinionInt = (uint) (opinion.quality * 100);
     int args[3] = {decision_rule, opinion.actualOpinion, opinionInt};
     string sOpinionBlocknumberBlockhash;
-    if (simulationParams.useMultipleNodes)
-      sOpinionBlocknumberBlockhash = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
+    if (simulationParams.useMultipleNodes) {
+      sOpinionBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
+      smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
+    }
     else
       sOpinionBlocknumberBlockhash = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0);
 
