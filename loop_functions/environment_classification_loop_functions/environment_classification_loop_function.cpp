@@ -38,6 +38,7 @@ static const int trialsMiningNotWorking = 40; /* If after x trials the number of
 std::string contractAddress;
 std::string minerAddressGlobal;
 std::string interface; // Smart contract interface
+double begin_prestep = get_wall_time();
 
 
 /************************************************* INIT ********************************************************/
@@ -50,9 +51,9 @@ void CEnvironmentClassificationLoopFunctions::fillSettings(TConfigurationNode& t
       GetNodeAttribute(tEnvironment, "number_of_red_cells", colorOfCell[0]);
       GetNodeAttribute(tEnvironment, "number_of_green_cells", colorOfCell[1]);
       GetNodeAttribute(tEnvironment, "number_of_blue_cells",colorOfCell[2]);
-      GetNodeAttribute(tEnvironment, "percent_red", percentageOfColors[0]);
-      GetNodeAttribute(tEnvironment, "percent_green", percentageOfColors[1]);
-      GetNodeAttribute(tEnvironment, "percent_blue", percentageOfColors[2]);
+      GetNodeAttribute(tEnvironment, "percent_green", percentageOfColors[0]);
+      GetNodeAttribute(tEnvironment, "percent_white", percentageOfColors[1]);
+      GetNodeAttribute(tEnvironment, "percent_black", percentageOfColors[2]);
       GetNodeAttribute(tEnvironment, "using_percentage", using_percentage);
       GetNodeAttribute(tEnvironment, "exit", exitFlag);
       
@@ -189,15 +190,10 @@ void CEnvironmentClassificationLoopFunctions::setContractAddressAndDistributeEth
       //      string e = get_enode(robotId, minerNode, blockchainPath);
       string e = cController.getEnode();
       add_peer(minerId, e, minerNode, basePort, blockchainPath);
-      /* Distribute ether among the robots */
-      /* Sending is not necessary anymore */
-      //sendEther(minerId, minerAddress, address, 20, minerNode, blockchainPath);
     } else {
       string e = get_enode(robotId);
       add_peer(minerId, e);
-      //sendEther(minerId, minerAddress, address, 4);
     }
-    cout << "Sent ether to address: " << address;
   }  
 }
 
@@ -270,6 +266,20 @@ void CEnvironmentClassificationLoopFunctions::disconnectAll(vector<int> allRobot
   }
 }
 
+void CEnvironmentClassificationLoopFunctions::registerAllRobots() {
+
+  CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
+  for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
+    
+    /* Get handle to e-puck entity and controller */
+    CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
+    EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
+    
+    cController.registerRobot();
+    
+  }  
+}
+
 void CEnvironmentClassificationLoopFunctions::PreinitMiner() {
 
   cout << "Initializing miner" << endl;
@@ -331,19 +341,6 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
   
   start_mining(minerId, 4, minerNode, blockchainPath);	
 
-  
-  /* Wait until at least x blocks are mined */
-  /* This part should be replaced by the preallocation*/
-  //int bHeight;
-  //do {
-  //  if (useMultipleNodes)
-  //    bHeight = getBlockChainLength(minerId, minerNode, blockchainPath);
-  //  else
-  //    bHeight = getBlockChainLength(minerId);
-  //  cout << "Checking block chain height. It is " << bHeight << endl;
-  //  sleep(1);
-  //} while (bHeight < (n_robots));
-  
   /* Deploy contract */  
   string interfacePath = baseDirLoop + "interface.txt";
   interface = readStringFromFile(interfacePath);
@@ -370,8 +367,6 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
     }
     u++;
   } while (u < maxContractAddressTrials && contractAddress.find("TypeError") == 0);
-
-  stop_mining(minerId, minerNode, blockchainPath);
   
   /* Remove space in contract address */
   contractAddress.erase(std::remove(contractAddress.begin(), 
@@ -381,7 +376,9 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
 
   /* Set the address of the deployed contract in each robot */
   setContractAddressAndDistributeEther(contractAddress, minerAddress);
- 	
+
+  stop_mining(minerId, minerNode, blockchainPath);
+  
   /* Check that all robots received their ether */
 
   bool etherReceived;
@@ -445,8 +442,7 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
     }
     trialssameheight++;	
   }
-
-  //disconnectAll(allRobotIds);
+  
   
   cout << "Disconnecting everyone by killing mining thread" << endl;
   if (useMultipleNodes) {
@@ -588,29 +584,24 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
     
     opinion.countedCellOfActualOpinion = 0;
     collectedData.count = 1;
-    if(opinion.actualOpinion == 0)
-      opinion.actualOpCol = CColor::RED;
+    if(opinion.actualOpinion == 1)
+      opinion.actualOpCol = CColor::WHITE;
     if(opinion.actualOpinion == 2)
-      opinion.actualOpCol = CColor::BLUE;
+      opinion.actualOpCol = CColor::BLACK;
     /* Setting robots initial states: exploring state */
 
     cController.fromLoopFunctionResPrepare();
-    
     
     if( gethStaticErrorOccurred ) {    
       cout << "gethStaticErrorOccurred was true in InitRobots" << endl;
       Reset();
       cout << "Finished Reset, returning true now" << endl;
       return true;
-    }
-
-    
+    }    
   }
 
-  PreallocateEther();
-  
-  RestartGeths();
-  
+  PreallocateEther();  
+  RestartGeths();  
   AssignNewStateAndPosition();
 
     if (!useClassicalApproach) {
@@ -1318,7 +1309,9 @@ void CEnvironmentClassificationLoopFunctions::Destroy(){
 void CEnvironmentClassificationLoopFunctions::PreStep() {
 
 
-  //double begin_prestep = get_wall_time();
+  cout << "Passed time is (ms):" << get_wall_time() - begin_prestep << endl;
+  begin_prestep = get_wall_time();
+  
   
   //cout << "gethStaticErrorOccurred = " << gethStaticErrorOccurred << endl;
   

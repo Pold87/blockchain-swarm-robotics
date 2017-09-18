@@ -78,6 +78,7 @@ private:
 	virtual void InitEthereum();
 	virtual void PreinitMiner();
 	virtual void setContractAddressAndDistributeEther(std::string contractAddress, std::string minerAddress);
+	virtual void registerAllRobots();
 	virtual bool allSameBCHeight();
 	virtual void connectMore(std::vector<int> allRobotIds);
 	virtual void connectMinerToEveryone();

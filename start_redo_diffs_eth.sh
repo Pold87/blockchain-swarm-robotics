@@ -112,4 +112,7 @@ SUBSWARMCONSENSUS=false # Determines if all N robots have to agree or
     
  done
 
+
+sendmail volker.strobel87@gmail.com < finished.txt
+     
 #done

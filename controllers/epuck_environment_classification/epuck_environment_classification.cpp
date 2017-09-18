@@ -5,9 +5,6 @@
 #define COLOR_STRENGHT           255
 #define N_COL		         	 3
 
-
-#include "geth_static.h" /* Use geth from C++ */
-
 #include <iostream>
 
 #include <algorithm>
@@ -72,8 +69,8 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "turn", turn);
     GetNodeAttribute(t_node, "decision_rule", decision_rule);
     GetNodeAttribute(t_node, "exitFlag", exitFlag);
-    GetNodeAttribute(t_node, "percent_red", percentRed);
-    GetNodeAttribute(t_node, "percent_blue", percentBlue);
+    GetNodeAttribute(t_node, "percent_white", percentRed);
+    GetNodeAttribute(t_node, "percent_white", percentBlue);
     GetNodeAttribute(t_node, "num_pack_saved", numPackSaved);
     GetNodeAttribute(t_node, "base_dir", baseDir);
     GetNodeAttribute(t_node, "interface_path", interfacePath);
@@ -92,6 +89,36 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     THROW_ARGOSEXCEPTION_NESTED("Error initializing controller state parameters.", ex);
   }
 }
+
+
+void EPuck_Environment_Classification::registerRobot() {
+
+  int robotId = Id2Int(GetId());
+  
+  int args[1] = {opinion.actualOpinion};
+
+  // Just call to get return value
+  string sBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface,
+	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
+
+  // Modify state of the blockchain
+  smartContractInterface(robotId, interface,
+	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
+
+  cout << "sBlocknumberBlockhash is: " << sBlocknumberBlockhash << endl;
+
+  vector<string> splitResult = split(sBlocknumberBlockhash, ',');
+  
+  string sBlocknumber = splitResult[0];
+  sBlocknumber.erase(0, 1);
+  string sBlockhash = splitResult[1];
+  cout <<" bwh.hash (before substring):" << sBlockhash << endl;
+  sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 1);
+  bwh.blockNumber = atoi(sBlocknumber.c_str());
+  bwh.hash = sBlockhash;
+  cout << "bwh.blockNumber: " << bwh.blockNumber << " bwh.hash:" << bwh.hash << endl;
+}
+
 
 void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
 
@@ -278,6 +305,12 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
 void EPuck_Environment_Classification::ControlStep() {
 
   int robotId = Id2Int(GetId());
+
+  if (beginning) {
+    registerRobot();
+    beginning = false;
+  }
+  
   //  int nodeInt = robotIdToNode[robotId];
   
   /* Turn leds according with actualOpinion */
@@ -449,15 +482,18 @@ void EPuck_Environment_Classification::Explore() {
     if (!simulationParams.useClassicalApproach) {
       uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
       //cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
-      int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
+      string args[4] = {NumberToString(opinion.actualOpinion),
+			NumberToString(simulationParams.decision_rule),
+			NumberToString(bwh.blockNumber),
+			bwh.hash}; 
 
       string voteResult;
       
       if (simulationParams.useMultipleNodes){
-	smartContractInterfaceBg(robotId, interface, contractAddress, "vote", args, 2, opinionInt, nodeInt, simulationParams.blockchainPath);
-      } else {
-	voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt);
-    }
+	smartContractInterfaceStringBg(robotId, interface, contractAddress, "vote", args, 4, opinionInt, nodeInt, simulationParams.blockchainPath);
+      } //else {
+      //	voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 4, opinionInt);
+      //    }
     }
     //after_vote = get_wall_time();
     //measure_time(before_vote, "Voting only");
@@ -696,12 +732,14 @@ void EPuck_Environment_Classification::Diffusing() {
 	  
 	    uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
 	    //cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
-	    int args[2] = {opinion.actualOpinion / 2, simulationParams.decision_rule}; 
+	    string args[4] = {NumberToString(opinion.actualOpinion),
+			      NumberToString(simulationParams.decision_rule),
+			      NumberToString(bwh.blockNumber), bwh.hash}; 
 	  
 	    if (simulationParams.useMultipleNodes)
-	      smartContractInterfaceBg(robotId, interface, contractAddress, "vote", args, 2, opinionInt, nodeInt, simulationParams.blockchainPath);
-	    else
-	      string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt);
+	      smartContractInterfaceStringBg(robotId, interface, contractAddress, "vote", args, 4, opinionInt, nodeInt, simulationParams.blockchainPath);
+	    //	    else
+	    //	      string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 4, opinionInt);
 	  }
 	  
 	} else if (simulationParams.decision_rule == 4) {
@@ -792,7 +830,7 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
   if (byzantineStyle > 0) {
 
     switch(byzantineStyle) {
-      case 1 : opinion.actualOpinion = 0;
+      case 1 : opinion.actualOpinion = 1;
 	       break;
       case 2 : opinion.actualOpinion = 2;
 	       break;
@@ -826,14 +864,31 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
     //  int nodeInt = robotIdToNode[robotId];
 
     uint opinionInt = (uint) (opinion.quality * 100);
-    int args[4] = {decision_rule, opinion.actualOpinion / 2, opinionInt, simulationParams.numPackSaved};
-    string sNewOpinion;
-    if (simulationParams.useMultipleNodes)
-      sNewOpinion = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 4, 0, nodeInt, simulationParams.blockchainPath);
+    int args[3] = {decision_rule, opinion.actualOpinion, opinionInt};
+    string sOpinionBlocknumberBlockhash;
+    if (simulationParams.useMultipleNodes) {
+      sOpinionBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
+      smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
+    }
     else
-      sNewOpinion = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 4, 0);
+      sOpinionBlocknumberBlockhash = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0);
+
+    // Parse the smart contract output
+
+    vector<string> splitResult = split(sOpinionBlocknumberBlockhash, ',');
+    
+    std::string sNewOpinion = splitResult[0];
+    // Remove first character
+    sNewOpinion.erase(0, 1);
+    std::string sBlock = splitResult[1];
+    std::string sBlockhash = splitResult[2];
+    // Remove first and last two characters
+    sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 1);
+    cout << "sNewOpinion is " << sNewOpinion << endl;
+    cout << "sBlock is " << sBlock << endl;
+    cout << "sBlockhash is " << sBlockhash << endl;
+    
     int newOpinion = atoi(sNewOpinion.c_str());
-    opinion.actualOpinion = newOpinion * 2; // Is implemented as 0 and 1 in the smart contract
   }    
 }
 
@@ -843,13 +898,13 @@ void EPuck_Environment_Classification::NotWeightedDirectComparison(){
 	std::vector<informationCollected> opinionsValuated;  // Set of information collected in every diffusing states
 
 	if(receivedOpinions.size()>simulationParams.numPackSaved){
-		for(size_t j=0; j<simulationParams.numPackSaved; j++){
-			opinionsValuated.push_back(receivedOpinions[size-1-j]);
-		}
+	  for(size_t j=0; j<simulationParams.numPackSaved; j++){
+	    opinionsValuated.push_back(receivedOpinions[size-1-j]);
+	  }
 	}
 	else
-	        for(size_t j=0; j<receivedOpinions.size(); j++)
-		    opinionsValuated.push_back(receivedOpinions[j]);
+	  for(size_t j=0; j<receivedOpinions.size(); j++)
+	    opinionsValuated.push_back(receivedOpinions[j]);
 
 	size = opinionsValuated.size();
 	if(size > 0){
@@ -1044,27 +1099,25 @@ void EPuck_Environment_Classification::TurnLeds(){
 
   switch(opinion.actualOpinion) {
 
-  case 0: {
-
+  case 1: {
+    opinion.actualOpCol = CColor::WHITE;
+    m_pcLEDs->SetAllColors(CColor::WHITE);
+    break;
+  }
+  case 2: {
     opinion.actualOpCol = CColor::BLACK;
     m_pcLEDs->SetAllColors(CColor::BLACK);
     break;
   }
-  case 1: {
+  case 3: {
     opinion.actualOpCol = CColor::GREEN;
     m_pcLEDs->SetAllColors(CColor::GREEN);
-    break;
-  }
-  case 2: {
-    opinion.actualOpCol = CColor::WHITE;
-    m_pcLEDs->SetAllColors(CColor::WHITE);
     break;
   }
   }
 }
 
 void EPuck_Environment_Classification::killGethAndRemoveFolders(string bcPath, string regenFile){
-
 
   // Kill all geth processes  
   string bckiller = "bash " + bcPath + "/bckillerccall";
@@ -1117,6 +1170,8 @@ void EPuck_Environment_Classification::fromLoopFunctionResPrepare(){
   cout << "ID Raw is: " << GetId() << endl;
   int robotId = Id2Int(GetId());
 
+  beginning = true;
+  
   /* Ethereum */
   if (!simulationParams.useClassicalApproach) {
     nodeInt = robotIdToNode[robotId];
@@ -1160,8 +1215,8 @@ void EPuck_Environment_Classification::fromLoopFunctionResPrepare(){
       coinbaseAddresses[robotId] = getCoinbase(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
       address = coinbaseAddresses[robotId];    
       
-      prepare_for_new_genesis(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
-      
+      prepare_for_new_genesis(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);      
+
       
     } else {
       geth_init(robotId);

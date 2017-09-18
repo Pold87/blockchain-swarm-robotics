@@ -2,6 +2,17 @@
 #define GETH_STATIC_H
 
 #include <string>
+#include <vector>
+
+struct blockWithHash {
+  int blockNumber;
+  std::string hash;
+};
+
+template<typename Out>
+void split(const std::string &s, char delim, Out result);
+
+std::vector<std::string> split(const std::string &s, char delim);
 
 double get_wall_time();
 
@@ -100,7 +111,9 @@ std::string sendEther(int i, std::string from, std::string to, int v, int nodeIn
 // Interact with a generic smart contract
 std::string smartContractInterface(int i, std::string interface, std::string contractAddress, std::string func, int args[], int argc, int v);
 std::string smartContractInterface(int i, std::string interface, std::string contractAddress, std::string func, int args[], int argc, int v, int nodeInt, std::string datadirBase);
+std::string smartContractInterfaceCall(int i, std::string interface, std::string contractAddress, std::string func, int args[], int argc, int v, int nodeInt, std::string datadirBase);
 void smartContractInterfaceBg(int i, std::string interface, std::string contractAddress, std::string func, int args[], int argc, int v, int nodeInt, std::string datadirBase);
+void smartContractInterfaceStringBg(int i, std::string interface, std::string contractAddress, std::string func, std::string args[], int argc, int v, int nodeInt, std::string datadirBase);
 
 /* Unlock account */
 std::string unlockAccount(int i, std::string pw);

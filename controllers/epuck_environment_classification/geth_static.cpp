@@ -439,6 +439,22 @@ void geth_init(int i) {
     
 }
 
+template<typename Out>
+void split(const std::string &s, char delim, Out result) {
+    std::stringstream ss;
+    ss.str(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        *(result++) = item;
+    }
+}
+
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, std::back_inserter(elems));
+    return elems;
+}
+
 
 void geth_init(int i, int nodeInt, int basePort, string datadirBase, string genesisPath) {
   cout << "Calling geth_init for robot " << i << endl;
@@ -1059,7 +1075,34 @@ std::string smartContractInterface(int i, string interface, string contractAddre
    std::string fullCommand = fullCommandStream.str();
 
    string res = exec_geth_cmd(i, fullCommand, nodeInt, datadirBase);
-   //cout << "Result received from SC is: " << res << endl;
+   cout << "Result received from SC is: " << res << endl;
+
+   return res;
+ }
+
+
+// Interact with a function of a smart contract
+// v: Amount of wei to send
+std::string smartContractInterfaceCall(int i, string interface, string contractAddress,
+				   string func, int args[], int argc, int v, int nodeInt, string datadirBase) {
+  
+  
+  ostringstream fullCommandStream;
+
+  fullCommandStream << "var cC = web3.eth.contract(" << interface << ");var c = cC.at(" << contractAddress << ");c." << func << ".call(";
+
+  
+  for(int k = 0; k < argc; k++) {
+    fullCommandStream << args[k] << ",";  
+  }
+  
+  fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '1000000'});";
+  
+  
+   std::string fullCommand = fullCommandStream.str();
+
+   string res = exec_geth_cmd(i, fullCommand, nodeInt, datadirBase);
+   cout << "Result received from SC is: " << res << endl;
 
    return res;
  }
@@ -1069,6 +1112,32 @@ std::string smartContractInterface(int i, string interface, string contractAddre
 // v: Amount of wei to send
 void smartContractInterfaceBg(int i, string interface, string contractAddress,
 				   string func, int args[], int argc, int v, int nodeInt, string datadirBase) {
+  
+  
+  ostringstream fullCommandStream;
+
+  fullCommandStream << "var cC = web3.eth.contract(" << interface << ");var c = cC.at(" << contractAddress << ");c." << func << "(";
+
+  
+  for(int k = 0; k < argc; k++) {
+    fullCommandStream << args[k] << ",";  
+  }
+  
+  fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '1000000'});";
+  
+  
+   std::string fullCommand = fullCommandStream.str();
+
+   exec_geth_cmd_background(i, fullCommand, nodeInt, datadirBase);
+   //cout << "Result received from SC is: " << res << endl;
+
+ }
+
+
+// Interact with a function of a smart contract
+// v: Amount of wei to send
+void smartContractInterfaceStringBg(int i, string interface, string contractAddress,
+				   string func, string args[], int argc, int v, int nodeInt, string datadirBase) {
   
   
   ostringstream fullCommandStream;
