@@ -2,11 +2,17 @@
 #define GETH_STATIC_H
 
 #include <string>
+#include <vector>
 
 struct blockWithHash {
   int blockNumber;
   std::string hash;
 };
+
+template<typename Out>
+void split(const std::string &s, char delim, Out result);
+
+std::vector<std::string> split(const std::string &s, char delim);
 
 double get_wall_time();
 

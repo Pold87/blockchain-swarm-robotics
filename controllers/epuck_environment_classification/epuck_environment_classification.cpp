@@ -106,15 +106,16 @@ void EPuck_Environment_Classification::registerRobot() {
 	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
 
   cout << "sBlocknumberBlockhash is: " << sBlocknumberBlockhash << endl;
+
+  vector<string> splitResult = split(sBlocknumberBlockhash, ',');
   
-  string sBlocknumber = sBlocknumberBlockhash.substr(0, sBlocknumberBlockhash.find(","));
+  string sBlocknumber = splitResult[0];
   sBlocknumber.erase(0, 1);
-  string sBlockhash = sBlocknumberBlockhash.substr(1, sBlocknumberBlockhash.find(","));
+  string sBlockhash = splitResult[1];
   cout <<" bwh.hash (before substring):" << sBlockhash << endl;
   sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 1);
   bwh.blockNumber = atoi(sBlocknumber.c_str());
   bwh.hash = sBlockhash;
-
   cout << "bwh.blockNumber: " << bwh.blockNumber << " bwh.hash:" << bwh.hash << endl;
 }
 
@@ -873,11 +874,14 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
       sOpinionBlocknumberBlockhash = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0);
 
     // Parse the smart contract output
-    std::string sNewOpinion = sOpinionBlocknumberBlockhash.substr(0, sOpinionBlocknumberBlockhash.find(","));
+
+    vector<string> splitResult = split(sOpinionBlocknumberBlockhash, ',');
+    
+    std::string sNewOpinion = splitResult[0];
     // Remove first character
     sNewOpinion.erase(0, 1);
-    std::string sBlock = sOpinionBlocknumberBlockhash.substr(1, sOpinionBlocknumberBlockhash.find(","));
-    std::string sBlockhash = sOpinionBlocknumberBlockhash.substr(2, sOpinionBlocknumberBlockhash.find(","));
+    std::string sBlock = splitResult[1];
+    std::string sBlockhash = splitResult[2];
     // Remove first and last two characters
     sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 1);
     cout << "sNewOpinion is " << sNewOpinion << endl;
