@@ -95,8 +95,14 @@ void EPuck_Environment_Classification::registerRobot() {
 
   int robotId = Id2Int(GetId());
   
-  int args[1] = {opinion.actualOpinion}; 
-  string sBlocknumberBlockhash = smartContractInterface(robotId, interface,
+  int args[1] = {opinion.actualOpinion};
+
+  // Just call to get return value
+  string sBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface,
+	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
+
+  // Modify state of the blockchain
+  smartContractInterface(robotId, interface,
 	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
 
   cout << "sBlocknumberBlockhash is: " << sBlocknumberBlockhash << endl;
