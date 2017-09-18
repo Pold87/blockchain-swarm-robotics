@@ -1091,6 +1091,32 @@ void smartContractInterfaceBg(int i, string interface, string contractAddress,
  }
 
 
+// Interact with a function of a smart contract
+// v: Amount of wei to send
+void smartContractInterfaceStringBg(int i, string interface, string contractAddress,
+				   string func, string args[], int argc, int v, int nodeInt, string datadirBase) {
+  
+  
+  ostringstream fullCommandStream;
+
+  fullCommandStream << "var cC = web3.eth.contract(" << interface << ");var c = cC.at(" << contractAddress << ");c." << func << "(";
+
+  
+  for(int k = 0; k < argc; k++) {
+    fullCommandStream << args[k] << ",";  
+  }
+  
+  fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '1000000'});";
+  
+  
+   std::string fullCommand = fullCommandStream.str();
+
+   exec_geth_cmd_background(i, fullCommand, nodeInt, datadirBase);
+   //cout << "Result received from SC is: " << res << endl;
+
+ }
+
+
 /* Deploy contract using robot number i and return the transaction hash */
 std::string deploy_contract(int i, string interfacePath, string dataPath, string templatePath) {
 

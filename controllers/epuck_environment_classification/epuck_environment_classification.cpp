@@ -472,15 +472,17 @@ void EPuck_Environment_Classification::Explore() {
     if (!simulationParams.useClassicalApproach) {
       uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
       //cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
-      int args[2] = {opinion.actualOpinion, simulationParams.decision_rule}; 
+      string args[4] = {NumberToString(opinion.actualOpinion),
+			NumberToString(simulationParams.decision_rule),
+			NumberToString(bwh.blockNumber), bwh.hash}; 
 
       string voteResult;
       
       if (simulationParams.useMultipleNodes){
-	smartContractInterfaceBg(robotId, interface, contractAddress, "vote", args, 2, opinionInt, nodeInt, simulationParams.blockchainPath);
-      } else {
-	voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt);
-    }
+	smartContractInterfaceStringBg(robotId, interface, contractAddress, "vote", args, 4, opinionInt, nodeInt, simulationParams.blockchainPath);
+      } //else {
+      //	voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 4, opinionInt);
+      //    }
     }
     //after_vote = get_wall_time();
     //measure_time(before_vote, "Voting only");
@@ -719,12 +721,14 @@ void EPuck_Environment_Classification::Diffusing() {
 	  
 	    uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
 	    //cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
-	    int args[2] = {opinion.actualOpinion, simulationParams.decision_rule}; 
+	    string args[4] = {NumberToString(opinion.actualOpinion),
+			      NumberToString(simulationParams.decision_rule),
+			      NumberToString(bwh.blockNumber), bwh.hash}; 
 	  
 	    if (simulationParams.useMultipleNodes)
-	      smartContractInterfaceBg(robotId, interface, contractAddress, "vote", args, 2, opinionInt, nodeInt, simulationParams.blockchainPath);
-	    else
-	      string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 2, opinionInt);
+	      smartContractInterfaceStringBg(robotId, interface, contractAddress, "vote", args, 4, opinionInt, nodeInt, simulationParams.blockchainPath);
+	    //	    else
+	    //	      string voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 4, opinionInt);
 	  }
 	  
 	} else if (simulationParams.decision_rule == 4) {

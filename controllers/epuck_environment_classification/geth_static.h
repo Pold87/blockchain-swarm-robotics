@@ -106,6 +106,7 @@ std::string sendEther(int i, std::string from, std::string to, int v, int nodeIn
 std::string smartContractInterface(int i, std::string interface, std::string contractAddress, std::string func, int args[], int argc, int v);
 std::string smartContractInterface(int i, std::string interface, std::string contractAddress, std::string func, int args[], int argc, int v, int nodeInt, std::string datadirBase);
 void smartContractInterfaceBg(int i, std::string interface, std::string contractAddress, std::string func, int args[], int argc, int v, int nodeInt, std::string datadirBase);
+void smartContractInterfaceStringBg(int i, std::string interface, std::string contractAddress, std::string func, std::string args[], int argc, int v, int nodeInt, std::string datadirBase);
 
 /* Unlock account */
 std::string unlockAccount(int i, std::string pw);
