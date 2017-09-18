@@ -5,9 +5,6 @@
 #define COLOR_STRENGHT           255
 #define N_COL		         	 3
 
-
-#include "geth_static.h" /* Use geth from C++ */
-
 #include <iostream>
 
 #include <algorithm>
@@ -92,6 +89,26 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     THROW_ARGOSEXCEPTION_NESTED("Error initializing controller state parameters.", ex);
   }
 }
+
+
+void EPuck_Environment_Classification::registerRobot() {
+
+  int robotId = Id2Int(GetId());
+  
+  int args[1] = {opinion.actualOpinion}; 
+  string sBlocknumberBlockhash = smartContractInterface(robotId, interface,
+	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
+
+  string sBlocknumber = sBlocknumberBlockhash.substr(0, sBlocknumberBlockhash.find(","));
+  sBlocknumber.erase(0, 1);
+  string sBlockhash = sBlocknumberBlockhash.substr(1, sBlocknumberBlockhash.find(","));
+  sBlockhash = sBlockhash.substr(1, sBlockhash.size() - 3);
+  bwh.blockNumber = atoi(sBlocknumber.c_str());
+  bwh.hash = sBlockhash;
+
+  cout << "bwh.blockNumber: " << bwh.blockNumber << " bwh.hash:" << bwh.hash << endl;
+}
+
 
 void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
 
@@ -278,6 +295,12 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
 void EPuck_Environment_Classification::ControlStep() {
 
   int robotId = Id2Int(GetId());
+
+  if (beginning) {
+    registerRobot();
+    beginning = false;
+  }
+  
   //  int nodeInt = robotIdToNode[robotId];
   
   /* Turn leds according with actualOpinion */
@@ -1127,6 +1150,8 @@ void EPuck_Environment_Classification::fromLoopFunctionResPrepare(){
   cout << "ID Raw is: " << GetId() << endl;
   int robotId = Id2Int(GetId());
 
+  beginning = true;
+  
   /* Ethereum */
   if (!simulationParams.useClassicalApproach) {
     nodeInt = robotIdToNode[robotId];
@@ -1170,25 +1195,7 @@ void EPuck_Environment_Classification::fromLoopFunctionResPrepare(){
       coinbaseAddresses[robotId] = getCoinbase(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
       address = coinbaseAddresses[robotId];    
       
-      prepare_for_new_genesis(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
-
-
-
-
-  int args[1] = {opinion.actualOpinion}; 
-  string sBlocknumberBlockhash = smartContractInterface(robotId, interface,
-	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
-
-  string sBlocknumber = sBlocknumberBlockhash.substr(0, sBlocknumberBlockhash.find(","));
-  sBlocknumber.erase(0, 1);
-  string sBlockhash = sBlocknumberBlockhash.substr(1, sBlocknumberBlockhash.find(","));
-  sBlockhash = sBlockhash.substr(1, sBlockhash.size() - 3);
-  blockWithHash bwh;
-  bwh.blockNumber = atoi(sBlocknumber.c_str());
-  bwh.hash = sBlockhash;
-
-  cout << "blockWithHash.blockNumber: " << blockWithHash.blockNumber << " blockWithHash.hash:" << blockWithHash.hash << endl;
-
+      prepare_for_new_genesis(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);      
 
       
     } else {
@@ -1216,22 +1223,6 @@ void EPuck_Environment_Classification::fromLoopFunctionResStart(){
   enodes[robotId] = get_enode(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
   enode = enodes[robotId];
   unlockAccount(robotId, "test", nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
-
-  
-  int args[1] = {opinion.actualOpinion}; 
-  string sBlocknumberBlockhash = smartContractInterface(robotId, interface,
-	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
-
-  string sBlocknumber = sBlocknumberBlockhash.substr(0, sBlocknumberBlockhash.find(","));
-  sBlocknumber.erase(0, 1);
-  string sBlockhash = sBlocknumberBlockhash.substr(1, sBlocknumberBlockhash.find(","));
-  sBlockhash = sBlockhash.substr(1, sBlockhash.size() - 3);
-  blockWithHash bwh;
-  bwh.blockNumber = atoi(sBlocknumber.c_str());
-  bwh.hash = sBlockhash;
-
-  cout << "blockWithHash.blockNumber: " << blockWithHash.blockNumber << " blockWithHash.hash:" << blockWithHash.hash << endl;
-
 
 }
 

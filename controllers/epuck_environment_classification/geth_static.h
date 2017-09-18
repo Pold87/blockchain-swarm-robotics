@@ -5,7 +5,7 @@
 
 struct blockWithHash {
   int blockNumber;
-  string hash;
+  std::string hash;
 };
 
 double get_wall_time();

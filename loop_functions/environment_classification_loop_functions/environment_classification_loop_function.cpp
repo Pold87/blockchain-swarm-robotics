@@ -190,15 +190,10 @@ void CEnvironmentClassificationLoopFunctions::setContractAddressAndDistributeEth
       //      string e = get_enode(robotId, minerNode, blockchainPath);
       string e = cController.getEnode();
       add_peer(minerId, e, minerNode, basePort, blockchainPath);
-      /* Distribute ether among the robots */
-      /* Sending is not necessary anymore */
-      //sendEther(minerId, minerAddress, address, 20, minerNode, blockchainPath);
     } else {
       string e = get_enode(robotId);
       add_peer(minerId, e);
-      //sendEther(minerId, minerAddress, address, 4);
     }
-    cout << "Sent ether to address: " << address;
   }  
 }
 
@@ -271,6 +266,20 @@ void CEnvironmentClassificationLoopFunctions::disconnectAll(vector<int> allRobot
   }
 }
 
+void CEnvironmentClassificationLoopFunctions::registerAllRobots() {
+
+  CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
+  for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
+    
+    /* Get handle to e-puck entity and controller */
+    CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
+    EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
+    
+    cController.registerRobot();
+    
+  }  
+}
+
 void CEnvironmentClassificationLoopFunctions::PreinitMiner() {
 
   cout << "Initializing miner" << endl;
@@ -332,19 +341,6 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
   
   start_mining(minerId, 4, minerNode, blockchainPath);	
 
-  
-  /* Wait until at least x blocks are mined */
-  /* This part should be replaced by the preallocation*/
-  //int bHeight;
-  //do {
-  //  if (useMultipleNodes)
-  //    bHeight = getBlockChainLength(minerId, minerNode, blockchainPath);
-  //  else
-  //    bHeight = getBlockChainLength(minerId);
-  //  cout << "Checking block chain height. It is " << bHeight << endl;
-  //  sleep(1);
-  //} while (bHeight < (n_robots));
-  
   /* Deploy contract */  
   string interfacePath = baseDirLoop + "interface.txt";
   interface = readStringFromFile(interfacePath);
@@ -371,8 +367,6 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
     }
     u++;
   } while (u < maxContractAddressTrials && contractAddress.find("TypeError") == 0);
-
-  stop_mining(minerId, minerNode, blockchainPath);
   
   /* Remove space in contract address */
   contractAddress.erase(std::remove(contractAddress.begin(), 
@@ -382,7 +376,9 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
 
   /* Set the address of the deployed contract in each robot */
   setContractAddressAndDistributeEther(contractAddress, minerAddress);
- 	
+
+  stop_mining(minerId, minerNode, blockchainPath);
+  
   /* Check that all robots received their ether */
 
   bool etherReceived;
@@ -446,8 +442,7 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
     }
     trialssameheight++;	
   }
-
-  //disconnectAll(allRobotIds);
+  
   
   cout << "Disconnecting everyone by killing mining thread" << endl;
   if (useMultipleNodes) {

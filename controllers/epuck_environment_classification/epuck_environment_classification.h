@@ -21,6 +21,7 @@
 #include <ctime>
 #include <iostream>
 
+#include "geth_static.h" /* Use geth from C++ */
 
 #define N_COL  3
 
@@ -201,6 +202,7 @@ public:
    
 
    void UpdateNeighbors(std::set<int> newNeighbors);
+   void registerRobot();
    
 
 private:
@@ -242,7 +244,8 @@ private:
    std::string enode;
 
    std::string blockchainPath;
-   
+   blockWithHash bwh;
+   bool beginning;
    int nodeInt;
    std::map<int, int> robotIdToNode;  
    bool mining;
