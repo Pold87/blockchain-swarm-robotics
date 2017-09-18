@@ -110,6 +110,7 @@ void EPuck_Environment_Classification::registerRobot() {
   string sBlocknumber = sBlocknumberBlockhash.substr(0, sBlocknumberBlockhash.find(","));
   sBlocknumber.erase(0, 1);
   string sBlockhash = sBlocknumberBlockhash.substr(1, sBlocknumberBlockhash.find(","));
+  cout <<" bwh.hash (before substring):" << sBlockhash << endl;
   sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 1);
   bwh.blockNumber = atoi(sBlocknumber.c_str());
   bwh.hash = sBlockhash;
