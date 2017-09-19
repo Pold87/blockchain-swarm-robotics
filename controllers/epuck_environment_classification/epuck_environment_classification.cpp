@@ -113,7 +113,7 @@ void EPuck_Environment_Classification::registerRobot() {
   sBlocknumber.erase(0, 1);
   string sBlockhash = splitResult[1];
   cout <<" bwh.hash (before substring):" << sBlockhash << endl;
-  sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 1);
+  sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 2);
   bwh.blockNumber = atoi(sBlocknumber.c_str());
   bwh.hash = sBlockhash;
   cout << "bwh.blockNumber: " << bwh.blockNumber << " bwh.hash:" << bwh.hash << endl;
@@ -504,13 +504,13 @@ void EPuck_Environment_Classification::Explore() {
        memory */
     //rawTx = getRawTransaction(robotId, voteResult);
     
-    //int args2[0] = {};
+    int args2[0] = {};
     
     // For debugging (show amount of white and black votes)
-    //string numWhite = smartContractInterface(robotId, interface, contractAddress, "wVotes", args2, 0, 0);
-    //string numBlack = smartContractInterface(robotId, interface, contractAddress, "bVotes", args2, 0, 0);
+    string numWhite = smartContractInterface(robotId, interface, contractAddress, "wVotes", args2, 0, 0, nodeInt, simulationParams.blockchainPath);
+    string numBlack = smartContractInterface(robotId, interface, contractAddress, "bVotes", args2, 0, 0, nodeInt, simulationParams.blockchainPath);
     
-    //cout << "Num white votes is: " << numWhite << "Num Black votes is: " << numBlack << endl;
+    cout << "Num white votes is: " << numWhite << "Num Black votes is: " << numBlack << endl;
     
     
     /* Assigning a new exploration time, for the next exploration state */
@@ -883,7 +883,7 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
     std::string sBlock = splitResult[1];
     std::string sBlockhash = splitResult[2];
     // Remove first and last two characters
-    sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 1);
+    sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 2);
     cout << "sNewOpinion is " << sNewOpinion << endl;
     cout << "sBlock is " << sBlock << endl;
     cout << "sBlockhash is " << sBlockhash << endl;
