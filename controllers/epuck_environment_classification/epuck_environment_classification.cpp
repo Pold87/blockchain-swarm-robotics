@@ -70,7 +70,7 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "decision_rule", decision_rule);
     GetNodeAttribute(t_node, "exitFlag", exitFlag);
     GetNodeAttribute(t_node, "percent_white", percentRed);
-    GetNodeAttribute(t_node, "percent_white", percentBlue);
+    GetNodeAttribute(t_node, "percent_black", percentBlue);
     GetNodeAttribute(t_node, "num_pack_saved", numPackSaved);
     GetNodeAttribute(t_node, "base_dir", baseDir);
     GetNodeAttribute(t_node, "interface_path", interfacePath);
@@ -504,13 +504,13 @@ void EPuck_Environment_Classification::Explore() {
        memory */
     //rawTx = getRawTransaction(robotId, voteResult);
     
-    int args2[0] = {};
+    //int args2[0] = {};
     
     // For debugging (show amount of white and black votes)
-    string numWhite = smartContractInterface(robotId, interface, contractAddress, "wVotes", args2, 0, 0, nodeInt, simulationParams.blockchainPath);
-    string numBlack = smartContractInterface(robotId, interface, contractAddress, "bVotes", args2, 0, 0, nodeInt, simulationParams.blockchainPath);
+    //string numWhite = smartContractInterface(robotId, interface, contractAddress, "wVotes", args2, 0, 0, nodeInt, simulationParams.blockchainPath);
+    //string numBlack = smartContractInterface(robotId, interface, contractAddress, "bVotes", args2, 0, 0, nodeInt, simulationParams.blockchainPath);
     
-    cout << "Num white votes is: " << numWhite << "Num Black votes is: " << numBlack << endl;
+    //cout << "Num white votes is: " << numWhite << "Num Black votes is: " << numBlack << endl;
     
     
     /* Assigning a new exploration time, for the next exploration state */

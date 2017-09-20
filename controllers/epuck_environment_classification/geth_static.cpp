@@ -1156,8 +1156,8 @@ void smartContractInterfaceStringBg(int i, string interface, string contractAddr
 
    cout << "Executing full command: " << fullCommand << endl;
 
-   string res = exec_geth_cmd(i, fullCommand, nodeInt, datadirBase);
-   cout << "Result received from SC is: " << res << endl;
+   exec_geth_cmd_background(i, fullCommand, nodeInt, datadirBase);
+   //cout << "Result received from SC is: " << res << endl;
 
  }
 

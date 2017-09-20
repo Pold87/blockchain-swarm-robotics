@@ -51,15 +51,15 @@ void CEnvironmentClassificationLoopFunctions::fillSettings(TConfigurationNode& t
       GetNodeAttribute(tEnvironment, "number_of_red_cells", colorOfCell[0]);
       GetNodeAttribute(tEnvironment, "number_of_green_cells", colorOfCell[1]);
       GetNodeAttribute(tEnvironment, "number_of_blue_cells",colorOfCell[2]);
-      GetNodeAttribute(tEnvironment, "percent_green", percentageOfColors[0]);
-      GetNodeAttribute(tEnvironment, "percent_white", percentageOfColors[1]);
+      GetNodeAttribute(tEnvironment, "percent_white", percentageOfColors[0]);
+      GetNodeAttribute(tEnvironment, "percent_green", percentageOfColors[1]);
       GetNodeAttribute(tEnvironment, "percent_black", percentageOfColors[2]);
       GetNodeAttribute(tEnvironment, "using_percentage", using_percentage);
       GetNodeAttribute(tEnvironment, "exit", exitFlag);
       
       /* Retrieving information about initial state of robots */
       GetNodeAttribute(tEnvironment, "r_0", initialOpinions[0]);
-      GetNodeAttribute(tEnvironment, "g_0", initialOpinions[1]);
+      GetNodeAttribute(tEnvironment, "w_0", initialOpinions[1]);
       GetNodeAttribute(tEnvironment, "b_0", initialOpinions[2]);
       GetNodeAttribute(tEnvironment, "number_of_robots", n_robots);
       GetNodeAttribute(tEnvironment, "number_of_qualities", number_of_qualities);
