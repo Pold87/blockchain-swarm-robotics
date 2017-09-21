@@ -825,18 +825,8 @@ void EPuck_Environment_Classification::Diffusing() {
 /* DECISION RULE */
 void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
 {
-
-  /*  */
-  if (byzantineStyle > 0) {
-
-    switch(byzantineStyle) {
-      case 1 : opinion.actualOpinion = 1;
-	       break;
-      case 2 : opinion.actualOpinion = 2;
-	       break;
-    }
     
-  } else if (simulationParams.useClassicalApproach) {
+  if (simulationParams.useClassicalApproach) {
 
     switch(decision_rule) {
 
@@ -889,6 +879,48 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
     cout << "sBlockhash is " << sBlockhash << endl;
     
     int newOpinion = atoi(sNewOpinion.c_str());
+
+    // If something went wrong, try again:
+    if (newOpinion == 0) {
+      cout << "Something went wrong with opinion parsing!!! The result was " << sOpinionBlocknumberBlockhash << endl;
+      sOpinionBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
+      cout << "Something went wrong with opinion parsing!!! The new result is " << sOpinionBlocknumberBlockhash << endl;
+
+      splitResult = split(sOpinionBlocknumberBlockhash, ',');
+
+      sNewOpinion = splitResult[0];
+      // Remove first character
+      sNewOpinion.erase(0, 1);
+      sBlock = splitResult[1];
+      sBlockhash = splitResult[2];
+      // Remove first and last two characters
+      sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 2);
+            
+      newOpinion = atoi(sNewOpinion.c_str());
+
+      cout << "sNewOpinion v2 is " << sNewOpinion << endl;
+      cout << "sBlock v2 is " << sBlock << endl;
+      cout << "sBlockhash v2 is " << sBlockhash << endl;
+    }
+    
+    /* If everything went alright */
+    if (newOpinion != 0) {
+
+      if (byzantineStyle > 0) {
+
+	switch(byzantineStyle) {
+	case 1 : opinion.actualOpinion = 1;
+	  break;
+	case 2 : opinion.actualOpinion = 2;
+	  break;
+	}
+      } else {      
+      opinion.actualOpinion = newOpinion;
+      }
+
+      bwh.blockNumber = atoi(sBlock.c_str());
+      bwh.hash = sBlockhash;
+    }
   }    
 }
 

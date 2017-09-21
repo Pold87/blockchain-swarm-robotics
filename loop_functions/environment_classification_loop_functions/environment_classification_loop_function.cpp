@@ -56,14 +56,14 @@ void CEnvironmentClassificationLoopFunctions::fillSettings(TConfigurationNode& t
       GetNodeAttribute(tEnvironment, "percent_black", percentageOfColors[2]);
       GetNodeAttribute(tEnvironment, "using_percentage", using_percentage);
       GetNodeAttribute(tEnvironment, "exit", exitFlag);
-      
+
       /* Retrieving information about initial state of robots */
       GetNodeAttribute(tEnvironment, "r_0", initialOpinions[0]);
       GetNodeAttribute(tEnvironment, "w_0", initialOpinions[1]);
       GetNodeAttribute(tEnvironment, "b_0", initialOpinions[2]);
       GetNodeAttribute(tEnvironment, "number_of_robots", n_robots);
       GetNodeAttribute(tEnvironment, "number_of_qualities", number_of_qualities);
-      
+
       /* Retrieving information about simulation paramaters */
       GetNodeAttribute(tEnvironment, "g", g);
       GetNodeAttribute(tEnvironment, "sigma", sigma);
@@ -71,7 +71,7 @@ void CEnvironmentClassificationLoopFunctions::fillSettings(TConfigurationNode& t
       GetNodeAttribute(tEnvironment, "turn", turn);
       GetNodeAttribute(tEnvironment, "decision_rule", decisionRule);
       GetNodeAttribute(tEnvironment, "number_of_runs", number_of_runs);
-      
+
       /* Retrieving information about how to catch and where to save statistics */
       GetNodeAttribute(tEnvironment, "save_every_ticks", timeStep);
       GetNodeAttribute(tEnvironment, "save_every_ticks_flag", everyTicksFileFlag);
@@ -94,8 +94,8 @@ void CEnvironmentClassificationLoopFunctions::fillSettings(TConfigurationNode& t
       GetNodeAttribute(tEnvironment, "use_classical_approach", useClassicalApproach);
       GetNodeAttribute(tEnvironment, "use_classical_approach", useClassicalApproach);
       GetNodeAttribute(tEnvironment, "subswarm_consensus", subswarmConsensus);
-      GetNodeAttribute(tEnvironment, "regenerate_file", regenerateFile);      
-      
+      GetNodeAttribute(tEnvironment, "regenerate_file", regenerateFile);
+
     }
   catch(CARGoSException& ex) {
     THROW_ARGOSEXCEPTION_NESTED("Error parsing loop functions!", ex);
@@ -108,16 +108,16 @@ vector<int> CEnvironmentClassificationLoopFunctions::getAllRobotIds() {
 
   CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
   for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
-    
+
     /* Get handle to e-puck entity and controller */
     CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
     EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
-    
+
     std::string id = cController.GetId();
     int robotId = Id2Int(id);
     res.push_back(robotId);
-  }  
-  return res;  
+  }
+  return res;
 }
 
 bool CEnvironmentClassificationLoopFunctions::CheckEtherReceived() {
@@ -126,7 +126,7 @@ bool CEnvironmentClassificationLoopFunctions::CheckEtherReceived() {
 
 
   bool everyoneReceivedSomething = true;
-  
+
   for(CSpace::TMapPerType::iterator it = m_cEpuck.begin(); it != m_cEpuck.end(); ++it) {
 
     /* Get handle to e-puck entity and controller */
@@ -135,17 +135,17 @@ bool CEnvironmentClassificationLoopFunctions::CheckEtherReceived() {
 
     std::string id = cController.GetId();
     int robotId = Id2Int(id);
-    int robotNodeInt = cController.getNodeInt();    
+    int robotNodeInt = cController.getNodeInt();
     long long balance;
-    
+
     //for (int t = 0; t < maxTime; ++t) {
       if (useMultipleNodes)
 	balance = check_balance(robotId, robotNodeInt, blockchainPath);
       else
 	balance = check_balance(robotId);
-      
+
       if (DEBUGLOOP)
-      	cout << "Checking account balance. It is " << balance << std::endl; 
+      	cout << "Checking account balance. It is " << balance << std::endl;
 
       if (balance == 0) {
       	everyoneReceivedSomething = false; /* At least one robot did not receive ether */
@@ -153,18 +153,18 @@ bool CEnvironmentClassificationLoopFunctions::CheckEtherReceived() {
       }
 
       // sleep(1); /* Wait for a second and check balance again */
-      
+
       //if (t == maxTime - 1) {
       //cout << "CEnvironmentClassificationLoopFunctions::Init: Maximum time reached for waiting that each robots receives its ether.Exiting." << std::endl;
       //if (useMultipleNodes) {
-	  
-      //  errorOccurred = true;	  
+
+      //  errorOccurred = true;
       //}
       //else
       //  exec("killall geth");
       //}
       //}
-      
+
   }
   return everyoneReceivedSomething;
 }
@@ -173,15 +173,15 @@ void CEnvironmentClassificationLoopFunctions::setContractAddressAndDistributeEth
 
   CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
   for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
-    
+
     /* Get handle to e-puck entity and controller */
     CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
     EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
-    
+
     std::string& address = cController.GetAddress();
     std::string id = cController.GetId();
     int robotId = Id2Int(id);
-    
+
     /* Set the smart contract address for the robot */
     cController.setContractAddress(contractAddress);
 
@@ -194,7 +194,7 @@ void CEnvironmentClassificationLoopFunctions::setContractAddressAndDistributeEth
       string e = get_enode(robotId);
       add_peer(minerId, e);
     }
-  }  
+  }
 }
 
 void CEnvironmentClassificationLoopFunctions::connectMinerToEveryone() {
@@ -202,15 +202,15 @@ void CEnvironmentClassificationLoopFunctions::connectMinerToEveryone() {
   CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
 
   for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
-    
+
     /* Get handle to e-puck entity and controller */
     CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
     EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
-    
+
     std::string& address = cController.GetAddress();
     std::string id = cController.GetId();
     int robotId = Id2Int(id);
-    
+
     /* Make sure that the robot is connected */
     if (useMultipleNodes) {
       //      string e = get_enode(robotId, minerNode, blockchainPath);
@@ -222,20 +222,20 @@ void CEnvironmentClassificationLoopFunctions::connectMinerToEveryone() {
       string e = get_enode(robotId);
       add_peer(minerId, e);
       }
-  }  
+  }
 
 }
 
 /* TODO: this function does not work with multiple nodes since the ssh
-   call is sent from the miner and not from the robot*/  
+   call is sent from the miner and not from the robot*/
 void CEnvironmentClassificationLoopFunctions::connectMore(vector<int> allRobotIds) {
   for (std::vector<int>::iterator it1 = allRobotIds.begin() ; it1 != allRobotIds.end() - 1; ++it1) {
-    
+
     std::vector<int>::iterator it2 = it1 + 1;
-    
+
     cout << "it1 is" << *it1 << " and it2 is " << *it2 << endl;
     if (useMultipleNodes) {
-      
+
       string e = get_enode(*it2, minerNode, basePort, blockchainPath);
       add_peer(*it1, e, minerNode, basePort, blockchainPath);
     } else {
@@ -251,10 +251,10 @@ void CEnvironmentClassificationLoopFunctions::connectMore(vector<int> allRobotId
 void CEnvironmentClassificationLoopFunctions::disconnectAll(vector<int> allRobotIds) {
 
   cout << "Disconnecting everyone" << endl;
-    
+
   for (std::vector<int>::iterator it1 = allRobotIds.begin() ; it1 != allRobotIds.end() - 1; ++it1) {
     std::vector<int>::iterator it2 = it1 + 1;
-      
+
     cout << "it 1 is " << *it1 << " and it2 is " << *it2 << endl;
     if (useMultipleNodes) {
       string e = get_enode(*it2, minerNode, basePort, blockchainPath);
@@ -270,14 +270,14 @@ void CEnvironmentClassificationLoopFunctions::registerAllRobots() {
 
   CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
   for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
-    
+
     /* Get handle to e-puck entity and controller */
     CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
     EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
-    
+
     cController.registerRobot();
-    
-  }  
+
+  }
 }
 
 void CEnvironmentClassificationLoopFunctions::PreinitMiner() {
@@ -291,7 +291,7 @@ void CEnvironmentClassificationLoopFunctions::PreinitMiner() {
   ostringstream genesisPathStream;
   genesisPathStream << "/home/vstrobel/genesis/genesis" << basePort << ".json";
   string genesisPath = genesisPathStream.str();
-    
+
   std::ostringstream fullCommandStream;
   std::string minerAddress;
   if (useMultipleNodes) {
@@ -303,7 +303,7 @@ void CEnvironmentClassificationLoopFunctions::PreinitMiner() {
     minerAddress = getCoinbase(minerId, minerNode, basePort, blockchainPath);
     minerAddressGlobal = minerAddress;
     prepare_for_new_genesis(minerId, minerNode, basePort, blockchainPath);
-    
+
   } else {
     /* Initialize the miner */
     geth_init(minerId);
@@ -311,11 +311,11 @@ void CEnvironmentClassificationLoopFunctions::PreinitMiner() {
     start_geth(minerId);
     createAccount(minerId);
     unlockAccount(minerId, "test");
-    start_mining(minerId, 4);	  
+    start_mining(minerId, 4);
     minerAddress = getCoinbase(minerId);
   }
 
-  
+
 }
 
 /* Set up the miner, deploy the smart contract, etc. */
@@ -326,22 +326,22 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
   ostringstream genesisPathStream;
   genesisPathStream << "~/genesis/genesis" << basePort << ".json";
   string genesisPath = genesisPathStream.str();
-    
+
   std::ostringstream fullCommandStream;
   std::string minerAddress;
-  
+
   /* Start geth again after the preallocation */
   geth_init(minerId, minerNode, basePort, blockchainPath, genesisPath);
   sleep(1);
   start_geth(minerId, minerNode, basePort, blockchainPath);
-  
+
   unlockAccount(minerId, "test", minerNode, basePort, blockchainPath);
 
   minerAddress = getCoinbase(minerId, minerNode, basePort, blockchainPath);
-  
-  start_mining(minerId, 4, minerNode, blockchainPath);	
 
-  /* Deploy contract */  
+  start_mining(minerId, 4, minerNode, blockchainPath);
+
+  /* Deploy contract */
   string interfacePath = baseDirLoop + "interface.txt";
   interface = readStringFromFile(interfacePath);
   string dataPath = baseDirLoop + "data.txt";
@@ -367,9 +367,9 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
     }
     u++;
   } while (u < maxContractAddressTrials && contractAddress.find("TypeError") == 0);
-  
+
   /* Remove space in contract address */
-  contractAddress.erase(std::remove(contractAddress.begin(), 
+  contractAddress.erase(std::remove(contractAddress.begin(),
 				    contractAddress.end(), '\n'),
 			contractAddress.end());
 
@@ -378,22 +378,22 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
   setContractAddressAndDistributeEther(contractAddress, minerAddress);
 
   stop_mining(minerId, minerNode, blockchainPath);
-  
+
   /* Check that all robots received their ether */
 
   bool etherReceived;
   for (int t = 0; t < maxTime; ++t) {
-    
+
     etherReceived = CheckEtherReceived();
 
     /* Check if an error in the geths call occurred  */
     IsExperimentFinished();
-    
+
 
     if (DEBUGLOOP)
-      cout << "time step of CheckEtherReceived is " << t << " and result is " << etherReceived << std::endl; 
-      
-    
+      cout << "time step of CheckEtherReceived is " << t << " and result is " << etherReceived << std::endl;
+
+
     if (etherReceived) {
       break;
     } else {
@@ -408,7 +408,7 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
 
 	errorOccurred = true;
 	IsExperimentFinished();
-      }    
+      }
     }
   }
 
@@ -419,20 +419,20 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
   /* Wait until all robots have the same blockchain */
   bool allSameHeight = allSameBCHeight();
 
-  //vector<int> allRobotIds = getAllRobotIds();  
+  //vector<int> allRobotIds = getAllRobotIds();
 
   int trialssameheight = 0;
   while (! allSameHeight) {
 
     /* Check if an error in the geths call occurred  */
     IsExperimentFinished();
-    
+
     // Connect again
     if (trialssameheight % 5 == 0) {
       connectMinerToEveryone();
       cout << "Troubles in getting same BC height; connect miner to everyone now" << endl;
     }
-    
+
     allSameHeight = allSameBCHeight();
 
     if (trialssameheight > 40) {
@@ -440,10 +440,10 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
       cout << "Fatal Error: more than 30 trials in allSameBCHeight" << endl;
       IsExperimentFinished();
     }
-    trialssameheight++;	
+    trialssameheight++;
   }
-  
-  
+
+
   cout << "Disconnecting everyone by killing mining thread" << endl;
   if (useMultipleNodes) {
     kill_geth_thread(minerId, basePort, minerNode, blockchainPath);
@@ -471,16 +471,16 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
     PreinitMiner();
   }
 
-  
+
   /* Resetting number of opinions that have to be written */
   written_qualities = 0;
 
   m_pcRNG->SetSeed((int)m_pcRNG->Uniform(bigRange));
   m_pcRNG->Reset();
-  
+
   GetSpace().SetSimulationClock(0);
   consensousReached = N_COL;
-  
+
   for(size_t i = 0; i<N_COL; i++){
     robotsInExplorationCounter[i] = 0;
     robotsInDiffusionCounter[i] = 0;
@@ -498,22 +498,22 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
       grid[j] = temp1;
     }
   }
-  
 
-    
+
+
   /* Helper array, used to store and shuffle the initial opinions of the robots */
   UInt32 opinionsToAssign[n_robots];
-  
+
   /* Build a vector containing the initial opinions */
   for (int i=0; i<initialOpinions[0];i++)
     opinionsToAssign[i] = 0;
-  
+
   for (int i=initialOpinions[0] ;i<initialOpinions[0]+initialOpinions[1];i++)
     opinionsToAssign[i] = 1;
-  
+
   for (int i=initialOpinions[0]+initialOpinions[1]; i<n_robots;i++)
     opinionsToAssign[i] = 2;
-  
+
   /* Vector shuffling, for randomize the opinions among the robots */
   for (int i = n_robots-1; i >= 0; --i){
     int j = ((int)m_pcRNG->Uniform(bigRange) % (i+1));
@@ -526,9 +526,9 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
   /* Initialize Byzantine robots */
   int remainingByzantineBlacks;
   int remainingByzantineWhites;
-  
+
   /* TODO: could be changed to switch case */
-  
+
   if (byzantineSwarmStyle == 0) { // No Byzantine robots
     remainingByzantineWhites = 0;
     remainingByzantineBlacks = 0;
@@ -537,7 +537,7 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
     remainingByzantineBlacks = 0;
   } else if (byzantineSwarmStyle == 2) { // Black Byzantine robots
     remainingByzantineWhites = 0;
-    remainingByzantineBlacks = numByzantine;   
+    remainingByzantineBlacks = numByzantine;
   } else if (byzantineSwarmStyle == 3) { // White + black Byzantine robots
     remainingByzantineWhites = numByzantine / 2;
     remainingByzantineBlacks = numByzantine / 2;
@@ -556,18 +556,18 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
     EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
     EPuck_Environment_Classification::Opinion& opinion = cController.GetOpinion();
     EPuck_Environment_Classification::CollectedData& collectedData = cController.GetColData();
-    
+
     /* Resetting initial state of the robots: exploring for everyone */
     cController.GetReceivedOpinions().clear();
     cController.GetStateData().State = EPuck_Environment_Classification::SStateData::STATE_EXPLORING;
     Real tmpValue = (m_pcRNG->Exponential((Real)sigma));
     cController.GetStateData().remainingExplorationTime = tmpValue;
     cController.GetStateData().explorDurationTime =  cController.GetStateData().remainingExplorationTime;
-    
+
     /* Assign a random actual opinion using the shuffled vector */
     opinion.actualOpinion = opinionsToAssign[i];
     i++;
-    
+
     /* Decide if the robot should be Byzantine */
     if (remainingByzantineWhites > 0 && opinion.actualOpinion == 0) {
       cController.setByzantineStyle(1); // always vote for white
@@ -581,7 +581,7 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
       cController.setByzantineStyle(0); // doe normaal
       //cout << "setting byz style 0" << endl;
     }
-    
+
     opinion.countedCellOfActualOpinion = 0;
     collectedData.count = 1;
     if(opinion.actualOpinion == 1)
@@ -591,17 +591,17 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
     /* Setting robots initial states: exploring state */
 
     cController.fromLoopFunctionResPrepare();
-    
-    if( gethStaticErrorOccurred ) {    
+
+    if( gethStaticErrorOccurred ) {
       cout << "gethStaticErrorOccurred was true in InitRobots" << endl;
       Reset();
       cout << "Finished Reset, returning true now" << endl;
       return true;
-    }    
+    }
   }
 
-  PreallocateEther();  
-  RestartGeths();  
+  PreallocateEther();
+  RestartGeths();
   AssignNewStateAndPosition();
 
     if (!useClassicalApproach) {
@@ -609,7 +609,7 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
     InitEthereum();
   }
 
-  
+
 }
 
 
@@ -617,7 +617,7 @@ void CEnvironmentClassificationLoopFunctions::PreallocateEther() {
 
   ostringstream genesisBlockStream;
 
-  
+
   genesisBlockStream << "{\n\"nonce\": \"0x0000000000000001\",\n\"mixhash\": \"0x0000000000000000000000000000000000000000000000000000000000000000\",\n\"difficulty\": \"0x1000\",\n\"alloc\": {\n";
 
 
@@ -627,23 +627,23 @@ void CEnvironmentClassificationLoopFunctions::PreallocateEther() {
 
     CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
     EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
-    
+
     std::string id = cController.GetId();
     int robotId = Id2Int(id);
 
     cout << "Coinbase address is " << coinbaseAddresses[robotId] << endl;
-    
+
     genesisBlockStream << removeSpace(coinbaseAddresses[robotId]) << ": {\n\"balance\": \"100000000000000000000000\"\n},";
-    
+
   }
-  
+
   genesisBlockStream << removeSpace(minerAddressGlobal) << ": {\n\"balance\": \"100000000000000000000000\"\n}";
-  
+
   genesisBlockStream << "\n},\n\"coinbase\": \"0xcbfbd4c79728b83eb7c3aa50455a78ba724c53ae\",\n\"timestamp\": \"0x00\",\n\"parentHash\": \"0x0000000000000000000000000000000000000000000000000000000000000000\",\n\"extraData\": \"0x\",\n\"gasLimit\": \"0x8000000\"\n}";
-  
-  
+
+
   string genesisBlock = genesisBlockStream.str();
-  ostringstream genesisPathStream;  
+  ostringstream genesisPathStream;
   genesisPathStream << "/home/vstrobel/genesis/genesis" << basePort  << ".json";
   string genesisPath = genesisPathStream.str();
   ofstream out(genesisPath.c_str());
@@ -670,7 +670,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 
   TConfigurationNode& tEnvironment = GetNode(t_node, "cells");
   fillSettings(tEnvironment);
-    
+
   time_t ti;
   time(&ti);
   std::string m_strOutput;
@@ -682,7 +682,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
   timeFile << ti << std::endl;
   incorrectParameters = false;
   m_pcRNG = CRandom::CreateRNG("argos");
-  
+
   /* Setting variables according with the parameters of the configuration file (XML) */
 
   /* Translating percentages in numbers */
@@ -693,7 +693,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 	cout << "Color: " << colorOfCell[c] << endl;
       }
     }
-  
+
   /*
    * Check: number of robots = sum of the initial opinions
    *        number of colors cells sums up to the total number of cells
@@ -705,15 +705,15 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
       sigma = sigma * 10;
       g = g * 10;
       max_time = max_time * 10;
-      
+
       int k = 0;
       /* Generate random color for each cell according with the choosen probabilities*/
       for ( int i = 0; i < N_COL; i++ )
 	for( int j = 0; j < colorOfCell[i] ; j++,k++ )
 	  grid[k] = i;
-            
+
       UInt32 i=0;
-      
+
       m_pcRNG->SetSeed(std::clock());
       m_pcRNG->Reset();
 
@@ -735,7 +735,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
       /* Initialize the robots and Ethereum */
       InitRobots();
       i = 0;
-      
+
       /*
        * File saving number of diffusing and exploring robots, for every opinion.
        * It saves situation every timeStep ticks (timeStep/10 seconds)
@@ -747,58 +747,58 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 	m_strOutput = dataDir + passedRadix +".RUN"+nRuns;
 	everyTicksFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 	everyTicksFile << "clock\trun\texploringWhite\tdiffusingWhite\texploringGreen\tdiffusingGreen\texploringBlack\tdiffusingBlack\tbyzantineExploringWhite\tbyzantineDiffusingWhite\tbyzantineExploringGreen\tbyzantineDiffusingGreen\tbyzantineExploringBlack\tbyzantineDiffusingBlack\t" << std::endl;
-	
+
       }
-      
+
       /* Blockchain Statistics */
       if((!useClassicalApproach) && blockChainFileFlag) {
-	
+
 	std::stringstream ss;
 	ss << number_of_runs;
 	std::string nRuns = ss.str();
-	
+
 	m_strOutput = dataDir + passedRadix +"-blockchain.RUN" + nRuns;
 	blockChainFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 	blockChainFile << "clock";
-	
+
 	m_strOutput = dataDir + passedRadix +"-whitevotes.RUN" + nRuns;
 	blockChainWhiteVotes.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 	blockChainWhiteVotes << "clock";
-	
+
 	m_strOutput = dataDir + passedRadix +"-blackvotes.RUN" + nRuns;
 	blockChainBlackVotes.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 	blockChainBlackVotes << "clock";
-	
+
 	m_strOutput = dataDir + passedRadix +"-last2votes.RUN" + nRuns;
 	blockChainLast2Votes.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 	blockChainLast2Votes << "clock";
-	
+
 	/* For all robots */
-	
+
 	CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
-	
+
 	for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
-	  
+
 	  CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
 	  EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
-	  
-	  std::string id = cController.GetId();		    
-	  
+
+	  std::string id = cController.GetId();
+
 	  blockChainFile << "\t" << "robot" << id;
 	  blockChainWhiteVotes << "\t" << "robot" << id;
 	  blockChainBlackVotes << "\t" << "robot" << id;
 	  blockChainLast2Votes << "\t" << "robot" << id;
-	  
+
 	}
-	
+
 	blockChainFile << std::endl;
 	blockChainWhiteVotes << std::endl;
 	blockChainBlackVotes << std::endl;
 	blockChainLast2Votes << std::endl;
-	
+
       }
-      
-      
+
+
       /*
        * File saving the the exit time and the number of robots (per opinion) after every run has been executed
        */
@@ -807,7 +807,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 	runsFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 	runsFile << "Runs\t\tExitTime\tWhites\t\tGreens\t\tBlacks" << std::endl;
       }
-      
+
       /*
        * File saving the quality and the opinion of every robots after every changing from exploration to diffusing state
        * (the quality and the   actualOpinion are the definitive ones)
@@ -817,7 +817,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 	everyQualityFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 	everyQualityFile << "Q\tOP" << std::endl;
       }
-      
+
       /* File saving all the statistics (times, counted cells and qualities) after the whole experiment is finished */
       if(globalStatFileFlag){
 	m_strOutput = dataDir + passedRadix + ".globalStatistics";
@@ -828,7 +828,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
 	m_strOutput = dataDir + passedRadix + ".oneRobotFile";
 	oneRobotFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
       }
-      
+
       /* Incorrect parameters (Number of robots or initial colors) -> Terminate the execution without write files */
     }else
     {
@@ -846,16 +846,16 @@ bool CEnvironmentClassificationLoopFunctions::allSameBCHeight() {
   bool canExit = false;
   bool success = true;
   b = -1;
-  
+
   //   for (int y = 0; y < maxChecks; y++) {
 
     cout << "Checking if all robots have the same blockchain height" << endl;
-    
+
     //if (canExit)
     //  break;
 
     //canExit = true;
-    
+
     //if (y == maxChecks - 1) {
       //cout << "Robots did not got the same blockchain in the first 20 trials; connecting everyone to everyone now" << endl;
     //  success = false;
@@ -866,11 +866,11 @@ bool CEnvironmentClassificationLoopFunctions::allSameBCHeight() {
 
       CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
       EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
-      
+
       std::string id = cController.GetId();
       int robotNodeInt = cController.getNodeInt();
       int robotId = Id2Int(id);
-      
+
       /* Check one robot (the first one) */
       if (s == 0) {
 	if (useMultipleNodes)
@@ -882,25 +882,26 @@ bool CEnvironmentClassificationLoopFunctions::allSameBCHeight() {
 	  b = getBlockChainLength(robotId, robotNodeInt, blockchainPath);
 	else
 	  b = getBlockChainLength(robotId);
-    	if (a != b) {
-	  cout << "a is " << a << " and b is " << b << endl;      
+    	if (abs(a - b) > 1) {
+
+	  cout << "a is " << a << " and b is " << b << endl;
     	  canExit = false;
 	  success = false;
 	  break;
-    	}	
+    	}
       }
 
-      cout << "a is " << a << " and b is " << b << endl;      
-      s++;      
+      cout << "a is " << a << " and b is " << b << endl;
+      s++;
     }
     //}
-   return success;   
+   return success;
 }
 
 void CEnvironmentClassificationLoopFunctions::Reset() {
 
   gethStaticErrorOccurred = false;
-  
+
   /* Clean up Ethereum stuff  */
   if (!useClassicalApproach) {
     if (useMultipleNodes) {
@@ -916,17 +917,17 @@ void CEnvironmentClassificationLoopFunctions::Reset() {
 
       // Regenerate blockchain folders
       string regenerateFolders = "bash " + regenerateFile;
-      exec(regenerateFolders.c_str());      
-      
+      exec(regenerateFolders.c_str());
+
     }
   }
-    
-  InitRobots();  
+
+  InitRobots();
 }
 
 /* Move every robot away from the arena*/
 void CEnvironmentClassificationLoopFunctions::MoveRobotsAwayFromArena(UInt32 opinionsToAssign[]) {
-  
+
   /* t is the index for the opinionToAssign vector */
   int t=0;
   /* Move every robot away from the arena (cNewPosition = CVector3(150.0f, 15.0f, 0.1f): a casual
@@ -940,40 +941,40 @@ void CEnvironmentClassificationLoopFunctions::MoveRobotsAwayFromArena(UInt32 opi
     cEpuck.GetEmbodiedEntity().MoveTo(cNewPosition, cNewOrientation, false);
     EPuck_Environment_Classification::Opinion& opinion = cController.GetOpinion();
     EPuck_Environment_Classification::CollectedData& collectedData = cController.GetColData();
-    
+
     cController.GetReceivedOpinions().clear();
-    
+
     /* Assign a random actual opinion using the shuffled vector */
   }
 }
 
 /* Assign a new state and a new position to the robots */
 void CEnvironmentClassificationLoopFunctions::AssignNewStateAndPosition() {
-  
+
   CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
   for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it)
     {
       CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
       EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
       CQuaternion cNewOrientation = cEpuck. GetEmbodiedEntity().GetOriginAnchor().Orientation;
-      
+
       /* Generating Uniformly distribuited x and y coordinates for the new position of the robot */
       Real xp = m_pcRNG->Uniform(arenaSizeRangeX);
       Real yp = m_pcRNG->Uniform(arenaSizeRangeY);
       CVector3 cNewPosition = CVector3(xp,yp,0.1f);
-      
+
       UInt32 i, unMaxRepositioningTrials = 100;
-      
+
       for(i = 0; i < unMaxRepositioningTrials; i++) {
 	if(cEpuck.GetEmbodiedEntity().MoveTo(cNewPosition, cNewOrientation, false)) break;
-	
+
 	xp = m_pcRNG->Uniform(arenaSizeRangeX);
 	yp = m_pcRNG->Uniform(arenaSizeRangeY);
-	
+
 	cNewPosition.SetX(xp);
 	cNewPosition.SetY(yp);
       }
-      
+
       cController.GetReceivedOpinions().clear();
       /* Resetting initial state of the robots: exploring for everyone */
       cController.GetStateData().State = EPuck_Environment_Classification::SStateData::STATE_EXPLORING;
@@ -985,7 +986,7 @@ void CEnvironmentClassificationLoopFunctions::AssignNewStateAndPosition() {
 /************************************************ IS EXPERIMENT FINISHED ***************************************/
 /***************************************************************************************************************/
 bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
-  
+
   /* If parameters are uncorrect then finish the experiment (Eg: number of robots vs sum of the initial opinion,
    * or the colours of the cells mismatching */
   if( incorrectParameters ) {
@@ -993,7 +994,7 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
     Reset();
     return true;
   }
-  
+
   if ( miningNotWorkingAnymore ) {
     // system("echo \"true\" > regeneratedag.txt"); // set flag that the DAG should be regenerated
     cout << "mininNotWorkingAnymore was true" << endl;
@@ -1007,71 +1008,71 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
     return true;
   }
 
-  if( gethStaticErrorOccurred ) {    
+  if( gethStaticErrorOccurred ) {
     cout << "gethStaticErrorOccurred was true" << endl;
     Reset();
     return true;
   }
 
-  
-  
+
+
   /* Vary termination condition: [GetSpace().GetSimulationClock() >= max_time] [consensousReached != N_COL]
    * [NumberOfQualities == WrittenQualities ] */
   CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
   CSpace::TMapPerType::iterator it = m_cEpuck.begin();
   if(exitFlag){
-    if( consensousReached != N_COL ){ 
+    if( consensousReached != N_COL ){
       number_of_runs--;
-      
+
       /* RUNSFILE: Write statistics of the last run */
       if (runsFile.is_open()){
 	runsFile << number_of_runs+1 <<"\t\t"
 		 << (GetSpace().GetSimulationClock()-1)/10 <<"\t\t";
-	
+
 	for ( UInt32 c = 0; c < N_COL; c++ )
 	  runsFile << robotsInDiffusionCounter[c] + robotsInExplorationCounter[c] <<"\t\t";
 	runsFile<<std::endl;
       }
-      
-      
+
+
       /* Save blockchain length */
       if (blockChainFile.is_open())
 	{
-	  
-	  
+
+
 	  blockChainFile << (GetSpace().GetSimulationClock()) / 10;
 	  blockChainWhiteVotes << (GetSpace().GetSimulationClock()) / 10;
 	  blockChainBlackVotes << (GetSpace().GetSimulationClock()) / 10;
 	  blockChainLast2Votes << (GetSpace().GetSimulationClock()) / 10;
-	  
-	  
+
+
 	  string contractAddressNoSpace = contractAddress;
-	  
-	  contractAddressNoSpace.erase(std::remove(contractAddressNoSpace.begin(), 
+
+	  contractAddressNoSpace.erase(std::remove(contractAddressNoSpace.begin(),
 						   contractAddressNoSpace.end(), '\n'),
 				       contractAddressNoSpace.end());
-	  
+
 	  int args[0] = {};
-	  
+
 	  /* For all robots */
-	  
+
 	  CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
-	  
+
 	  for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
-	    
+
 	    CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
 	    EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
-	    
-	    std::string id = cController.GetId();		    
+
+	    std::string id = cController.GetId();
 	    int robotId = Id2Int(id);
 	    int robotNodeInt = cController.getNodeInt();
-	    
+
 	    /* Blockchain height per robot */
 	    if ((!useClassicalApproach) && useMultipleNodes)
 	      blockChainFile << "\t" << getBlockChainLength(robotId, robotNodeInt, blockchainPath);
 	    else
 	      blockChainFile << "\t" << getBlockChainLength(robotId);
-	    
+
 	    /* Number of white votes per robot */
 
 	    string numWhite;
@@ -1080,9 +1081,9 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 						robotNodeInt, blockchainPath);
 	    else
 	      numWhite = smartContractInterface(robotId, interface, contractAddressNoSpace, "whiteVotes", args, 0, 0);
-	    
+
 	    numWhite.erase(std::remove(numWhite.begin(), numWhite.end(), '\n'), numWhite.end());
-	    
+
 	    /* TODO: This should be improved (maybe I don't need it since I removed the mining bug) !! */
 	    /* Check if mining works */
 	    //    if ( ((GetSpace().GetSimulationClock()) / 10) == 30 && numWhite == "0") {
@@ -1090,9 +1091,9 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 	    //  miningNotWorkingAnymore = true;
 	    //  IsExperimentFinished();
 	    //}
-		    
+
 	    blockChainWhiteVotes << "\t" << numWhite;
-	    
+
 	    /* Number of black votes per robot */
 	    string numBlack;
 	    if (useMultipleNodes)
@@ -1103,26 +1104,26 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 
 	    numBlack.erase(std::remove(numBlack.begin(), numBlack.end(), '\n'), numBlack.end());
 	    blockChainBlackVotes << "\t" << numBlack;
-	    	    
+
 	    /* Last 2 votes per robot */
 	    //string lastVote = smartContractInterface(robotId, interface, contractAddressNoSpace, "returnLast", args, 0, 0);
 	    //string secondToLastVote = smartContractInterface(robotId, interface, contractAddressNoSpace, "returnSecondToLast", args, 0, 0);
 	    //lastVote.erase(std::remove(lastVote.begin(), lastVote.end(), '\n'), lastVote.end());
 	    //secondToLastVote.erase(std::remove(secondToLastVote.begin(), secondToLastVote.end(), '\n'), secondToLastVote.end());
 	    //blockChainLast2Votes << "\t[" << lastVote << ";" << secondToLastVote << "]";
-	    
+
 	  }
-	  
+
 	  blockChainFile << std::endl;
 	  blockChainWhiteVotes << std::endl;
 	  blockChainBlackVotes << std::endl;
 	  blockChainLast2Votes << std::endl;
-	  
+
 	}
-      
-      
+
+
       if (number_of_runs<=0) {
-	
+
 	/* Close runsFile*/
 	if(runsFile.is_open())
 	  {
@@ -1138,12 +1139,12 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 	}
 	totalExploringTime = (Real)((Real)totalExploringTime/(Real)totalNumberOfExplorations);
 	totalCountedCells=(Real)((Real)totalCountedCells/(Real)totalNumberOfExplorations);
-	
+
 	/* Close qualities file */
 	if (everyQualityFile.is_open()){
 	  everyQualityFile.close();
 	}
-	
+
 	/* globalStatFile: write the general statistics, such as counted cells,
 	   times of diffusing and exploring */
 	if (globalStatFile.is_open()){
@@ -1156,36 +1157,36 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 	  }
 	  globalStatFile.close();
 	}
-	
+
 	/* Set experimentFinished variable to true -> the experiment will terminate */
 	std::cout << "Consensus is reached and the experiment is FINISHED" << std::endl;
 	m_bExperimentFinished = true;
-	
+
 	// ostringstream fullS;
 	// ostringstream fullAStream;
 	// std::stringstream nRunsStream;
 	// nRunsStream << number_of_runs;
 	// std::string nRuns = nRunsStream.str();
-	
+
 	// fullAStream << "mkdir -p " << dataDir << passedRadix << nRuns << "bcdata";
-	// std::string fullA = fullAStream.str();	
-	// exec(fullA.c_str());	
+	// std::string fullA = fullAStream.str();
+	// exec(fullA.c_str());
 
 	// if (useMultipleNodes) {
 	//   string bckiller = "bash " + blockchainPath + "/bckillerccall";
 	//   exec(bckiller.c_str());
 
 	//   fullS << "mv " << blockchainPath << "* " << dataDir << passedRadix << nRuns << "bcdata";
-	
-	//   std::string fullC = fullS.str();	  
+
+	//   std::string fullC = fullS.str();
 	//   cout << "executing (moving blockchain folder): " << fullC << endl;
 	//   system(fullC.c_str());
 
-	  
+
 	// } else {
 	//   exec("killall -HUP geth");
 	// }
-	
+
       }
       else  {
 	written_qualities = 0;
@@ -1195,34 +1196,34 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
     return m_bExperimentFinished;
   }
 	else {
-	  
+
 	  if( written_qualities == number_of_qualities){ //consensousReached != N_COL){  written_qualities == number_of_qualities
 	    number_of_runs--;
-	    
+
 	    /* RUNSFILE: Write statistics of the last run */
 	    if (runsFile.is_open()){
 	      runsFile << number_of_runs+1 <<"\t\t"
 		       << (GetSpace().GetSimulationClock()-1)/10 <<"\t\t";
-	      
+
 	      for ( UInt32 c = 0; c < N_COL; c++ )
 		runsFile << robotsInDiffusionCounter[c] + robotsInExplorationCounter[c] <<"\t\t";
 	      runsFile<<std::endl;
 	    }
-	    
-	    
+
+
 	    time_t ti_end;
 	    time(&ti_end);
-	    
+
 	    std::string m_strOutput;
 	    std::stringstream nRunsStream;
 	    nRunsStream << number_of_runs;
 	    std::string nRuns = nRunsStream.str();
-	    
+
 	    m_strOutput = dataDir + passedRadix + "-timeend.RUN" + nRuns;
 			timeFileEnd.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
 			timeFileEnd << ti_end << std::endl;
 			timeFileEnd.close();
-			
+
 			if (number_of_runs<=0) {
 
 				/* Close runsFile*/
@@ -1252,7 +1253,7 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 				  blockChainWhiteVotes.close();
 				  blockChainBlackVotes.close();
 				  blockChainLast2Votes.close();
-				}				
+				}
 
 				/* globalStatFile: write the general statistics, such as counted cells,
 		   times of diffusing and exploring */
@@ -1297,8 +1298,8 @@ void CEnvironmentClassificationLoopFunctions::Destroy(){
 
       // Regenerate blockchain folders
       //string regenerateFolders = "bash " + regenerateFile;
-      //exec(regenerateFolders.c_str());      
-      
+      //exec(regenerateFolders.c_str());
+
     }
   }
 }
@@ -1311,14 +1312,14 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 
   cout << "Passed time is (ms):" << get_wall_time() - begin_prestep << endl;
   begin_prestep = get_wall_time();
-  
-  
+
+
   //cout << "gethStaticErrorOccurred = " << gethStaticErrorOccurred << endl;
-  
+
 
 	/* Reset counters: these array are counting the number of robots in each state. Every position corresponds to a color:
 	robotsInExplorationCounter[0] -> number of robots exploring with opinion red
-	robotsInExplorationCounter[1] -> number of robots exploring with opinion green 
+	robotsInExplorationCounter[1] -> number of robots exploring with opinion green
 	... */
 
 	for ( UInt32 c=0; c<N_COL; c++ ){
@@ -1359,11 +1360,11 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 		/* Update statistics about the robot opinions*/
 
 		//cout << "getByzantineStyle returned: " << cController.getByzantineStyle() << endl;
-		
+
 		bool isByzantine = (bool) cController.getByzantineStyle();
 
 		//cout << "getByzantineStyle after boolean conversion is: " << isByzantine << endl;
-		
+
 		UpdateStatistics(opinion, sStateData, isByzantine);
 		if(cController.IsExploring())
 			UpdateCount(collectedData, cell, cPos, opinion, sStateData, id, simulationParam);
@@ -1389,7 +1390,7 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 	    {
 	      everyTicksFile << (GetSpace().GetSimulationClock())/10 << "\t";
 	      everyTicksFile << number_of_runs << "\t";
-	      
+
 	      for ( UInt32 c = 0; c < N_COL; c++ ) {
 		everyTicksFile << robotsInExplorationCounter[c] << "\t\t" << robotsInDiffusionCounter[c]  << "\t\t";
 	      }
@@ -1403,7 +1404,7 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 	  if (blockChainFile.is_open())
 	    {
 
-	      
+
 	      blockChainFile << (GetSpace().GetSimulationClock()) / 10;
 	      //blockChainWhiteVotes << (GetSpace().GetSimulationClock()) / 10;
 	      //blockChainBlackVotes << (GetSpace().GetSimulationClock()) / 10;
@@ -1411,31 +1412,31 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 
 
 	      string contractAddressNoSpace = contractAddress;
-  
-	      contractAddressNoSpace.erase(std::remove(contractAddressNoSpace.begin(), 
+
+	      contractAddressNoSpace.erase(std::remove(contractAddressNoSpace.begin(),
 					   contractAddressNoSpace.end(), '\n'),
 			       contractAddressNoSpace.end());
-	      
+
 	      int args[0] = {};
 
 
 
 	      /* For all robots */
-	      
+
 	      CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
-	      
+
 	      for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
-		
+
 		CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
 		EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
-		
-		std::string id = cController.GetId();		    
+
+		std::string id = cController.GetId();
 		int robotId = Id2Int(id);
 		int robotNodeInt = cController.getNodeInt();
 		//string numWhite;
-		
+
 		if (useMultipleNodes) {
-		  
+
 		  /* Blockchain height per robot */
 		  blockChainFile << "\t" << getBlockChainLength(robotId, robotNodeInt, blockchainPath);
 
@@ -1443,7 +1444,7 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 		  /* TODO !!! */
 		  /* TODO !!! */
 		  /* TODO: If a reintroduce the following function, I have to change minerNode to robotNodeInt */
-		  
+
 		  /* Number of white votes per robot */
 		  //numWhite = smartContractInterface(robotId, interface, contractAddressNoSpace, "whiteVotes", args, 0, 0,
 		  //				    minerNode, blockchainPath);
@@ -1455,12 +1456,12 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 
 		      /* Number of white votes per robot */
 		      //  numWhite = smartContractInterface(robotId, interface, contractAddressNoSpace, "whiteVotes", args, 0, 0);
-		      
+
 		    }
 
 		//numWhite.erase(std::remove(numWhite.begin(), numWhite.end(), '\n'), numWhite.end());
 		//  blockChainWhiteVotes << "\t" << numWhite;
-		      
+
 		    /* TODO: This should be improved !! */
 		    /* Check if mining works */
 		    //if ( ((GetSpace().GetSimulationClock()) / 10) == trialsMiningNotWorking && numWhite == "0") {
@@ -1496,7 +1497,7 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 	}
 
 	//measure_time(begin_prestep, "Prestep");
-	
+
 }
 
 
@@ -1504,12 +1505,12 @@ void CEnvironmentClassificationLoopFunctions::UpdateStatistics(EPuck_Environment
 							       EPuck_Environment_Classification::SStateData& sStateData, bool isByzantine) {
 
   /* Increment counters of the opinions and states of the robots */
-  
+
   if (isByzantine) {
     if (sStateData.State == EPuck_Environment_Classification::SStateData::STATE_EXPLORING)
       byzantineRobotsInExplorationCounter[opinion.actualOpinion]++;
     if (sStateData.State == EPuck_Environment_Classification::SStateData::STATE_DIFFUSING)
-      byzantineRobotsInDiffusionCounter[opinion.actualOpinion]++;   
+      byzantineRobotsInDiffusionCounter[opinion.actualOpinion]++;
   } else {
     if (sStateData.State == EPuck_Environment_Classification::SStateData::STATE_EXPLORING)
       robotsInExplorationCounter[opinion.actualOpinion]++;
@@ -1529,8 +1530,8 @@ void CEnvironmentClassificationLoopFunctions::UpdateCount(EPuck_Environment_Clas
 	collectedData.count++;
 
     // However increment the count of cells passed thorugh //
-	
-	/* Collecting datas for statistics: times and qualities *///	
+
+	/* Collecting datas for statistics: times and qualities *///
 	if(sStateData.remainingExplorationTime == 1){
 
 	   oneRobotFile << std::setprecision(3) << opinion.quality << " ";
@@ -1543,7 +1544,7 @@ void CEnvironmentClassificationLoopFunctions::RandomWalk(EPuck_Environment_Class
   /* walkTime represents the number of clock cycles (random number) of walk in a random direction*/
   if ( movement.walkTime == 0 )                            // Is the walkTime in that direction finished? ->
     { 				                                         // -> YES: change direction//
-      
+
       if ( movement.actualDirection == 0 )                  // If robot was going straight then turn standing in ->
 	// -> a position for an uniformly distribuited time //
 	{
@@ -1555,7 +1556,7 @@ void CEnvironmentClassificationLoopFunctions::RandomWalk(EPuck_Environment_Class
 	    movement.actualDirection = 2;
 	  movement.walkTime = (UInt32) abs(p);
 	}
-      
+
       else 						// The robot was turning, time to go straight for ->
 	// -> an exponential period of time //
 	{
@@ -1566,7 +1567,6 @@ void CEnvironmentClassificationLoopFunctions::RandomWalk(EPuck_Environment_Class
   else 							// NO: The period of time is not finished, decrement the ->
     // -> walkTime and keep the direction //
     movement.walkTime--;
-} 
+}
 
 REGISTER_LOOP_FUNCTIONS(CEnvironmentClassificationLoopFunctions, "environment_classification_loop_functions")
-
