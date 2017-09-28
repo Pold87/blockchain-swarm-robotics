@@ -532,12 +532,13 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
   if (byzantineSwarmStyle == 0) { // No Byzantine robots
     remainingByzantineWhites = 0;
     remainingByzantineBlacks = 0;
-  } else if (byzantineSwarmStyle == 1) { // White Byzantine robots
+  } else if (byzantineSwarmStyle == 1) { // Black Byzantine robots (makes it harder)
     remainingByzantineWhites = numByzantine;
     remainingByzantineBlacks = 0;
-  } else if (byzantineSwarmStyle == 2) { // Black Byzantine robots
+  } else if (byzantineSwarmStyle == 2  || byzantineSwarmStyle == 5) { // White Byzantine robots (makes it easier)
     remainingByzantineWhites = 0;
     remainingByzantineBlacks = numByzantine;
+
   } else if (byzantineSwarmStyle == 3) { // White + black Byzantine robots
     remainingByzantineWhites = numByzantine / 2;
     remainingByzantineBlacks = numByzantine / 2;
@@ -570,11 +571,11 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
 
     /* Decide if the robot should be Byzantine */
     if (remainingByzantineWhites > 0 && opinion.actualOpinion == 1) {
-      cController.setByzantineStyle(1); // always vote for white
+      cController.setByzantineStyle(byzantineSwarmStyle); // always vote for white
       //cout << "setting byz style 1" << endl;
       remainingByzantineWhites--;
     } else if (remainingByzantineBlacks > 0 && opinion.actualOpinion == 2) {
-      cController.setByzantineStyle(2); // always vote for black
+      cController.setByzantineStyle(byzantineSwarmStyle); // always vote for white      
       remainingByzantineBlacks--;
       //cout << "setting byz style 2" << endl;
     } else {

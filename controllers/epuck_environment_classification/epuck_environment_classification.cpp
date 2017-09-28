@@ -464,7 +464,12 @@ void EPuck_Environment_Classification::Explore() {
    */
   else{
     double before_vote = get_wall_time();
-    opinion.quality = (Real)((Real)(opinion.countedCellOfActualOpinion)/(Real)(collectedData.count));
+
+    if (byzantineStyle == 4 || byzantineStyle == 5)
+      opinion.quality = 1.0;
+    else
+      opinion.quality = (Real)((Real)(opinion.countedCellOfActualOpinion)/(Real)(collectedData.count));
+    
     
     //std::cout<<"Qual "<<opinion.quality<<std::endl;
     //std::cout<<"Op "<<opinion.actualOpinion<<std::endl;
@@ -907,12 +912,17 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
     if (newOpinion != 0) {
 
       if (byzantineStyle > 0) {
-
+	
 	switch(byzantineStyle) {
 	case 1 : opinion.actualOpinion = 1;
 	  break;
 	case 2 : opinion.actualOpinion = 2;
 	  break;
+	case 5 : opinion.actualOpinion = 2;
+	  break;
+	default:
+	  cout << "Wrong byzantine style" << endl;
+	  throw;
 	}
       } else {      
       opinion.actualOpinion = newOpinion;
