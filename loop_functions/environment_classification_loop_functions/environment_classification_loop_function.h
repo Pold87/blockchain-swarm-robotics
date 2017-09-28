@@ -38,7 +38,7 @@ public:
 		UInt32 i;
 
 		if ((c_pos_on_floor.GetX() > Y_DIMENSION) || (c_pos_on_floor.GetY() > X_DIMENSION))
-			return CColor::WHITE;
+			return CColor::YELLOW;
 
 		x = (UInt32)(((Real)c_pos_on_floor.GetX())/(Real)CELL_DIMENSION);
 		y = (UInt32)(((Real)c_pos_on_floor.GetY())/(Real)CELL_DIMENSION);
@@ -48,13 +48,13 @@ public:
 		switch ( grid[i])
 		{
 		case 0:
-			return CColor::WHITE;
+			return CColor::RED;
 		case 1:
-			return CColor::GREEN;
+			return CColor::WHITE;
 		case 2:
 			return CColor::BLACK;
 		}
-		return CColor::WHITE;
+		return CColor::YELLOW;
 	}
 
 	inline UInt32 GetGrid(UInt32 i) {

@@ -49,10 +49,10 @@ void CEnvironmentClassificationLoopFunctions::fillSettings(TConfigurationNode& t
     {
       /* Retrieving information about arena */
       GetNodeAttribute(tEnvironment, "number_of_red_cells", colorOfCell[0]);
-      GetNodeAttribute(tEnvironment, "number_of_green_cells", colorOfCell[1]);
-      GetNodeAttribute(tEnvironment, "number_of_blue_cells",colorOfCell[2]);
-      GetNodeAttribute(tEnvironment, "percent_white", percentageOfColors[0]);
-      GetNodeAttribute(tEnvironment, "percent_green", percentageOfColors[1]);
+      GetNodeAttribute(tEnvironment, "number_of_white_cells", colorOfCell[1]);
+      GetNodeAttribute(tEnvironment, "number_of_black_cells",colorOfCell[2]);
+      GetNodeAttribute(tEnvironment, "percent_red", percentageOfColors[0]);
+      GetNodeAttribute(tEnvironment, "percent_white", percentageOfColors[1]);
       GetNodeAttribute(tEnvironment, "percent_black", percentageOfColors[2]);
       GetNodeAttribute(tEnvironment, "using_percentage", using_percentage);
       GetNodeAttribute(tEnvironment, "exit", exitFlag);
