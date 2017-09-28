@@ -569,7 +569,7 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
     i++;
 
     /* Decide if the robot should be Byzantine */
-    if (remainingByzantineWhites > 0 && opinion.actualOpinion == 0) {
+    if (remainingByzantineWhites > 0 && opinion.actualOpinion == 1) {
       cController.setByzantineStyle(1); // always vote for white
       //cout << "setting byz style 1" << endl;
       remainingByzantineWhites--;
