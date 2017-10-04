@@ -1315,6 +1315,13 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
   begin_prestep = get_wall_time();
 
 
+  // Check if the experiment is taking too much time
+  // TODO: 2500 as parameter and not hard-coded
+  if ((GetSpace().GetSimulationClock() / 10) > 2500) {
+    errorOccurred = true;
+    IsExperimentFinished();
+  }
+  
   //cout << "gethStaticErrorOccurred = " << gethStaticErrorOccurred << endl;
 
 
