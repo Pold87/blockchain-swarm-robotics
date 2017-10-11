@@ -601,16 +601,17 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
     }
   }
 
-  PreallocateEther();
-  RestartGeths();
-  AssignNewStateAndPosition();
-
-    if (!useClassicalApproach) {
-    /* Initialize miner, distribute ether, and more */
-    InitEthereum();
+  if (!useClassicalApproach) {
+    PreallocateEther();
+    RestartGeths();
   }
 
+  AssignNewStateAndPosition();
 
+  if (!useClassicalApproach) {
+    /* Initialize miner, distribute ether, and more */
+    InitEthereum();
+  }    
 }
 
 

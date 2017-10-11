@@ -31,7 +31,7 @@ MINERNODE=${USEDNODES[0]}
 
 USECLASSICALAPPROACH=false
 # TODO:
-NUMBYZANTINE=(4 5 6 7 8 9)
+NUMBYZANTINE=(0 1 2 3 4 5 6 7 8 9)
 BYZANTINESWARMSTYLE=5
 SUBSWARMCONSENSUS=true # Determines if all N robots have to agree or
 		       # only the beneficial subswarm.

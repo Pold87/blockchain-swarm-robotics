@@ -306,9 +306,11 @@ void EPuck_Environment_Classification::ControlStep() {
 
   int robotId = Id2Int(GetId());
 
-  if (beginning) {
-    registerRobot();
-    beginning = false;
+  if (!simulationParams.useClassicalApproach) {
+    if (beginning) {
+      registerRobot();
+      beginning = false;
+    }
   }
   
   //  int nodeInt = robotIdToNode[robotId];
@@ -833,25 +835,42 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
     
   if (simulationParams.useClassicalApproach) {
 
-    switch(decision_rule) {
 
-    case 0: {
-      NotWeightedDirectComparison();
-      break;
+    if (byzantineStyle > 0) {
+	
+      switch(byzantineStyle) {
+      case 1 : opinion.actualOpinion = 1;
+	break;
+      case 2 : opinion.actualOpinion = 2;
+	break;
+      case 5 : opinion.actualOpinion = 2;
+	break;
+      default:
+	cout << "Wrong byzantine style" << endl;
+	throw;
+      }
+    } else {
+      
+	switch(decision_rule) {
+
+	case 0: {
+	  NotWeightedDirectComparison();
+	  break;
+	}
+	case 1: {
+	  VoterModel();
+	  break;
+	}
+	case 2: {
+	  DirectComparison();
+	  break;
+	}
+	case 3: {
+	  MajorityRule();
+	  break;
+	}
+	}
     }
-    case 1: {
-      VoterModel();
-      break;
-    }
-    case 2: {
-      DirectComparison();
-      break;
-    }
-    case 3: {
-      MajorityRule();
-      break;
-    }
-  }    
     
   } else {
 
@@ -1274,18 +1293,19 @@ void EPuck_Environment_Classification::fromLoopFunctionResPrepare(){
 
 void EPuck_Environment_Classification::fromLoopFunctionResStart(){
 
-  int robotId = Id2Int(GetId());
+  if (!simulationParams.useClassicalApproach) {
+    int robotId = Id2Int(GetId());
   
-  ostringstream genesisPathStream;
-  genesisPathStream << "~/genesis/genesis" << simulationParams.basePort << ".json";
-  string genesisPath = genesisPathStream.str();
+    ostringstream genesisPathStream;
+    genesisPathStream << "~/genesis/genesis" << simulationParams.basePort << ".json";
+    string genesisPath = genesisPathStream.str();
         
-  geth_init(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath, genesisPath);
-  start_geth(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
-  enodes[robotId] = get_enode(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
-  enode = enodes[robotId];
-  unlockAccount(robotId, "test", nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
-
+    geth_init(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath, genesisPath);
+    start_geth(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
+    enodes[robotId] = get_enode(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
+    enode = enodes[robotId];
+    unlockAccount(robotId, "test", nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
+  }
 }
 
 /****************************************/
