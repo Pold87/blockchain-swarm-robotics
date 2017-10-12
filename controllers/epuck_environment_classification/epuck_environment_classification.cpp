@@ -875,8 +875,6 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
   } else {
 
     int robotId = Id2Int(GetId());
-    //  int nodeInt = robotIdToNode[robotId];
-
     uint opinionInt = (uint) (opinion.quality * 100);
     int args[3] = {decision_rule, opinion.actualOpinion, opinionInt};
     string sOpinionBlocknumberBlockhash;
