@@ -10,7 +10,9 @@
 #include <algorithm>
 #include <sstream>
 #include <unistd.h>
+#include <pthread.h>
 #include <map>
+#include <thread>
 
 
 /****************************************/
@@ -57,6 +59,7 @@ EPuck_Environment_Classification::Movement::Movement() :
   walkTime (3),
   actualDirection (0){}
 
+
 /************************************************* INIT ********************************************************/
 /***************************************************************************************************************/
 void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode& t_node) {
@@ -95,7 +98,7 @@ void EPuck_Environment_Classification::registerRobot() {
 
   int robotId = Id2Int(GetId());
   
-  int args[1] = {opinion.actualOpinion};
+  int args[1] = {(int) opinion.actualOpinion};
 
   // Just call to get return value
   string sBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface,
@@ -119,10 +122,9 @@ void EPuck_Environment_Classification::registerRobot() {
   cout << "bwh.blockNumber: " << bwh.blockNumber << " bwh.hash:" << bwh.hash << endl;
 }
 
-
 void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
-
-  cout << "Called Init for Robot" << endl;
+  
+  receivedDecision = true;
   
   /* Initialize the actuators (and sensors) and the initial velocity as straight walking*/
   m_pcWheels = GetActuator<CCI_EPuckWheelsActuator>("epuck_wheels");
@@ -179,7 +181,6 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
   
 }
 
-
 void EPuck_Environment_Classification::readNodeMapping() {
 
  int r_id;
@@ -196,24 +197,10 @@ void EPuck_Environment_Classification::readNodeMapping() {
   
 }
 
-// void EPuck_Environment_Classification::readByzantineMapping() {
+// vector<string> res EPuck_Environment_Classification::ApplyStrategy(int robotId, int[3] args, string blockchainPath) {
 
-//  int r_id;
-//  int r_byzantine;
-
-//  ifstream infile;
-
-//  infile.open(simulationParams.mappingByzantinePath.c_str());
- 
-//  while (infile >> r_id >> r_byzantine)
-//    robotIdToByzantine[r_id] = r_byzantine;
-
-//  infile.close();
-  
+//   return splitResult;
 // }
-
-
-
 
 void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
 
@@ -351,8 +338,11 @@ void EPuck_Environment_Classification::ControlStep() {
     }
 
     //cout << fixed << "The extra stuff took (ms): " << (get_wall_time() -  before_extra) << endl;
-    
-    Explore();
+
+
+    if (receivedDecision)
+      Explore();
+
     break;
   }
 
@@ -764,7 +754,6 @@ void EPuck_Environment_Classification::Diffusing() {
 	    }
 	  }
 	  
-	  
 	  throw;
 	  
 	} else {
@@ -800,7 +789,21 @@ void EPuck_Environment_Classification::Diffusing() {
 
       /* Change to EXPLORING state and choose another opinion with decision rules */
       m_sStateData.State = SStateData::STATE_EXPLORING;
-      DecisionRule(simulationParams.decision_rule);
+      receivedDecision = false;
+
+      //pthread_t tid;
+      //pthread_attr_t attr;
+      //pthread_attr_init(&attr);
+
+      //int args[3] = {(int) decision_rule, (int) opinion.actualOpinion, (int) opinionInt};
+      
+      //pthread_create(&tid, &attr, DecisionRule, &simulationParams.decision_rule);
+
+
+      thread t1(DecisionRule, simulationParams.decision_rule);
+      
+      
+	//DecisionRule(simulationParams.decision_rule);
 
       //	 	for(size_t i=0; i<receivedOpinions.size();i++){
       //
@@ -876,7 +879,7 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
 
     int robotId = Id2Int(GetId());
     uint opinionInt = (uint) (opinion.quality * 100);
-    int args[3] = {decision_rule, opinion.actualOpinion, opinionInt};
+    int args[3] = {(int) decision_rule, (int) opinion.actualOpinion, (int) opinionInt};
     string sOpinionBlocknumberBlockhash;
     if (simulationParams.useMultipleNodes) {
       sOpinionBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
@@ -948,8 +951,77 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
       bwh.blockNumber = atoi(sBlock.c_str());
       bwh.hash = sBlockhash;
     }
-  }    
+  }
+
+  receivedDecision = true;
+  
 }
+
+// static void* EPuck_Environment_Classification::DecisionRuleForThread(void* arguments)
+// {
+//   struct arg_struct *args = arguments;
+  
+//   //vector<string> res = ApplyStrategy(args->robotId, args, blockchainPath);
+//   int newOpinion = atoi(res[0].c_str());
+
+//   string sOpinionBlocknumberBlockhash;
+//   sOpinionBlocknumberBlockhash = smartContractInterfaceCall(passedargs->robotId, passedargs->interface,	args->contractAddress, "applyStrategy", passedargs->args, 3, 0, passedargs->nodeInt, passedargs->blockchainPath);
+
+//   smartContractInterface(robotId, interface, contractAddress,
+// 			 "applyStrategy", args, 3, 0, nodeInt, blockchainPath);
+
+//   // Parse the smart contract output
+//   // The result is:
+//   // 0: new opinion
+//   // 1: block number
+//   // 2: block hash
+//   vector<string> splitResult = split(sOpinionBlocknumberBlockhash, ',');
+//   splitResult[0].erase(0, 1);   // Remove first character
+//   splitResult[2] = splitResult[2].substr(0, splitResult[2].size() -2);
+
+  
+//   // If something went wrong, try again:
+//   if (newOpinion == 0) {
+//       cout << "Something went wrong with opinion parsing!!! The result was " <<
+//       res[0] <<
+//       res[1] <<
+//       res[2] << endl;
+
+//       res = ApplyStrategy(robotId, args, blockchainPath);
+//       newOpinion = atoi(res[0].c_str());
+//     }
+    
+//     /* If everything went alright */
+//     if (newOpinion != 0) {
+
+//         if (args->byzantineStyle > 0) {
+
+//             switch (args->byzantineStyle) {
+//                 case 1 :
+//                     opinion.actualOpinion = 1;
+//                     break;
+//                 case 2 :
+//                     opinion.actualOpinion = 2;
+//                     break;
+//                 case 5 :
+//                     opinion.actualOpinion = 2;
+//                     break;
+//                 default:
+//                     cout << "Wrong byzantine style" << endl;
+//                     throw;
+//             }
+//         } else {
+//             opinion.actualOpinion = newOpinion;
+//         }
+
+//         bwh.blockNumber = atoi(res[1].c_str());
+//         bwh.hash = res[2];
+//     }
+
+//   receivedDecision = true;
+//   pthread_exit(0);
+  
+// }
 
 void EPuck_Environment_Classification::NotWeightedDirectComparison(){
 
