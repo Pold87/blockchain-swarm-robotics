@@ -125,7 +125,7 @@ public:
    void Diffusing();   
    void Listening();
    void DecisionRule(UInt32 decision_rule);
-   void* DecisionRuleForThread(void* arg);
+   static void* DecisionRuleForThread(void* arg);
    void NotWeightedDirectComparison();
    void VoterModel();
    void DirectComparison();
