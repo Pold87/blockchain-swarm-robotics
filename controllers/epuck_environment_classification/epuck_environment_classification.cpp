@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <sstream>
 #include <unistd.h>
+#include <pthread.h>
 #include <map>
 
 
@@ -95,7 +96,7 @@ void EPuck_Environment_Classification::registerRobot() {
 
   int robotId = Id2Int(GetId());
   
-  int args[1] = {opinion.actualOpinion};
+  int args[1] = {(int) opinion.actualOpinion};
 
   // Just call to get return value
   string sBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface,
@@ -122,7 +123,10 @@ void EPuck_Environment_Classification::registerRobot() {
 
 void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
 
+  
   cout << "Called Init for Robot" << endl;
+
+  receivedDecision = true;
   
   /* Initialize the actuators (and sensors) and the initial velocity as straight walking*/
   m_pcWheels = GetActuator<CCI_EPuckWheelsActuator>("epuck_wheels");
@@ -351,8 +355,11 @@ void EPuck_Environment_Classification::ControlStep() {
     }
 
     //cout << fixed << "The extra stuff took (ms): " << (get_wall_time() -  before_extra) << endl;
-    
-    Explore();
+
+
+    if (receivedDecision)
+      Explore();
+
     break;
   }
 
@@ -800,7 +807,14 @@ void EPuck_Environment_Classification::Diffusing() {
 
       /* Change to EXPLORING state and choose another opinion with decision rules */
       m_sStateData.State = SStateData::STATE_EXPLORING;
-      DecisionRule(simulationParams.decision_rule);
+      receivedDecision = false;
+
+      pthread_t tid;
+      pthread_attr_t attr;
+      pthread_attr_init(&attr);
+      pthread_create(&tid, &attr, EPuck_Environment_Classification::DecisionRuleForThread, &simulationParams.decision_rule);
+      
+	//DecisionRule(simulationParams.decision_rule);
 
       //	 	for(size_t i=0; i<receivedOpinions.size();i++){
       //
@@ -878,7 +892,7 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
     //  int nodeInt = robotIdToNode[robotId];
 
     uint opinionInt = (uint) (opinion.quality * 100);
-    int args[3] = {decision_rule, opinion.actualOpinion, opinionInt};
+    int args[3] = {(int) decision_rule, (int) opinion.actualOpinion, (int) opinionInt};
     string sOpinionBlocknumberBlockhash;
     if (simulationParams.useMultipleNodes) {
       sOpinionBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
@@ -950,7 +964,91 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
       bwh.blockNumber = atoi(sBlock.c_str());
       bwh.hash = sBlockhash;
     }
-  }    
+  }
+
+  receivedDecision = true;
+  
+}
+
+
+void* EPuck_Environment_Classification::DecisionRuleForThread(void* arg)
+{
+
+  UInt32 *decision_rule_ptr = (UInt32*) arg;
+  UInt32 decision_rule = *decision_rule_ptr;
+
+
+    int robotId = Id2Int(GetId());
+
+    uint opinionInt = (uint) (opinion.quality * 100);
+    int args[3] = {(int) decision_rule, (int) opinion.actualOpinion, (int) opinionInt};
+    string sOpinionBlocknumberBlockhash;
+    if (simulationParams.useMultipleNodes) {
+      sOpinionBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
+      smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
+    }
+    else
+      sOpinionBlocknumberBlockhash = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0);
+
+    // Parse the smart contract output
+
+    vector<string> splitResult = split(sOpinionBlocknumberBlockhash, ',');
+    
+    std::string sNewOpinion = splitResult[0];
+    // Remove first character
+    sNewOpinion.erase(0, 1);
+    std::string sBlock = splitResult[1];
+    std::string sBlockhash = splitResult[2];
+    // Remove first and last two characters
+    sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 2);
+    int newOpinion = atoi(sNewOpinion.c_str());
+
+    // If something went wrong, try again:
+    if (newOpinion == 0) {
+      cout << "Something went wrong with opinion parsing!!! The result was " << sOpinionBlocknumberBlockhash << endl;
+      sOpinionBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
+      cout << "Something went wrong with opinion parsing!!! The new result is " << sOpinionBlocknumberBlockhash << endl;
+      splitResult = split(sOpinionBlocknumberBlockhash, ',');
+      sNewOpinion = splitResult[0];
+      // Remove first character
+      sNewOpinion.erase(0, 1);
+      sBlock = splitResult[1];
+      sBlockhash = splitResult[2];
+      // Remove first and last two characters
+      sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 2);
+      newOpinion = atoi(sNewOpinion.c_str());
+    }
+    
+    /* If everything went alright */
+    if (newOpinion != 0) {
+
+        if (byzantineStyle > 0) {
+
+            switch (byzantineStyle) {
+                case 1 :
+                    opinion.actualOpinion = 1;
+                    break;
+                case 2 :
+                    opinion.actualOpinion = 2;
+                    break;
+                case 5 :
+                    opinion.actualOpinion = 2;
+                    break;
+                default:
+                    cout << "Wrong byzantine style" << endl;
+                    throw;
+            }
+        } else {
+            opinion.actualOpinion = newOpinion;
+        }
+
+        bwh.blockNumber = atoi(sBlock.c_str());
+        bwh.hash = sBlockhash;
+    }
+
+  receivedDecision = true;
+  pthread_exit(0);
+  
 }
 
 void EPuck_Environment_Classification::NotWeightedDirectComparison(){
