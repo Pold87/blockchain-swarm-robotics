@@ -339,7 +339,6 @@ void EPuck_Environment_Classification::ControlStep() {
 
     //cout << fixed << "The extra stuff took (ms): " << (get_wall_time() -  before_extra) << endl;
 
-
     if (receivedDecision)
       Explore();
 
@@ -800,8 +799,9 @@ void EPuck_Environment_Classification::Diffusing() {
       //pthread_create(&tid, &attr, DecisionRule, &simulationParams.decision_rule);
 
 
-      thread t1(DecisionRule, simulationParams.decision_rule);
-      
+      receivedDecision = false;
+      thread t1(&EPuck_Environment_Classification::DecisionRule, this, simulationParams.decision_rule);
+      t1.detach();
       
 	//DecisionRule(simulationParams.decision_rule);
 
@@ -837,7 +837,6 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
 {
     
   if (simulationParams.useClassicalApproach) {
-
 
     if (byzantineStyle > 0) {
 	
