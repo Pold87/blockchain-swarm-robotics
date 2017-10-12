@@ -7,3 +7,4 @@ first_version_report/
 *#
 nohup*.out
 data/
+.idea/
