@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <sstream>
 #include <unistd.h>
-#include <pthread.h>
 #include <map>
 #include <thread>
 
@@ -341,6 +340,8 @@ void EPuck_Environment_Classification::ControlStep() {
 
     if (receivedDecision)
       Explore();
+    //else
+    //cout << "Decision not received yet; robot: " << robotId << endl;
 
     break;
   }
@@ -788,16 +789,6 @@ void EPuck_Environment_Classification::Diffusing() {
 
       /* Change to EXPLORING state and choose another opinion with decision rules */
       m_sStateData.State = SStateData::STATE_EXPLORING;
-      receivedDecision = false;
-
-      //pthread_t tid;
-      //pthread_attr_t attr;
-      //pthread_attr_init(&attr);
-
-      //int args[3] = {(int) decision_rule, (int) opinion.actualOpinion, (int) opinionInt};
-      
-      //pthread_create(&tid, &attr, DecisionRule, &simulationParams.decision_rule);
-
 
       receivedDecision = false;
       thread t1(&EPuck_Environment_Classification::DecisionRule, this, simulationParams.decision_rule);
@@ -926,101 +917,31 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
       cout << "sBlock v2 is " << sBlock << endl;
       cout << "sBlockhash v2 is " << sBlockhash << endl;
     }
-    
-    /* If everything went alright */
-    if (newOpinion != 0) {
 
-      if (byzantineStyle > 0) {
+
+    if (byzantineStyle > 0) {
 	
-	switch(byzantineStyle) {
-	case 1 : opinion.actualOpinion = 1;
-	  break;
-	case 2 : opinion.actualOpinion = 2;
-	  break;
-	case 5 : opinion.actualOpinion = 2;
-	  break;
-	default:
-	  cout << "Wrong byzantine style" << endl;
-	  throw;
-	}
-      } else {      
-      opinion.actualOpinion = newOpinion;
+      switch(byzantineStyle) {
+      case 1 : opinion.actualOpinion = 1;
+	break;
+      case 2 : opinion.actualOpinion = 2;
+	break;
+      case 5 : opinion.actualOpinion = 2;
+	break;
+      default:
+	cout << "Wrong byzantine style" << endl;
+	throw;
       }
-
-      bwh.blockNumber = atoi(sBlock.c_str());
-      bwh.hash = sBlockhash;
+    } else if (newOpinion != 0) {
+      opinion.actualOpinion = newOpinion;
     }
+
+    if (newOpinion != 0) {
+      bwh.blockNumber = atoi(sBlock.c_str());
+      bwh.hash = sBlockhash;      
+    }
+    receivedDecision = true;
   }
-
-  receivedDecision = true;
-  
-}
-
-// static void* EPuck_Environment_Classification::DecisionRuleForThread(void* arguments)
-// {
-//   struct arg_struct *args = arguments;
-  
-//   //vector<string> res = ApplyStrategy(args->robotId, args, blockchainPath);
-//   int newOpinion = atoi(res[0].c_str());
-
-//   string sOpinionBlocknumberBlockhash;
-//   sOpinionBlocknumberBlockhash = smartContractInterfaceCall(passedargs->robotId, passedargs->interface,	args->contractAddress, "applyStrategy", passedargs->args, 3, 0, passedargs->nodeInt, passedargs->blockchainPath);
-
-//   smartContractInterface(robotId, interface, contractAddress,
-// 			 "applyStrategy", args, 3, 0, nodeInt, blockchainPath);
-
-//   // Parse the smart contract output
-//   // The result is:
-//   // 0: new opinion
-//   // 1: block number
-//   // 2: block hash
-//   vector<string> splitResult = split(sOpinionBlocknumberBlockhash, ',');
-//   splitResult[0].erase(0, 1);   // Remove first character
-//   splitResult[2] = splitResult[2].substr(0, splitResult[2].size() -2);
-
-  
-//   // If something went wrong, try again:
-//   if (newOpinion == 0) {
-//       cout << "Something went wrong with opinion parsing!!! The result was " <<
-//       res[0] <<
-//       res[1] <<
-//       res[2] << endl;
-
-//       res = ApplyStrategy(robotId, args, blockchainPath);
-//       newOpinion = atoi(res[0].c_str());
-//     }
-    
-//     /* If everything went alright */
-//     if (newOpinion != 0) {
-
-//         if (args->byzantineStyle > 0) {
-
-//             switch (args->byzantineStyle) {
-//                 case 1 :
-//                     opinion.actualOpinion = 1;
-//                     break;
-//                 case 2 :
-//                     opinion.actualOpinion = 2;
-//                     break;
-//                 case 5 :
-//                     opinion.actualOpinion = 2;
-//                     break;
-//                 default:
-//                     cout << "Wrong byzantine style" << endl;
-//                     throw;
-//             }
-//         } else {
-//             opinion.actualOpinion = newOpinion;
-//         }
-
-//         bwh.blockNumber = atoi(res[1].c_str());
-//         bwh.hash = res[2];
-//     }
-
-//   receivedDecision = true;
-//   pthread_exit(0);
-  
-// }
 
 void EPuck_Environment_Classification::NotWeightedDirectComparison(){
 

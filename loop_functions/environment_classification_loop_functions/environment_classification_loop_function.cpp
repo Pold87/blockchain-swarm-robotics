@@ -532,13 +532,12 @@ bool CEnvironmentClassificationLoopFunctions::InitRobots() {
   if (byzantineSwarmStyle == 0) { // No Byzantine robots
     remainingByzantineWhites = 0;
     remainingByzantineBlacks = 0;
-  } else if (byzantineSwarmStyle == 1) { // Black Byzantine robots (makes it harder)
+  } else if (byzantineSwarmStyle == 1) { 
     remainingByzantineWhites = numByzantine;
     remainingByzantineBlacks = 0;
-  } else if (byzantineSwarmStyle == 2  || byzantineSwarmStyle == 5) { // White Byzantine robots (makes it easier)
+  } else if (byzantineSwarmStyle == 2  || byzantineSwarmStyle == 5) { 
     remainingByzantineWhites = 0;
     remainingByzantineBlacks = numByzantine;
-
   } else if (byzantineSwarmStyle == 3) { // White + black Byzantine robots
     remainingByzantineWhites = numByzantine / 2;
     remainingByzantineBlacks = numByzantine / 2;
@@ -680,8 +679,8 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
   nRunsStream << number_of_runs;
   std::string nRuns = nRunsStream.str();
   m_strOutput = dataDir + passedRadix +"-timestart.RUN" + nRuns;
-  timeFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
-  timeFile << ti << std::endl;
+  //timeFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
+  //timeFile << ti << std::endl;
   incorrectParameters = false;
   m_pcRNG = CRandom::CreateRNG("argos");
 
@@ -806,7 +805,7 @@ void CEnvironmentClassificationLoopFunctions::Init(TConfigurationNode& t_node) {
        */
       if(runsFileFlag){
 	m_strOutput = dataDir + passedRadix+".RUNS";
-	runsFile.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
+	runsFile.open(m_strOutput.c_str(), std::ios_base::out | std::ios_base::app);
 	runsFile << "Runs\t\tExitTime\tWhites\t\tGreens\t\tBlacks" << std::endl;
       }
 
@@ -1221,10 +1220,10 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 	    nRunsStream << number_of_runs;
 	    std::string nRuns = nRunsStream.str();
 
-	    m_strOutput = dataDir + passedRadix + "-timeend.RUN" + nRuns;
-			timeFileEnd.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
-			timeFileEnd << ti_end << std::endl;
-			timeFileEnd.close();
+	    //m_strOutput = dataDir + passedRadix + "-timeend.RUN" + nRuns;
+	    //timeFileEnd.open(m_strOutput.c_str(), std::ios_base::trunc | std::ios_base::out);
+	    //timeFileEnd << ti_end << std::endl;
+	    //timeFileEnd.close();
 
 			if (number_of_runs<=0) {
 
@@ -1312,16 +1311,17 @@ void CEnvironmentClassificationLoopFunctions::Destroy(){
 void CEnvironmentClassificationLoopFunctions::PreStep() {
 
 
-  cout << "Passed time is (ms):" << get_wall_time() - begin_prestep << endl;
-  begin_prestep = get_wall_time();
+  
+  //cout << "Passed time is (ms):" << get_wall_time() - begin_prestep << endl;
+  //begin_prestep = get_wall_time();
 
 
   // Check if the experiment is taking too much time
   // TODO: 2500 as parameter and not hard-coded
-  if ((GetSpace().GetSimulationClock() / 10) > 2500) {
-    errorOccurred = true;
-    IsExperimentFinished();
-  }
+  // if ((GetSpace().GetSimulationClock() / 10) > 2500) {
+  //   errorOccurred = true;
+  //   IsExperimentFinished();
+  // }
   
   //cout << "gethStaticErrorOccurred = " << gethStaticErrorOccurred << endl;
 

@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 project(argos3_examples)
 
+
+#SET(CMAKE_C_COMPILER /home/vstrobel/bin/gcc_71)
+#SET(CMAKE_CXX_COMPILER /home/vstrobel/bin/g++_71)
+
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 # Set the path where CMake will find additional scripts

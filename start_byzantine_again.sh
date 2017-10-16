@@ -7,7 +7,7 @@ BLOCKCHAINPATH="/home/vstrobel/eth_data_para$1/data" # always without '/' at the
 MINERID=$(expr 120 + $1)
 echo "MINERID is ${MINERID}"
 NUMROBOTS=(20) 
-#REPETITIONS=50
+REPETITIONS=10
 DECISIONRULE=$3
 PERCENT_BLACKS=(34)
 # the one I did all the tests with:
@@ -17,14 +17,14 @@ USEMULTIPLENODES=true
 USEBACKGROUNDGETHCALLS=true
 MAPPINGPATH="/home/vstrobel/Documents/argdavide/experiments/config$1.txt"
 CHANGEDIFFIULTY=""
-NUMRUNS=15
+NUMRUNS=1
 THREADS=20
 NOW=`date +"%d-%m-%Y"`
 USEDNODES=($1 $2)
 echo "USEDNODES is ${USEDNODES}"
 BASEPORT=$((33000 + $1 * 200))
 echo "BASEPORT is ${BASEPORT}"
-DATADIR="data/experiment1_decision${DECISIONRULE}-node$1-byzantine--${NOW}/"
+DATADIR="data/experiment1_decision${DECISIONRULE}-node$1-byzantine-THREAD-extra2-${NOW}/"
 REGENERATEFILE="$(pwd)/regenerate${USEDNODES[0]}.sh"
 # The miner node is the first of the used nodes
 MINERNODE=${USEDNODES[0]}
@@ -48,7 +48,7 @@ SUBSWARMCONSENSUS=true # Determines if all N robots have to agree or
  
  # Iterate over experimental settings and start experiments
  
-# for i in `seq 1 $REPETITIONS`; do
+ for i in `seq 1 $REPETITIONS`; do
 
      for y in "${NUMBYZANTINE[@]}"; do
  
@@ -115,4 +115,4 @@ SUBSWARMCONSENSUS=true # Determines if all N robots have to agree or
 
 sendmail volker.strobel87@gmail.com < finished.txt
      
-#done
+done

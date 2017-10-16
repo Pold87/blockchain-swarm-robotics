@@ -10,6 +10,7 @@
 
     <experiment length="0"
                 ticks_per_second="10"
+		real_time="true"
                 random_seed="0" />
 
   </framework>
@@ -20,7 +21,7 @@
 <controllers>
 
     <epuck_environment_classification_controller id="epc"
-     library="build/controllers/epuck_environment_classification/libepuck_environment_classification.so">
+     library="/home/vstrobel/Documents/argdavide/build/controllers/epuck_environment_classification/libepuck_environment_classification.so">
      
       <actuators>
 	<epuck_wheels implementation="default" />
@@ -59,7 +60,7 @@
       </params>
     </epuck_environment_classification_controller>
   </controllers>
- <loop_functions  library="build/loop_functions/environment_classification_loop_functions/libenvironment_classification_loop_functions.so"
+ <loop_functions  library="/home/vstrobel/Documents/argdavide/build/loop_functions/environment_classification_loop_functions/libenvironment_classification_loop_functions.so"
                   label="environment_classification_loop_functions">
 
   <cells  number_of_red_cells="0"
@@ -72,13 +73,13 @@
 	  exit="true"            
 	  percent_black="PERCENT_BLACK"
 	  percent_red="0"
-	  save_every_ticks="20"
+	  save_every_ticks="200"
 	  save_every_ticks_flag="false"
 	  save_every_run_flag="true"
 	  save_blockchain_flag="false"
 	  save_every_robot_flag="false"
 	  save_every_quality_flag="false"
-	  save_global_stat_flag="true"
+	  save_global_stat_flag="false"
 	  radix="RADIX"
 	  number_of_robots="NUMROBOTS"
 	  number_of_runs="NUMRUNS"
