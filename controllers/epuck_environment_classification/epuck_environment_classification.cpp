@@ -98,27 +98,37 @@ void EPuck_Environment_Classification::registerRobot() {
   int robotId = Id2Int(GetId());
   
   int args[1] = {(int) opinion.actualOpinion};
-
-  // Just call to get return value
-  string sBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface,
-	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
-
+  int emptyArgs[0] = {};
+  
   // Modify state of the blockchain
   smartContractInterface(robotId, interface,
 	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
 
-  cout << "sBlocknumberBlockhash is: " << sBlocknumberBlockhash << endl;
+  // Just call to get return value
+  //string sBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface,
+  //	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
 
-  vector<string> splitResult = split(sBlocknumberBlockhash, ',');
+  string sOpinionBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface,
+	 contractAddress, "askForOpinion", emptyArgs, 0, 0, nodeInt, simulationParams.blockchainPath);
   
-  string sBlocknumber = splitResult[0];
-  sBlocknumber.erase(0, 1);
-  string sBlockhash = splitResult[1];
-  cout <<" bwh.hash (before substring):" << sBlockhash << endl;
-  sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 2);
-  bwh.blockNumber = atoi(sBlocknumber.c_str());
-  bwh.hash = sBlockhash;
-  cout << "bwh.blockNumber: " << bwh.blockNumber << " bwh.hash:" << bwh.hash << endl;
+
+    vector<string> splitResult = split(sOpinionBlocknumberBlockhash, ',');
+    
+    std::string sNewOpinion = splitResult[0];
+    // Remove first character
+    sNewOpinion.erase(0, 1);
+    std::string sBlock = splitResult[1];
+    std::string sBlockhash = splitResult[2];
+    // Remove first and last two characters
+    sBlockhash = sBlockhash.substr(0, sBlockhash.size() - 2);
+    cout << "Registered robot" << endl;
+    cout << "sNewOpinion is " << sNewOpinion << endl;
+    cout << "sBlock is " << sBlock << endl;
+    cout << "sBlockhash is " << sBlockhash << endl;
+  
+    bwh.blockNumber = atoi(sBlock.c_str());
+    bwh.hash = sBlockhash;
+    cout << "bwh.blockNumber: " << bwh.blockNumber << " bwh.hash:" << bwh.hash << endl;
 }
 
 void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
@@ -318,9 +328,9 @@ void EPuck_Environment_Classification::ControlStep() {
     set<int> currentNeighbors;
     
     // Fully connected
-    //for (UInt8 i = 1; i <= 10; i++) {
-    //  currentNeighbors.insert(i);
-    //}
+    for (UInt8 i = 0; i <= 19; i++) {
+      currentNeighbors.insert(i);
+    }
 
     double before_extra = get_wall_time();
     if (!simulationParams.useClassicalApproach) {
@@ -485,8 +495,14 @@ void EPuck_Environment_Classification::Explore() {
 			bwh.hash}; 
 
       string voteResult;
-      
+
       if (simulationParams.useMultipleNodes){
+
+	int args3[1] = {bwh.blockNumber};
+	string getOpinionPerBlockResult = smartContractInterfaceCall(robotId, interface, contractAddress, "getOpinionPerBlock", args3, 1, 0, nodeInt, simulationParams.blockchainPath);
+	cout << "getOpinionPerBlockResult is " << getOpinionPerBlockResult << " robotId is " << robotId << "Block number is " << bwh.blockNumber << endl;
+	string voteResult = smartContractInterfaceStringCall(robotId, interface, contractAddress, "vote", args, 4, opinionInt, nodeInt, simulationParams.blockchainPath);
+	cout << "The vote result is " << voteResult << endl;
 	smartContractInterfaceStringBg(robotId, interface, contractAddress, "vote", args, 4, opinionInt, nodeInt, simulationParams.blockchainPath);
       } //else {
       //	voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 4, opinionInt);
@@ -870,10 +886,11 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
     int robotId = Id2Int(GetId());
     uint opinionInt = (uint) (opinion.quality * 100);
     int args[3] = {(int) decision_rule, (int) opinion.actualOpinion, (int) opinionInt};
+    int emptyArgs[0] = {};
     string sOpinionBlocknumberBlockhash;
     if (simulationParams.useMultipleNodes) {
-      sOpinionBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
       smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
+      sOpinionBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface, contractAddress, "askForOpinion", emptyArgs, 0, 0, nodeInt, simulationParams.blockchainPath);
     }
     else
       sOpinionBlocknumberBlockhash = smartContractInterface(robotId, interface, contractAddress, "applyStrategy", args, 3, 0);
@@ -898,7 +915,8 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
     // If something went wrong, try again:
     if (newOpinion == 0) {
       cout << "Something went wrong with opinion parsing!!! The result was " << sOpinionBlocknumberBlockhash << endl;
-      sOpinionBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
+      //sOpinionBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface, contractAddress, "applyStrategy", args, 3, 0, nodeInt, simulationParams.blockchainPath);
+      sOpinionBlocknumberBlockhash = smartContractInterfaceCall(robotId, interface, contractAddress, "askForOpinion", emptyArgs, 0, 0, nodeInt, simulationParams.blockchainPath);
       cout << "Something went wrong with opinion parsing!!! The new result is " << sOpinionBlocknumberBlockhash << endl;
 
       splitResult = split(sOpinionBlocknumberBlockhash, ',');
@@ -918,6 +936,11 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
       cout << "sBlockhash v2 is " << sBlockhash << endl;
     }
 
+    if (newOpinion != 0) {
+      bwh.blockNumber = atoi(sBlock.c_str());
+      bwh.hash = sBlockhash;
+      opinion.actualOpinion = newOpinion;
+    }
 
     if (byzantineStyle > 0) {
 	
@@ -932,16 +955,10 @@ void EPuck_Environment_Classification::DecisionRule(UInt32 decision_rule)
 	cout << "Wrong byzantine style" << endl;
 	throw;
       }
-    } else if (newOpinion != 0) {
-      opinion.actualOpinion = newOpinion;
-    }
-
-    if (newOpinion != 0) {
-      bwh.blockNumber = atoi(sBlock.c_str());
-      bwh.hash = sBlockhash;      
     }
     receivedDecision = true;
   }
+}
 
 void EPuck_Environment_Classification::NotWeightedDirectComparison(){
 

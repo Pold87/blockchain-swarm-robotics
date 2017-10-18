@@ -1037,7 +1037,7 @@ std::string smartContractInterface(int i, string interface, string contractAddre
      fullCommandStream << args[k] << ",";  
    }
 
-   fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '1000000'});";
+   fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '3000000'});";
    
   
    std::string fullCommand = fullCommandStream.str();
@@ -1069,7 +1069,7 @@ std::string smartContractInterface(int i, string interface, string contractAddre
     fullCommandStream << args[k] << ",";  
   }
   
-  fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '1000000'});";
+  fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '3000000'});";
   
   
    std::string fullCommand = fullCommandStream.str();
@@ -1096,7 +1096,7 @@ std::string smartContractInterfaceCall(int i, string interface, string contractA
     fullCommandStream << args[k] << ",";  
   }
   
-  fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '1000000'});";
+  fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '3000000'});";
   
   
    std::string fullCommand = fullCommandStream.str();
@@ -1106,6 +1106,31 @@ std::string smartContractInterfaceCall(int i, string interface, string contractA
 
    return res;
  }
+
+
+std::string smartContractInterfaceStringCall(int i, std::string interface, std::string contractAddress, std::string func, std::string args[], int argc, int v, int nodeInt, std::string datadirBase) {
+
+
+  ostringstream fullCommandStream;
+
+  fullCommandStream << "var cC = web3.eth.contract(" << interface << ");var c = cC.at(" << contractAddress << ");c." << func << ".call(";
+
+  
+  for(int k = 0; k < argc; k++) {
+    fullCommandStream << args[k] << ",";  
+  }
+  
+  fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '3000000'});";
+  
+  
+   std::string fullCommand = fullCommandStream.str();
+
+   string res = exec_geth_cmd(i, fullCommand, nodeInt, datadirBase);
+   cout << "Result received from SC is: " << res << endl;
+
+   return res;
+  
+}
 
 
 // Interact with a function of a smart contract
@@ -1123,7 +1148,7 @@ void smartContractInterfaceBg(int i, string interface, string contractAddress,
     fullCommandStream << args[k] << ",";  
   }
   
-  fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '1000000'});";
+  fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '3000000'});";
   
   
    std::string fullCommand = fullCommandStream.str();
@@ -1149,7 +1174,7 @@ void smartContractInterfaceStringBg(int i, string interface, string contractAddr
     fullCommandStream << args[k] << ",";  
   }
   
-  fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '1000000'});";
+  fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '3000000'});";
   
   
    std::string fullCommand = fullCommandStream.str();

@@ -11,7 +11,7 @@ REPETITIONS=10
 DECISIONRULE=$3
 PERCENT_BLACKS=(34)
 # the one I did all the tests with:
-MININGDIFF=1000000
+MININGDIFF=300000 #was 1000000 before 
 # never go with the difficulty below 131072! (see https://github.com/ethereum/go-ethereum/issues/3590)
 USEMULTIPLENODES=true
 USEBACKGROUNDGETHCALLS=true
@@ -31,7 +31,7 @@ MINERNODE=${USEDNODES[0]}
 
 USECLASSICALAPPROACH=false
 # TODO:
-NUMBYZANTINE=(0 1 2 3 4 5 6 7 8 9)
+NUMBYZANTINE=(5 6 7 8 9)
 BYZANTINESWARMSTYLE=5
 SUBSWARMCONSENSUS=true # Determines if all N robots have to agree or
 		       # only the beneficial subswarm.
@@ -40,7 +40,6 @@ SUBSWARMCONSENSUS=true # Determines if all N robots have to agree or
 
  # Rebuild geth with another value in checkDifficulty
  if [ $CHANGEDIFFIULTY ]; then
-     #    ./change_difficulty.sh $MININGDIFF
      ./create_geths.sh $MININGDIFF
  fi
 
