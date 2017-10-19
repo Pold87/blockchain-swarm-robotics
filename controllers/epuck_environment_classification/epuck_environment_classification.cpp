@@ -585,18 +585,18 @@ void EPuck_Environment_Classification::WaitForDecision() {
 
       eventResult = eventInterface(robotId, interface, contractAddress, nodeInt, simulationParams.blockchainPath);	
 
-      if (eventResult.find("Error") != string::npos) {
-	  
-      vector<string> splitResult = split(eventResult, ' ');    
-      std::string sNewOpinion = splitResult[2];
-      std::string sBlock = splitResult[1];
-      std::string sBlockhash = splitResult[0];      
-      cout << "sNewOpinion is " << sNewOpinion << endl;
-      cout << "sBlock is " << sBlock << endl;
-      cout << "sBlockhash is " << sBlockhash << endl;
+      if (eventResult.find("Error") == string::npos) {
+	
+	vector<string> splitResult = split(eventResult, ' ');    
+	std::string sNewOpinion = splitResult[2];
+	std::string sBlock = splitResult[1];
+	std::string sBlockhash = splitResult[0];      
+	cout << "sNewOpinion is " << sNewOpinion << endl;
+	cout << "sBlock is " << sBlock << endl;
+	cout << "sBlockhash is " << sBlockhash << endl;
+	
 
-
-      if (bwh.blockNumber != atoi(sBlock.c_str())) {
+	if (bwh.blockNumber != atoi(sBlock.c_str())) {
       
       
       // while (bwh.blockNumber == atoi(sBlock.c_str())) {
@@ -656,10 +656,9 @@ void EPuck_Environment_Classification::WaitForDecision() {
       toSend[2]=5;
       toSend[3]=5;
       m_pcRABA->SetData(toSend);
-
       
       //receivedDecision = true;
-      }
+	}
       }      
 }
 
