@@ -124,6 +124,9 @@ public:
    void Explore();
    void Diffusing();   
    void Listening();
+   void ConnectAndListen();
+   void DiffuseInformation();
+   void WaitForDecision();
    void DecisionRule(UInt32 decision_rule);
    void NotWeightedDirectComparison();
    void VoterModel();
