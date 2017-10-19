@@ -203,6 +203,7 @@ public:
 
    void UpdateNeighbors(std::set<int> newNeighbors);
    void registerRobot();
+   void updateRegistration();
    
 
 private:

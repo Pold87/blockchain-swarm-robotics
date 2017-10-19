@@ -11,7 +11,7 @@ REPETITIONS=10
 DECISIONRULE=$3
 PERCENT_BLACKS=(34)
 # the one I did all the tests with:
-MININGDIFF=300000 #was 1000000 before 
+MININGDIFF=1000000 #was 1000000 before 
 # never go with the difficulty below 131072! (see https://github.com/ethereum/go-ethereum/issues/3590)
 USEMULTIPLENODES=true
 USEBACKGROUNDGETHCALLS=true
@@ -24,7 +24,7 @@ USEDNODES=($1 $2)
 echo "USEDNODES is ${USEDNODES}"
 BASEPORT=$((33000 + $1 * 200))
 echo "BASEPORT is ${BASEPORT}"
-DATADIR="data/experiment1_decision${DECISIONRULE}-node$1-byzantine-THREAD-extra2-${NOW}/"
+DATADIR="data/experiment1_decision${DECISIONRULE}-node$1-byzantine-withoutbug-${NOW}/"
 REGENERATEFILE="$(pwd)/regenerate${USEDNODES[0]}.sh"
 # The miner node is the first of the used nodes
 MINERNODE=${USEDNODES[0]}

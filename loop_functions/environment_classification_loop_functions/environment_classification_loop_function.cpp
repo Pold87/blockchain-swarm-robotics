@@ -280,6 +280,20 @@ void CEnvironmentClassificationLoopFunctions::registerAllRobots() {
   }
 }
 
+
+void CEnvironmentClassificationLoopFunctions::UpdateRegistrationAllRobots() {
+
+  CSpace::TMapPerType& m_cEpuck = GetSpace().GetEntitiesByType("epuck");
+  for(CSpace::TMapPerType::iterator it = m_cEpuck.begin();it != m_cEpuck.end();++it){
+
+    /* Get handle to e-puck entity and controller */
+    CEPuckEntity& cEpuck = *any_cast<CEPuckEntity*>(it->second);
+    EPuck_Environment_Classification& cController =  dynamic_cast<EPuck_Environment_Classification&>(cEpuck.GetControllableEntity().GetController());
+
+    cController.updateRegistration();
+  }
+}
+
 void CEnvironmentClassificationLoopFunctions::PreinitMiner() {
 
   cout << "Initializing miner" << endl;
@@ -376,11 +390,16 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
 
   /* Set the address of the deployed contract in each robot */
   setContractAddressAndDistributeEther(contractAddress, minerAddress);
-
+  int l1 = getBlockChainLength(minerId, minerNode, blockchainPath);
+  registerAllRobots();
+  int l2;
+  do {
+    l2 = getBlockChainLength(minerId, minerNode, blockchainPath);
+    cout << "Checking BC length" << endl;
+    sleep(1);
+    } while (l2 < (l1 + 3));
   stop_mining(minerId, minerNode, blockchainPath);
-
-  /* Check that all robots received their ether */
-
+  
   bool etherReceived;
   for (int t = 0; t < maxTime; ++t) {
 
@@ -392,7 +411,6 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
 
     if (DEBUGLOOP)
       cout << "time step of CheckEtherReceived is " << t << " and result is " << etherReceived << std::endl;
-
 
     if (etherReceived) {
       break;
@@ -412,12 +430,11 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
     }
   }
 
-
-
   cout << "Waiting until all robots have the same blockchain" << endl;
 
   /* Wait until all robots have the same blockchain */
   bool allSameHeight = allSameBCHeight();
+  /* Check that all robots received their ether */
 
   //vector<int> allRobotIds = getAllRobotIds();
 
@@ -443,6 +460,7 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
     trialssameheight++;
   }
 
+  //  UpdateRegistrationAllRobots();
 
   cout << "Disconnecting everyone by killing mining thread" << endl;
   if (useMultipleNodes) {

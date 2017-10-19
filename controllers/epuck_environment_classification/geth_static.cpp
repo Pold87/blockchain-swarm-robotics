@@ -1077,8 +1077,23 @@ std::string smartContractInterface(int i, string interface, string contractAddre
    string res = exec_geth_cmd(i, fullCommand, nodeInt, datadirBase);
    cout << "Result received from SC is: " << res << endl;
 
-   return res;
+   return res; 
  }
+
+
+std::string eventInterface(int i, std::string interface, std::string contractAddress, int nodeInt, std::string datadirBase) {
+
+  ostringstream fullCommandStream;
+  fullCommandStream << "var cC = web3.eth.contract(" << interface << ");var c = cC.at(" << contractAddress << ");var ev = c.strategyApplied({sender:eth.coinbase},{fromBlock: 0, toBlock: \"latest\"});var allStratEvents = ev.get();allStratEvents[allStratEvents.length - 1].args;console.log(allStratEvents[allStratEvents.length - 1].args.blockHash, allStratEvents[allStratEvents.length - 1].args.blockNumber, allStratEvents[allStratEvents.length - 1].args.opinion);";
+
+   std::string fullCommand = fullCommandStream.str();
+
+   string res = exec_geth_cmd(i, fullCommand, nodeInt, datadirBase);
+   cout << "Result received from EVENT is: " << res << endl;
+
+   return res; 
+  
+}
 
 
 // Interact with a function of a smart contract
@@ -1179,7 +1194,7 @@ void smartContractInterfaceStringBg(int i, string interface, string contractAddr
   
    std::string fullCommand = fullCommandStream.str();
 
-   cout << "Executing full command: " << fullCommand << endl;
+   //cout << "Executing full command: " << fullCommand << endl;
 
    exec_geth_cmd_background(i, fullCommand, nodeInt, datadirBase);
    //cout << "Result received from SC is: " << res << endl;
