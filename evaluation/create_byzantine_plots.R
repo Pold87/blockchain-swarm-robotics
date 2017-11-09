@@ -4,7 +4,8 @@ source("myplothelpers.R")
 trials.base <- "volker"
 
 use.fake.data <- FALSE
-report.dir <- "~/Dropbox/mypapers/technical_report_collective/img/"
+##report.dir <- "~/Dropbox/mypapers/technical_report_collective/img/"
+report.dir <- "~/Dropbox/mypapers/AAMAS2018/aamas18-latex-template/img"
 #data.dir <- "../data/experiment1_decision3-run3/"
 ## Blockchain experiments
 data.dir <- "../data/"
@@ -22,25 +23,25 @@ tol4qualitative=c("#4477AA", "#117733", "#DDCC77", "#CC6677")
 #difficulty <- c(34, 36, 38, 40, 42, 44, 46, 48) # Make sure to match it with metastarter.sh
 
 num.byzantines = 0:9
-diffs <- c(34, 48)
+diffs <- c(34)
 
 # As a function of Byzantine robots, easy and difficult setup
 if (do.difficulty) {
     for (d in diffs) {
-    E.Ns <- c()
-    strategies <- c(0)
-    strategy <- c()
-    nodes <- 0:2
-    runs <- c()
+        E.Ns <- c()
+        strategies <- c(1, 2, 3)
+        strategy <- c()
+        nodes <- 0:2
+        runs <- c()
     
-    ## Exit probability: As a function of Byzantine robots
+        ## Exit probability: As a function of Byzantine robots
     
-    strategy <- c()
-    used.difficulties <- c()
+        strategy <- c()
+        used.difficulties <- c()
     
     for (s in strategies) {
-            for (k in num.robots) {    
-                for (b in num.byzantines) {
+        for (k in num.robots) {    
+            for (b in num.byzantines) {
 
                     successes <- c()                                        
                     strategy <- c(strategy, s)
@@ -153,11 +154,6 @@ if (do.difficulty) {
         }
     }
 
-#print(difficulty)
-#print(bc.height)
-#print(consensus.time)
-#print(strategy)
-#difficulty <- difficulty / (100 - difficulty)
     df <- data.frame(num.byzantines, consensus.time, strategy)
     print(df)
     names(df) <- c("difficulty", "consensus.time", "strategy")

@@ -4,7 +4,7 @@ source("myplothelpers.R")
 trials.base <- "volker"
 
 use.fake.data <- FALSE
-report.dir <- "~/Dropbox/mypapers/RAR/img/"
+report.dir <- "~/Dropbox/mypapers/AAMAS2018/aamas18-latex-template/img_final_paper/"
 #data.dir <- "../data/experiment1_decision3-run3/"
 ## Blockchain experiments
 data.dir <- "../data/"
@@ -151,11 +151,13 @@ if (do.difficulty) {
     plot.consensus.time.gg(df,
                            xlab="Difficulty",
                            ylab=ylab.cons,
-                           sprintf("consensustime_%s-_%d-redodiffs_correctonly%d.pdf", style, k, do.consensus.on.correct.outcomes.only))
+                           sprintf("consensustime_%s-_%d-redodiffs_correctonly%d.pdf", style, k, do.consensus.on.correct.outcomes.only),
+                           report.dir)
     plot.exit.prob.gg(df,
                       xlab="Difficulty",
                       ylab=expression("Exit probability (E"[N]*")"),
-                      sprintf("exit_prob_d_%s_%d_gg-redodiffs_correctonly%d.pdf", style, k, do.consensus.on.correct.outcomes.only))
+                      sprintf("exit_prob_d_%s_%d_gg-redodiffs_correctonly%d.pdf", style, k, do.consensus.on.correct.outcomes.only),
+                      report.dir)
         
     }
 }
