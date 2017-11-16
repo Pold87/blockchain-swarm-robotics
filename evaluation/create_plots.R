@@ -4,7 +4,7 @@ source("myplothelpers.R")
 trials.base <- "volker"
 
 use.fake.data <- FALSE
-report.dir <- "~/Dropbox/mypapers/RAR/img/"
+report.dir <- "~/Dropbox/mypapers/AAMAS2018/aamas18-latex-template/img/"
 #data.dir <- "../data/experiment1_decision3-run3/"
 ## Blockchain experiments
 data.dir <- "../data/"
@@ -58,18 +58,15 @@ if (do.difficulty) {
                     consensus.times <- c()
                     
                     for (node in nodes) {
-        ## For metastarter.sh
-        ##trials.name <- sprintf("%s/exp_4_N%d_Percent%d", data.dir, k, d)
-
-        ## For start_from_template.sh
-        ## TODO: should include the name of the strategy in the filename
-                        trials.name <- sprintf("%s/experiment1_decision%s-node%s/num%d_black%d", data.dir, s, node, k, d)
-
- ##                       trials.name <- sprintf("%s/experiment1_decision%s-node%s-classical-afterbugfix/num%d_black%d_byz0_run", data.dir, s, node, k, d)
-
+                        ## For metastarter.sh
+                        ##trials.name <- sprintf("%s/exp_4_N%d_Percent%d", data.dir, k, d)
                         
+                        ## For start_from_template.sh
+                        ## TODO: should include the name of the strategy in the filename
+                        trials.name <- sprintf("%s/experiment1_decision%s-node%s/num%d_black%d", data.dir, s, node, k, d)                        
+                        ## trials.name <- sprintf("%s/experiment1_decision%s-node%s-classical-afterbugfix/num%d_black%d_byz0_run", data.dir, s, node, k, d)
                     
-        ## For all trials
+                        ## For all trials
         for (i in 0:max.trials) {
             f <- paste0(trials.name, i, ".RUNS")
             print(f)
@@ -135,11 +132,13 @@ if (do.difficulty) {
 
     plot.consensus.time.gg(df,
                            xlab=expression("Difficulty"), ylab="Consensus time / 10",
-                           sprintf("consensustime_blockchain_difficulty_correctonly%d.pdf", do.consensus.on.correct.outcomes.only))
+                           sprintf("consensustime_blockchain_difficulty_correctonly%d.pdf", do.consensus.on.correct.outcomes.only),
+                           report.dir)
     
     plot.exit.prob.gg(df,
                       xlab="Difficulty", ylab="Exit probability",
-                      sprintf("exit_prob_blockchain_difficulty_correctonly%d.pdf", do.consensus.on.correct.outcomes.only))    
+                      sprintf("exit_prob_blockchain_difficulty_correctonly%d.pdf", do.consensus.on.correct.outcomes.only),
+                      report.dir)    
     }
 }    
 
