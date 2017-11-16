@@ -1,3 +1,7 @@
+# Managing Byzantine Robots via Blockchain Technology in a Swarm Robotics Collective Decision Making Scenario
+
+
+
 This folder contains the source files for the environment classification. 
 
 * loop_functions: it contains the .h and .cpp files about the loop functions. environment_classification_qt_user_functions are only used to draw the arena in Argos, while the actual loop functions set up and run the experiment, using the robots’ behaviour described by the controller. 
