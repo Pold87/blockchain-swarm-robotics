@@ -254,6 +254,8 @@ private:
    std::map<int, int> robotIdToNode;  
    bool mining;
    int byzantineStyle;
+   bool threadCurrentlyRunning;
+   int eventTrials;
    bool receivedDecision; // Indicates if the robots already received a new opinion from the smart contract (for multi threading)
    CColor red, blue, green;                    // Add here eventual additional color AGGIUNGERECOLORI
 //   int totalCounted, countedOfThisOpinion[N_COL];  USED JUST FOR STATISTICS, no more used

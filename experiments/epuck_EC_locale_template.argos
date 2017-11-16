@@ -74,7 +74,7 @@
 	  percent_black="PERCENT_BLACK"
 	  percent_red="0"
 	  save_every_ticks="100"
-	  save_every_ticks_flag="true"
+	  save_every_ticks_flag="false"
 	  save_every_run_flag="true"
 	  save_blockchain_flag="false"
 	  save_every_robot_flag="false"
