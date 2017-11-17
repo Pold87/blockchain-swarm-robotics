@@ -27,7 +27,7 @@ via dissemination/decision-making strategies, they influence their
 peers. At the end of a successful run, all robots have the opinion of
 the majority color (in our experiments it is always the white).
 
-![Collective decision-making scenario](https://raw.githubusercontent.com/Pold87/blockchain-swarm-robotics/master/img/ "Collective decision-making scenario")
+![Collective decision-making scenario](https://raw.githubusercontent.com/Pold87/blockchain-swarm-robotics/master/img/environment.png "Collective decision-making scenario")
 
 
 
