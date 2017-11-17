@@ -1,14 +1,15 @@
-# Managing Byzantine Robots via Blockchain Technology in a Swarm
-  Robotics Collective Decision Making Scenario
+# Managing Byzantine Robots via Blockchain Technology in a Swarm Robotics Collective Decision Making Scenario
 
 
 This repository contains the code for the paper "Managing Byzantine
 Robots via Blockchain Technology in a Swarm Robotics Collective
 Decision Making Scenario."
 
+## Scenario
+
 Using the robot swarm simulator ARGoS 3, we study a collective
 decision scenario, in which robots sense which of two features in an
-environment is the most frequent one---a best-of-$2$ problem. Our
+environment is the most frequent one---a best-of-2 problem. Our
 approach is based on the collective decision scenario of Valentini et
 al. Via blockchain-based smart contracts using the Ethereum protocol,
 we add a security layer on top of the classical approach that allows
@@ -26,21 +27,7 @@ via dissemination/decision-making strategies, they influence their
 peers. At the end of a successful run, all robots have the opinion of
 the majority color (in our experiments it is always the white).
 
+![Collective decision-making scenario](https://raw.githubusercontent.com/Pold87/blockchain-swarm-robotics/master/img/ "Collective decision-making scenario")
 
-## Source files
 
-This folder contains the source files for the environment
-classification.
 
-* loop_functions/environment_classification_loop_functions: it
-contains the .h and .cpp files about the loop
-functions. environment_classification_qt_user_functions are only used
-to draw the arena in Argos, while the actual loop functions set up and
-run the experiment, using the robots' behaviour described by the
-controller.
-
-* experiments: it contains the configuration files for the local
-  (epuck_EC_locale.argos) and for the cluster executions.
-
-* controllers/epuck_environment_classification:
-- epuck_environment_classification.cpp and .h: controller of the robots	
