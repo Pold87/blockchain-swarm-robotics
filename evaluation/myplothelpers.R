@@ -1,6 +1,6 @@
 library(ggplot2)
 library(ggthemes)
-library(directlabels)
+#library(directlabels)
 library(grid)
 
 
@@ -22,6 +22,15 @@ base_breaks_x <- function(x){
 #       geom_segment(data=d, size=1, colour="white", aes(x=xend, y = y, xend = xend+0.2, yend=yend), inherit.aes=FALSE),
        scale_x_continuous(breaks=b))
 }
+
+base_breaks_x_discrete<- function(x){
+  b <- x
+  d <- data.frame(y=-Inf, yend=-Inf, x=min(b), xend=max(b))
+  list(geom_segment(data=d, size=1.3, colour="gray35", aes(x=x, y=y, xend=xend, yend=yend), inherit.aes=FALSE),
+#       geom_segment(data=d, size=1, colour="white", aes(x=xend, y = y, xend = xend+0.2, yend=yend), inherit.aes=FALSE),
+       scale_x_discrete(limits=b))
+}
+
 base_breaks_y <- function(x){
   b <- x
   d <- data.frame(x=-Inf, xend=-Inf, y=min(b), yend=max(b))
@@ -76,7 +85,8 @@ plot.exit.prob.gg <- function(df, xlab, ylab, out.name, report.dir) {
     #+ xlim(c(, max(difficulty)))
 
     base_breaks_x(seq(34 / (100 - 34), 48 / (100 - 48), length.out = 8)) + 
-    base_breaks_y(seq(0.0, 1, 0.1)) + 
+                                        #    base_breaks_y(seq(0.0, 1, 0.1)) +
+            base_breaks_x(c(0.52, 0.72, 0.92)) +
         
     expand_limits(x = 1.05)
 
@@ -98,29 +108,34 @@ plot.exit.prob.gg.facet <- function(df, xlab, ylab, out.name, report.dir) {
 
     print(df)
     df[, 'strat.names'] <- as.factor(df[, 'strat.names'])
+    df[, 'difficulty'] <- as.factor(df[, 'difficulty'])
     p <- ggplot(transform(df, strat.names=factor(strat.names, level=c("DMVD", "DMMD", "DC"))), aes(x=difficulty, y=E.Ns, group=strat.names)) +
         facet_wrap(~strat.names) +
-        geom_bar(aes(fill = strat.names, color=strat.names), stat="identity", width = 0.03) +
+        geom_bar(aes(fill = strat.names, color=strat.names), stat="identity", width = 0.5) +
         theme_classic() +
-        theme(axis.text=element_text(size=11, colour="gray25"),
-              axis.title=element_text(size=17, colour="gray25"),
+        theme(axis.text=element_text(size=9, colour="gray25"),
+              axis.title=element_text(size=14, colour="gray25"),
               axis.line = element_blank(),              
               axis.ticks.length=unit(-0.25, "cm"),
               axis.ticks = element_line(colour = 'gray25'),
+              panel.spacing.x=unit(.8, "lines"),
               legend.position="none",
               strip.background = element_rect(size = 1.3),
-              axis.text.x = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")),
+              axis.text.x = element_text(margin=unit(c(0.3,0.3,0.3,0.3), "cm"),
+                                         angle = 45, vjust = 1, hjust=1),
               axis.text.y = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")))  +
         ylab(ylab) +
         xlab(xlab) +
-        coord_cartesian(xlim=c(min(df$difficulty), max(df$difficulty))) + 
-        base_breaks_x(seq(0.5, 0.95, 0.10)) +
-    base_breaks_y(seq(0.0, 1, 0.1)) + 
+        #coord_cartesian(xlim=c(min(df$difficulty), max(df$difficulty))) + 
+                                        #base_breaks_x(seq(0.5, 1.0, 0.10)) +
+                                        #base_breaks_x(seq(0.5, 1.0, 0.10)) +
+        #base_breaks_x_discrete(c(0.52, 0.56, 0.61, 0.67, 0.72, 0.79, 0.85, 0.92)) +
+        base_breaks_y(seq(0.0, 1, 0.1))
         
-    expand_limits(x = 1.05)
+    #expand_limits(x = 1.05)
 
     print(paste0(report.dir, out.name))
-    ggsave(paste0(report.dir, out.name))
+    ggsave(paste0(report.dir, out.name), width=7, height=4)
 }
 
 
@@ -137,10 +152,11 @@ plot.exit.prob.gg.byz.facet <- function(df, xlab, ylab, out.name, report.dir) {
         geom_bar(aes(fill = strat.names, color=strat.names), stat="identity", width = 0.7) +
         theme_classic() +
         theme(axis.text=element_text(size=11, colour="gray25"),
-              axis.title=element_text(size=17, colour="gray25"),
+              axis.title=element_text(size=14, colour="gray25"),
               axis.line = element_blank(),              
               axis.ticks.length=unit(-0.25, "cm"),
               axis.ticks = element_line(colour = 'gray25'),
+              panel.spacing.x=unit(.8, "lines"),
               legend.position="none",
               strip.background = element_rect(size = 1.3),
               axis.text.x = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")),
@@ -152,7 +168,7 @@ plot.exit.prob.gg.byz.facet <- function(df, xlab, ylab, out.name, report.dir) {
     base_breaks_y(seq(0.0, 1, 0.1))
         
     print(paste0(report.dir, out.name))
-    ggsave(paste0(report.dir, out.name))
+    ggsave(paste0(report.dir, out.name), width=7, height=4)
 }
 
 
@@ -284,7 +300,8 @@ plot.consensus.time.gg <- function(df, xlab, ylab, out.name, report.dir) {
               axis.text.y = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")))  +
         ylab(ylab) +
         xlab(xlab) +
-        base_breaks_x(seq(0.5, 0.95, 0.10)) +
+                                        #        base_breaks_x(seq(0.5, 1.0, 0.10)) +
+        base_breaks_x(c(0.52, 0.72, 0.92)) +
         base_breaks_y(seq(0, 140, 20))# + expand_limits(x=25)
 
 
@@ -318,7 +335,8 @@ plot.consensus.time.gg2 <- function(df, xlab, ylab, out.name, report.dir) {
               axis.text.y = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")))  +
         ylab(ylab) +
         xlab(xlab) +
-        base_breaks_x(seq(0.5, 0.95, 0.10)) +
+                                        #        base_breaks_x(seq(0.5, 1.0, 0.10)) +
+                base_breaks_x(c(0.52, 0.72, 0.92)) +
         base_breaks_y(seq(0, 140, 20))# + expand_limits(x=25)
 
 
@@ -334,30 +352,35 @@ plot.consensus.time.gg2 <- function(df, xlab, ylab, out.name, report.dir) {
 plot.consensus.time.gg.box <- function(df, xlab, ylab, out.name, report.dir) {
 
     df[, 'strat.names'] <- as.factor(df[, 'strat.names'])
+    df[, 'difficulty'] <- as.factor(df[, 'difficulty'])
     p <- ggplot(transform(df, strat.names=factor(strat.names, level=c("DMVD", "DMMD", "DC"))), aes(x=difficulty, y=ExitTime / 10, group=(difficulty))) +
         geom_boxplot(aes(colour = strat.names), size=0.5, outlier.size = 0.5) + facet_wrap(~strat.names) +
         theme_classic() +
 
 
-        theme(axis.text=element_text(size=11, colour="gray15"),
-              axis.title=element_text(size=17, colour="gray15"),
+        theme(axis.text=element_text(size=9, colour="gray15"),
+              axis.title=element_text(size=14, colour="gray15"),
               panel.border = element_blank(),
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank(),
               axis.line = element_blank(),
+              panel.spacing.x=unit(.8, "lines"),
               axis.ticks.length=unit(-0.15, "cm"),
               axis.ticks = element_line(colour = 'gray15'),
               legend.position="none",
               strip.background = element_rect(size = 1.3),
-              axis.text.x = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")),
+              axis.text.x = element_text(margin=unit(c(0.3,0.3,0.3,0.3), "cm"),
+                                         angle = 45, vjust = 1, hjust=1),
+
               axis.text.y = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")))  +
         ylab(ylab) +
     xlab(xlab) +
-            base_breaks_x(seq(0.5, 0.95, 0.10)) +
-    base_breaks_y(seq(0, 400, 20))# + expand_limits(x=25)
+                                        #            base_breaks_x(seq(0.5, 1.0, 0.10)) +
+#            base_breaks_x(c(0.52, 0.72, 0.92)) +
+    base_breaks_y(seq(0, 400, 40))# + expand_limits(x=25)
 
     
-    ggsave(paste0(report.dir, out.name))
+    ggsave(paste0(report.dir, out.name), width=7, height=4)
     }
 
 
@@ -371,11 +394,12 @@ plot.consensus.time.gg.byz.box <- function(df, xlab, ylab, out.name, report.dir)
 
 
         theme(axis.text=element_text(size=11, colour="gray15"),
-              axis.title=element_text(size=17, colour="gray15"),
+              axis.title=element_text(size=14, colour="gray15"),
               panel.border = element_blank(),
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank(),
               axis.line = element_blank(),
+              panel.spacing.x=unit(.8, "lines"),
               axis.ticks.length=unit(-0.15, "cm"),
               axis.ticks = element_line(colour = 'gray15'),
               legend.position="none",
@@ -386,10 +410,10 @@ plot.consensus.time.gg.byz.box <- function(df, xlab, ylab, out.name, report.dir)
     xlab(xlab) +
     base_breaks_x(seq(min(df$num.byz), max(df$num.byz), 1)) +
     coord_cartesian(ylim=c(0, 400)) +
-    base_breaks_y(seq(0, 400, 20))# + expand_limits(x=25)
+    base_breaks_y(seq(0, 400, 40))# + expand_limits(x=25)
 
     
-    ggsave(paste0(report.dir, out.name))
+    ggsave(paste0(report.dir, out.name), width=7, height=4)
     }
 
 
@@ -404,7 +428,7 @@ plot.consensus.time.gg.box2 <- function(df, xlab, ylab, out.name, report.dir) {
 
 
         theme(axis.text=element_text(size=11, colour="gray15"),
-              axis.title=element_text(size=17, colour="gray15"),
+              axis.title=element_text(size=14, colour="gray15"),
               panel.border = element_blank(),
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank(),
@@ -415,7 +439,8 @@ plot.consensus.time.gg.box2 <- function(df, xlab, ylab, out.name, report.dir) {
               axis.text.y = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")))  +
         ylab(ylab) +
     xlab(xlab) +
-            base_breaks_x(seq(0.5, 0.95, 0.10)) +
+                                        #base_breaks_x(seq(0.5, 1.0, 0.10)) +
+            base_breaks_x(c(0.52, 0.72, 0.92)) +
     base_breaks_y(seq(0, 400, 20))# + expand_limits(x=25)
 
     
@@ -434,7 +459,7 @@ plot.consensus.time.gg.bar <- function(df, xlab, ylab, out.name, report.dir) {
         theme_classic() + 
 
         theme(axis.text=element_text(size=11, colour="gray15"),
-              axis.title=element_text(size=17, colour="gray15"),
+              axis.title=element_text(size=14, colour="gray15"),
               panel.border = element_blank(),
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank(),
@@ -446,7 +471,8 @@ plot.consensus.time.gg.bar <- function(df, xlab, ylab, out.name, report.dir) {
               axis.text.y = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")))  +
         ylab(ylab) +
     xlab(xlab) +
-            base_breaks_x(seq(0.5, 0.95, 0.10)) +
+                                        #base_breaks_x(seq(0.5, 1.0, 0.10)) +
+            base_breaks_x(c(0.52, 0.72, 0.92)) +
     base_breaks_y(seq(0, 300, 20))# + expand_limits(x=25)
 
     
@@ -466,7 +492,7 @@ plot.consensus.time.gg.bar2 <- function(df, xlab, ylab, out.name, report.dir) {
         theme_classic() + 
 
         theme(axis.text=element_text(size=11, colour="gray15"),
-              axis.title=element_text(size=17, colour="gray15"),
+              axis.title=element_text(size=14, colour="gray15"),
               panel.border = element_blank(),
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank(),
@@ -478,7 +504,8 @@ plot.consensus.time.gg.bar2 <- function(df, xlab, ylab, out.name, report.dir) {
               axis.text.y = element_text(margin=unit(c(0.5,0.5,0.5,0.5), "cm")))  +
         ylab(ylab) +
     xlab(xlab) +
-            base_breaks_x(seq(0.5, 0.95, 0.10)) +
+                                        #base_breaks_x(seq(0.5, 1.0, 0.10)) +
+            base_breaks_x(c(0.52, 0.72, 0.92)) +
     base_breaks_y(seq(0, 180, 20))# + expand_limits(x=25)
 
     
@@ -514,7 +541,8 @@ plot.bc.height.gg <- function(df, xlab, ylab, out.name) {
         ylab(ylab) +
         xlab(xlab) +
 #        coord_fixed()
-        base_breaks_x(seq(0.5, 1, 0.1)) +
+                                        #        base_breaks_x(seq(0.5, 1, 0.1)) +
+            base_breaks_x(c(0.52, 0.72, 0.92)) +
 #        base_breaks_x(seq(0, 20, 5)) +
         base_breaks_y(seq(0, 140, 20))# + expand_limits(x=25)
 

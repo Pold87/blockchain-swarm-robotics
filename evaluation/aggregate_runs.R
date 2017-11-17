@@ -6,19 +6,19 @@ source("myplothelpers.R")
 ## "24-10-2017" is also good but only contains 7, 8, and 9 Byzantine robots
 num.byzantines = 0:9
 difficulties <- c(34, 36, 38, 40, 42, 44, 46, 48)
-##style <- "blockchain"
-style <- "classical"
+style <- "blockchain"
+##style <- "classical"
 nodes <- 0:12
 ##data.base <- "/home/volker/localargdavide/data/"
 
-do.experiment1 <- TRUE
-do.experiment2 <- FALSE
+do.experiment1 <- FALSE
+do.experiment2 <- TRUE
 
-dates.bc.exp1 <- c("08-11-2017", "04-11-2017", "03-11-2017")
-dates.cl.exp1 <- c("30-10-2017")
+dates.bc.exp1 <- c("15-11-2017", "14-11-2017", "13-11-2017", "08-11-2017", "04-11-2017", "03-11-2017")
+dates.cl.exp1 <- c("09-11-2017")
 
-dates.bc.exp2 <- c("04-11-2017", "03-11-2017", "31-10-2017", "28-10-2017", "25-10-2017", "24-10-2017")
-dates.cl.exp2 <- c("30-10-2017")
+dates.bc.exp2 <- c("09-11-2017", "04-11-2017", "03-11-2017", "31-10-2017", "28-10-2017", "25-10-2017")
+dates.cl.exp2 <- c("09-11-2017")
 
 if (style == "classical") {
     dates.exp1 <- dates.cl.exp1
@@ -28,7 +28,8 @@ if (style == "classical") {
     dates.exp2 <- dates.bc.exp2
 }
 
-data.base <- "~/local-exps/data/"
+data.base <- "~/localargdavide/data/"
+#data.base <- "~/local-exps/data/"
 report.dir <- "~/Dropbox/mypapers/AAMAS2018/aamas18-latex-template/img/"
 N = 20
 strategies <- c(1, 2, 3)
@@ -61,7 +62,7 @@ create.df.exp1 <- function(max.trials=50) {
                     if (file.exists(trials.name)) {
                         X <- read.table(trials.name, header=T)
                         if (nrow(X) != 0){ 
-                            X$difficulty = d / (100 - d)
+                            X$difficulty = round(d / (100 - d), 2)
                             X$strat = s
                             if (nrow(df) == 0) {
                                 df <- X
@@ -123,9 +124,21 @@ data_summary <- function(data, varname, groupnames){
 }
 
 
-if (do.experiment1){
+if (do.experiment1) {
 
     df <- create.df.exp1() ## Iterate over runs and create big df
+
+    df$Runs <- c()
+    df$Whites <- c()
+    colnames(df)[which(names(df) == "difficulty")] <- "Difficulty"
+    colnames(df)[which(names(df) == "strat")] <- "Strategy"
+    colnames(df)[which(names(df) == "Greens")] <- "Whites"
+
+    df <- df[df$ExitTime < 4000, ]
+
+    df$StrategyName <- sapply(df$Strategy, strat2strat.name) ## Insert strategy names
+
+    write.csv(df, sprintf("experiment1_%s.csv", style), row.names = FALSE, quote=FALSE)
     
     df$E.Ns <- df$Greens == N ## specify if the outcome was correct
     df.correct.only <- df[df$E.Ns == 1, ]
@@ -173,6 +186,20 @@ df <- create.df.exp2() ## Iterate over runs and create big df
     ## Remove crazy outliers
 df <- df[df$ExitTime < 4000, ]
     
+
+    df$Runs <- c()
+    df$Whites <- c()
+    colnames(df)[which(names(df) == "difficulty")] <- "Difficulty"
+    colnames(df)[which(names(df) == "strat")] <- "Strategy"
+    colnames(df)[which(names(df) == "Greens")] <- "Whites"
+    colnames(df)[which(names(df) == "num.byz")] <- "k"
+
+
+    df$StrategyName <- sapply(df$Strategy, strat2strat.name) ## Insert strategy names
+
+    write.csv(df, sprintf("experiment2_%s.csv", style), row.names = FALSE, quote=FALSE)
+
+
     
 df$E.Ns <- df$Greens == (N - df$num.byz) ## specify if the outcome was correct
 print(df[order(df$num.byz),]) 
@@ -202,7 +229,7 @@ plot.exit.prob.gg.byz.facet(df.agg,
 source("myplothelpers.R")
 plot.consensus.time.gg.byz.box(df.correct.only,
                       xlab="Number of Byzantine robots (k)",
-                      ylab=expression('Sub-swarm consensus time (T'['N']^'correct'*' / 10)'),
+                      ylab=expression('Sub-swarm cons. time (T'['N']^'correct'*' / 10)'),
                       sprintf("box_exp2_consensustime_%s_byz_diff%d_correctonly%d.pdf", style, d, 1),
                       report.dir)  
 
