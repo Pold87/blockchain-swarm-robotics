@@ -21,7 +21,7 @@
 <controllers>
 
     <epuck_environment_classification_controller id="epc"
-     library="/home/vstrobel/Documents/argdavide/build/controllers/epuck_environment_classification/libepuck_environment_classification.so">
+     library="/home/vstrobel/Documents/argdavide/build/controllers/libepuck_environment_classification.so">
      
       <actuators>
 	<epuck_wheels implementation="default" />
@@ -60,7 +60,7 @@
       </params>
     </epuck_environment_classification_controller>
   </controllers>
- <loop_functions  library="/home/vstrobel/Documents/argdavide/build/loop_functions/environment_classification_loop_functions/libenvironment_classification_loop_functions.so"
+ <loop_functions  library="/home/vstrobel/Documents/argdavide/build/loop_functions/libenvironment_classification_loop_functions.so"
                   label="environment_classification_loop_functions">
 
   <cells  number_of_red_cells="0"

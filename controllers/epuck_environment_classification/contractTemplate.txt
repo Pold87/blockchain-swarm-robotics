@@ -1,1 +1,0 @@
-var cC = web3.eth.contract(INTERFACE); var c = cC.new({ from: web3.eth.accounts[0], data: 'DATA', gas: '4700000' }, function (e, contract){if (!e) {   while (!contract.transactionHash) {   admin.sleep(1);   }	console.log(contract.transactionHash);	} else {console.log(e);}})
