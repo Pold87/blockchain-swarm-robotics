@@ -6,7 +6,6 @@
 #define N_COL		         	 3
 
 #include <iostream>
-
 #include <algorithm>
 #include <sstream>
 #include <unistd.h>
@@ -25,8 +24,6 @@ string interface; // Smart contract interface
 int usedRack = 3;
 int numNodes = 7;
 SInt32 voteEveryXTicks = 5;
-
-//vector<string> usedNodes = {"c3-0", "c3-1", "c3-2", "c3-3", "c3-4", "c3-5", "c3-6"};
 string username = "vstrobel";
 
 /* Convert a number to a string */
@@ -77,7 +74,6 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "base_dir", baseDir);
     GetNodeAttribute(t_node, "interface_path", interfacePath);
     GetNodeAttribute(t_node, "mapping_path", mappingPath);
-    //    GetNodeAttribute(t_node, "mapping_byzantine_path", mappingByzantinePath);
     GetNodeAttribute(t_node, "use_multiple_nodes", useMultipleNodes);
     GetNodeAttribute(t_node, "use_background_geth_calls", useBackgroundGethCalls);
     GetNodeAttribute(t_node, "blockchain_path", blockchainPath);
@@ -85,7 +81,6 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "use_classical_approach", useClassicalApproach);
     GetNodeAttribute(t_node, "regenerate_file", regenerateFile);
     GetNodeAttribute(t_node, "profiling", profiling);
-    //    GetNodeAttribute(t_node, "num_byzantine", numByzantine);
   }
   catch(CARGoSException& ex) {
     THROW_ARGOSEXCEPTION_NESTED("Error initializing controller state parameters.", ex);
@@ -93,6 +88,7 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
 }
 
 
+// Tell the smart contract the robot's public key
 void EPuck_Environment_Classification::registerRobot() {
 
   int robotId = Id2Int(GetId());
@@ -107,6 +103,7 @@ void EPuck_Environment_Classification::registerRobot() {
 
 
 
+// Wait for the first event of the smart contract
 void EPuck_Environment_Classification::updateRegistration() {
 
   int robotId = Id2Int(GetId());
@@ -115,7 +112,6 @@ void EPuck_Environment_Classification::updateRegistration() {
   do {
    eventResult  = eventInterface(robotId, interface, contractAddress, nodeInt, simulationParams.blockchainPath);	
    } while (eventResult.find("Error") != string::npos);
-   //} while (false);
   
   vector<string> splitResult = split(eventResult, ' ');    
   std::string sNewOpinion = splitResult[2];
@@ -179,18 +175,15 @@ void EPuck_Environment_Classification::Init(TConfigurationNode& t_node) {
 
   readNodeMapping();
   
-  /* Strange settings that do strange things (TODO: ask Davide why)  */
   if(simulationParams.percentRed < simulationParams.percentBlue)
     simulationParams.percentRed = simulationParams.percentBlue;
   simulationParams.percentRed = simulationParams.percentRed / 100;
 
   cout << "Percent red is " << simulationParams.percentRed << endl;
   cout << "Percent blue is " << simulationParams.percentBlue << endl;
-
-  //fromLoopFunctionRes();
-  
 }
 
+// Decide which robot runs on which cluster node
 void EPuck_Environment_Classification::readNodeMapping() {
 
  int r_id;
@@ -203,18 +196,17 @@ void EPuck_Environment_Classification::readNodeMapping() {
  while (infile >> r_id >> r_node)
    robotIdToNode[r_id] = r_node;
 
- infile.close();
-  
+ infile.close();  
 }
 
 
+/* Connect/disconnect Ethereum processes to each other */
 void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
 
   set<int> neighborsToAdd;
   set<int> neighborsToRemove;
 
   int robotId = Id2Int(GetId());
-  //  int nodeInt = robotIdToNode[robotId];
   
   /* Old neighbors minus new neighbors = neighbors that should be removed */
   std::set_difference(neighbors.begin(),
@@ -232,32 +224,20 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
   		      std::inserter(neighborsToAdd, neighborsToAdd.end()));
  
   
-  //  cout << "Robot " << robotId << " Old neighbors: ";
-
   std::set<int>::iterator it;
   for (it = neighbors.begin(); it != neighbors.end(); ++it) {
     int i = *it;
-    //    cout << i << " ";
   }
-  //  cout << endl;
 
-  //  cout << "Robot " << robotId << " New neighbors: ";
   for (it = newNeighbors.begin(); it != newNeighbors.end(); ++it) {
     int i = *it;
-    //    cout << i << " ";
   }
-  //  cout << endl;
-  
 
   for (it = neighborsToRemove.begin(); it != neighborsToRemove.end(); ++it) {
     
     int i = *it;
-    //cout << "Robot " << robotId << " Removing neighbors: ";
-    //cout << i << " ";
-    //cout << endl;
     if (simulationParams.useMultipleNodes) {
       string e = enodes[i];
-      //string e = get_enode(i, robotIdToNode[i], simulationParams.basePort, simulationParams.blockchainPath);
       if (simulationParams.useBackgroundGethCalls)
 	remove_peer_bg(robotId, e, nodeInt, simulationParams.blockchainPath);
       else
@@ -270,12 +250,8 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
 
   for (it = neighborsToAdd.begin(); it != neighborsToAdd.end(); ++it) {
     int i = *it;
-    //cout << "Robot " << robotId << " Adding neighbors: ";
-    //cout << i << " ";
-    // cout << endl;
     if (simulationParams.useMultipleNodes) {
       string e = enodes[i];
-      //string e = get_enode(i, robotIdToNode[i], simulationParams.basePort, simulationParams.blockchainPath);
       if (simulationParams.useBackgroundGethCalls)
 	add_peer_bg(robotId, e, nodeInt, simulationParams.blockchainPath);
       else
@@ -286,7 +262,7 @@ void EPuck_Environment_Classification::UpdateNeighbors(set<int> newNeighbors) {
     }
   }
   
-  //Update neighbor array
+  // Update neighbor array
   set<int> neighborsTmp(newNeighbors);
   neighbors = neighborsTmp;
   
@@ -314,10 +290,8 @@ void EPuck_Environment_Classification::ControlStep() {
   /* Move robots following randomWalk */
   Move();
 
-  double begin_state = get_wall_time();
   /* Two different behaviours, depending on if they are diffusing or exploring */
   switch(m_sStateData.State) {
-
     
   case SStateData::STATE_EXPLORING: {
 
@@ -329,7 +303,6 @@ void EPuck_Environment_Classification::ControlStep() {
     //  currentNeighbors.insert(i);
     //}
 
-    double before_extra = get_wall_time();
     if (!simulationParams.useClassicalApproach) {
       UpdateNeighbors(currentNeighbors);
       
@@ -342,11 +315,7 @@ void EPuck_Environment_Classification::ControlStep() {
 	  stop_mining(robotId);
       }
     }
-
-    Explore();
-    
-    //cout << fixed << "The extra stuff took (ms): " << (get_wall_time() -  before_extra) << endl;
-
+    Explore();    
     break;
   }
 
@@ -379,10 +348,7 @@ void EPuck_Environment_Classification::ControlStep() {
     else {
       m_pcWheels->SetLinearVelocity(0.0f, m_fWheelVelocity);
     }
-  }
-
-  //measure_time(begin_state,  "Full iteration state");
-  
+  }  
 }
 
 /************************************************** RANDOM WALK ************************************************/
@@ -413,8 +379,6 @@ void EPuck_Environment_Classification::RandomWalk() {
 	{
 	  movement.walkTime = Ceil(m_pcRNG->Exponential((Real)simulationParams.LAMDA)*4); // Exponential random generator. *50 is a scale factor for the time
 	  movement.actualDirection = 0;
-	  //std::cout<<" LMB "<< simulationParams.LAMDA <<" WT NEW "<< movement.walkTime;
-	  //std::cout.flush();
 	}
     }
   else {							// NO: The period of time is not finished, decrement the ->
@@ -428,13 +392,6 @@ void EPuck_Environment_Classification::RandomWalk() {
 /***************************************************************************************************************/
 void EPuck_Environment_Classification::Explore() {
 
-
-  //if (simulationParams.profiling)
-  double begin_explore = get_wall_time();
-  double after_vote, timer1, timer2;
-  timer1 = get_wall_time();
-  timer2 = get_wall_time();
-  
   m_pcRABS->ClearPackets();
   
   int robotId = Id2Int(GetId());
@@ -459,8 +416,6 @@ void EPuck_Environment_Classification::Explore() {
    *   different params for the random variable;
    */
   else{
-    double before_vote = get_wall_time();
-
     if (byzantineStyle == 4 || byzantineStyle == 5)
       opinion.quality = 1.0;
     else
@@ -474,7 +429,6 @@ void EPuck_Environment_Classification::Explore() {
     
     if (!simulationParams.useClassicalApproach) {
       uint opinionInt = (uint) (opinion.quality * 100); // Convert opinion quality to a value between 0 and 100
-      //cout << "Opinion to send is " << (opinion.actualOpinion / 2) << endl;
       string args[4] = {NumberToString(opinion.actualOpinion),
 			NumberToString(simulationParams.decision_rule),
 			NumberToString(bwh.blockNumber),
@@ -485,17 +439,9 @@ void EPuck_Environment_Classification::Explore() {
       if (simulationParams.useMultipleNodes){
 
 	int args3[1] = {bwh.blockNumber};
-	//string getOpinionPerBlockResult = smartContractInterfaceCall(robotId, interface, contractAddress, "getOpinionPerBlock", args3, 1, 0, nodeInt, simulationParams.blockchainPath);
-	//cout << "getOpinionPerBlockResult is " << getOpinionPerBlockResult << " robotId is " << robotId << "Block number is " << bwh.blockNumber << endl;
-	//voteResult = smartContractInterfaceStringCall(robotId, interface, contractAddress, "vote", args, 4, opinionInt, nodeInt, simulationParams.blockchainPath);
-	//cout << "The vote result is " << voteResult << " robotId " << robotId << " byz: " << byzantineStyle << endl;
 	smartContractInterfaceStringBg(robotId, interface, contractAddress, "vote", args, 4, opinionInt, nodeInt, simulationParams.blockchainPath);
-      } //else {
-      //	voteResult = smartContractInterface(robotId, interface, contractAddress, "vote", args, 4, opinionInt);
-      //    }
+      } 
     }
-    //after_vote = get_wall_time();
-    //measure_time(before_vote, "Voting only");
     
     /* Assigning a new exploration time, for the next exploration state */
     
@@ -532,18 +478,14 @@ void EPuck_Environment_Classification::Explore() {
 
     }
 
-    //cout << "Remaining diffusing time is: " << m_sStateData.remainingDiffusingTime << " and opinion is " << opinion.actualOpinion << endl;
-
     m_sStateData.diffusingDurationTime = m_sStateData.remainingDiffusingTime;
-  }
-
-  //measure_time(begin_explore, "Explore time measurement");
-  
+  }  
 }
 
 /************************************************* DIFFUSING STATE *********************************************/
 /***************************************************************************************************************/
 
+// Wait until a transaction is mined and the corresponding event is created
 void EPuck_Environment_Classification::WaitForDecision() {
 
   int robotId = Id2Int(GetId());
@@ -639,8 +581,6 @@ void EPuck_Environment_Classification::ConnectAndListen() {
      * Don't want to save 0,0,0 values (values sent casually before to add 555 value, probably no
      * more used now.
      */
-    //	if((IC.senderID == 0) && (IC.receivedQuality==0) && (IC.receivedOpinion==0))
-    //	  saved = true;
     
     /* Save value if it has not been already saved and it's not 5,5,5 or 0,0,0 value  */
     if(!saved) {
@@ -671,8 +611,6 @@ void EPuck_Environment_Classification::ConnectAndListen() {
 	start_mining_bg(robotId, 1, nodeInt, simulationParams.blockchainPath);
       else
 	start_mining(robotId, 1);
-      //measure_time(before_mining, "Start mining");
-      
     }    	  
   }
 }
@@ -777,26 +715,18 @@ void EPuck_Environment_Classification::DiffuseInformation() {
 
 	      cout << "epuck_environment_classification error !!" << endl;
 	      throw;
-	      //killGethAndRemoveFolders(simulationParams.blockchainPath, simulationParams.regenerateFile);	  
-
 	    }
 	  }
 	  
 	  throw;
 	}
-	//measure_time(begin_diffuse, "Voting finished in diffuse");
       }
 
 }
 
 void EPuck_Environment_Classification::Diffusing() {
 
-  //if (simulationParams.profiling)
-  double begin_diffuse = get_wall_time();
-  
-  
   m_sStateData.remainingDiffusingTime--;
-  
 
   if (m_sStateData.remainingDiffusingTime < 30 ) {
     ConnectAndListen();
@@ -821,8 +751,6 @@ void EPuck_Environment_Classification::Diffusing() {
 	
 	m_sStateData.remainingDiffusingTime--;
   } else if (m_sStateData.remainingDiffusingTime < 0 && !receivedDecision) {
-    // Wait for Decision
-    //WaitForDecision();
     if (!threadCurrentlyRunning){
       eventTrials++;
       threadCurrentlyRunning = true;
@@ -1027,20 +955,8 @@ void EPuck_Environment_Classification::MajorityRule(){
 	    numberOpinionsReceived[opinionsValuated[i].receivedOpinion]++;
 	  }
 
-	  //for (UInt32 i = 0; i < N_COL; i++ ) {
-	  //  cout << "i is " << i << " and numberOpinionsReceived[i] is " << numberOpinionsReceived[i] << endl;
-	  //}
-
-
-	  // Loop seems to be unncessary
-
-	  //cout << "Prev. opinion was" << opinion.actualOpinion << endl;
-	  	  //	  for( UInt32 i = 0; i<3; i++) {
 	  opinion.actualOpinion = FindMaxOpinionReceived(numberOpinionsReceived, opinion.actualOpinion);
 	  //opinion.actualOpinion = FindMaxOpinionReceivedWithBug(numberOpinionsReceived, opinion.actualOpinion);
-	  //cout << "New opinion is" << opinion.actualOpinion << endl;
-		
-		
 	  }
 }
 
@@ -1197,32 +1113,8 @@ void EPuck_Environment_Classification::fromLoopFunctionResPrepare(){
   
   /* Ethereum */
   if (!simulationParams.useClassicalApproach) {
-    nodeInt = robotIdToNode[robotId];
-    
-    
-    //isByzantine = true;
-    
-    //   if (robotId == 0) {
-
-    // if (simulationParams.useMultipleNodes) {
-	
-    //	string bckiller = "bash " + simulationParams.blockchainPath + "/bckillerccall";
-    //exec(bckiller.c_str());    
-	//	
-    //} else {
-    //	system("killall geth");
-    //}
-      
-    //std::ostringstream fullCommandStream;
-      
-      /* The blockchain folder gets moved to the data folder (or just
-	 removed) at the end of each run; therefore, this command is
-	 just to make sure that the directory is really empty */
-      //fullCommandStream << "rm -rf " << simulationParams.blockchainPath << "?*";
-      
-      //std::string fullCommand = fullCommandStream.str();
-      //system(fullCommand.c_str());     
-      interface = readStringFromFile(simulationParams.baseDir + simulationParams.interfacePath);
+    nodeInt = robotIdToNode[robotId];       
+    interface = readStringFromFile(simulationParams.baseDir + simulationParams.interfacePath);
     
     /* Find out on which cluster node this robot's geth process should be executed */
     if (simulationParams.useMultipleNodes) {

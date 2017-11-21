@@ -203,11 +203,9 @@ public:
      byzantineStyle = style;
    }
    
-
    void UpdateNeighbors(std::set<int> newNeighbors);
-   void registerRobot();
-   void updateRegistration();
-   
+   void registerRobot(); // Tell the smart contract the robot's public key
+   void updateRegistration(); // Wait for the first event of the smart contract   
 
 private:
 
