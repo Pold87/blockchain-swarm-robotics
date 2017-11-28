@@ -1,0 +1,12 @@
+{
+    "blockchain": {
+        "id" : "49",
+	"bin" : "/home/arena/repos/volker/blockchain-swarm-robotics/src/controllers/epuck_blockchain",
+        "xml" : "/home/arena/repos/volker/blockchain-swarm-robotics/experiments/epuck_blockchain_created.argos",
+        "controller" : "blockchain",
+        "baseip" : "10.0.1",
+        "username" : "root",
+        "uploadfolder" : "vstrobel/"
+    }
+
+}

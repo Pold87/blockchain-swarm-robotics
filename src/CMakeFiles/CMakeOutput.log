@@ -1,0 +1,232 @@
+The target system is: Linux -  - 
+The host system is: Linux - 4.10.0-37-generic - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /home/arena/arm-unknown-linux-gnueabi/bin/arm-unknown-linux-gnueabi-gcc 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/3.5.1/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /home/arena/arm-unknown-linux-gnueabi/bin/arm-unknown-linux-gnueabi-g++ 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/3.5.1/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_e5740/fast"
+/usr/bin/make -f CMakeFiles/cmTC_e5740.dir/build.make CMakeFiles/cmTC_e5740.dir/build
+make[1]: Entering directory '/home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e5740.dir/testCCompiler.c.o
+/home/arena/arm-unknown-linux-gnueabi/bin/arm-unknown-linux-gnueabi-gcc    -O3 -DNDEBUG   -o CMakeFiles/cmTC_e5740.dir/testCCompiler.c.o   -c /home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_e5740
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e5740.dir/link.txt --verbose=1
+/home/arena/arm-unknown-linux-gnueabi/bin/arm-unknown-linux-gnueabi-gcc    -O3 -DNDEBUG    CMakeFiles/cmTC_e5740.dir/testCCompiler.c.o  -o cmTC_e5740 -rdynamic 
+make[1]: Leaving directory '/home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp'
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c32a0/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c32a0.dir/build.make CMakeFiles/cmTC_c32a0.dir/build
+make[1]: Entering directory '/home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c32a0.dir/CMakeCCompilerABI.c.o
+/home/arena/arm-unknown-linux-gnueabi/bin/arm-unknown-linux-gnueabi-gcc    -O3 -DNDEBUG   -o CMakeFiles/cmTC_c32a0.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_c32a0
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c32a0.dir/link.txt --verbose=1
+/home/arena/arm-unknown-linux-gnueabi/bin/arm-unknown-linux-gnueabi-gcc    -O3 -DNDEBUG   -v CMakeFiles/cmTC_c32a0.dir/CMakeCCompilerABI.c.o  -o cmTC_c32a0 -rdynamic  
+Using built-in specs.
+Target: arm-unknown-linux-gnueabi
+Configured with: /home/ken/armcompiler/.build/src/gcc-4.3.6/configure --build=x86_64-build_pc-linux-gnu --host=x86_64-build_pc-linux-gnu --target=arm-unknown-linux-gnueabi --prefix=/home/ken/x-tools/arm-unknown-linux-gnueabi --with-sysroot=/home/ken/x-tools/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot --enable-languages=c,c++ --with-float=soft --with-pkgversion='crosstool-NG crosstool-ng-1.22.0' --disable-sjlj-exceptions --enable-__cxa_atexit --disable-libmudflap --disable-libgomp --disable-libssp --with-gmp=/home/ken/armcompiler/.build/arm-unknown-linux-gnueabi/buildtools --with-mpfr=/home/ken/armcompiler/.build/arm-unknown-linux-gnueabi/buildtools --with-libelf=/home/ken/armcompiler/.build/arm-unknown-linux-gnueabi/buildtools --enable-lto --enable-threads=posix --enable-target-optspace --disable-nls --disable-multilib --with-local-prefix=/home/ken/x-tools/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot --enable-long-long
+Thread model: posix
+gcc version 4.3.3 (crosstool-NG crosstool-ng-1.22.0) 
+COMPILER_PATH=/home/arena/arm-unknown-linux-gnueabi/bin/../libexec/gcc/arm-unknown-linux-gnueabi/4.3.3/:/home/arena/arm-unknown-linux-gnueabi/bin/../libexec/gcc/:/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/bin/
+LIBRARY_PATH=/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/:/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/:/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/lib/:/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/lib/:/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/
+COLLECT_GCC_OPTIONS='-O3' '-DNDEBUG' '-v' '-o' 'cmTC_c32a0' '-rdynamic' '-mfloat-abi=soft'
+ /home/arena/arm-unknown-linux-gnueabi/bin/../libexec/gcc/arm-unknown-linux-gnueabi/4.3.3/collect2 --sysroot=/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot --eh-frame-hdr -export-dynamic -dynamic-linker /lib/ld-linux.so.3 -X -m armelf_linux_eabi -o cmTC_c32a0 /home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crt1.o /home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crti.o /home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/crtbegin.o -L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3 -L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc -L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/lib -L/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/lib -L/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib CMakeFiles/cmTC_c32a0.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/crtend.o /home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crtn.o
+make[1]: Leaving directory '/home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp'
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(CMAKE_LINKER-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_c32a0/fast"]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_c32a0.dir/build.make CMakeFiles/cmTC_c32a0.dir/build]
+  ignore line: [make[1]: Entering directory '/home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_c32a0.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/home/arena/arm-unknown-linux-gnueabi/bin/arm-unknown-linux-gnueabi-gcc    -O3 -DNDEBUG   -o CMakeFiles/cmTC_c32a0.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_c32a0]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c32a0.dir/link.txt --verbose=1]
+  ignore line: [/home/arena/arm-unknown-linux-gnueabi/bin/arm-unknown-linux-gnueabi-gcc    -O3 -DNDEBUG   -v CMakeFiles/cmTC_c32a0.dir/CMakeCCompilerABI.c.o  -o cmTC_c32a0 -rdynamic  ]
+  ignore line: [Using built-in specs.]
+  ignore line: [Target: arm-unknown-linux-gnueabi]
+  ignore line: [Configured with: /home/ken/armcompiler/.build/src/gcc-4.3.6/configure --build=x86_64-build_pc-linux-gnu --host=x86_64-build_pc-linux-gnu --target=arm-unknown-linux-gnueabi --prefix=/home/ken/x-tools/arm-unknown-linux-gnueabi --with-sysroot=/home/ken/x-tools/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot --enable-languages=c,c++ --with-float=soft --with-pkgversion='crosstool-NG crosstool-ng-1.22.0' --disable-sjlj-exceptions --enable-__cxa_atexit --disable-libmudflap --disable-libgomp --disable-libssp --with-gmp=/home/ken/armcompiler/.build/arm-unknown-linux-gnueabi/buildtools --with-mpfr=/home/ken/armcompiler/.build/arm-unknown-linux-gnueabi/buildtools --with-libelf=/home/ken/armcompiler/.build/arm-unknown-linux-gnueabi/buildtools --enable-lto --enable-threads=posix --enable-target-optspace --disable-nls --disable-multilib --with-local-prefix=/home/ken/x-tools/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot --enable-long-long]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 4.3.3 (crosstool-NG crosstool-ng-1.22.0) ]
+  ignore line: [COMPILER_PATH=/home/arena/arm-unknown-linux-gnueabi/bin/../libexec/gcc/arm-unknown-linux-gnueabi/4.3.3/:/home/arena/arm-unknown-linux-gnueabi/bin/../libexec/gcc/:/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/bin/]
+  ignore line: [LIBRARY_PATH=/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/:/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/:/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/lib/:/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/lib/:/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-O3' '-DNDEBUG' '-v' '-o' 'cmTC_c32a0' '-rdynamic' '-mfloat-abi=soft']
+  link line: [ /home/arena/arm-unknown-linux-gnueabi/bin/../libexec/gcc/arm-unknown-linux-gnueabi/4.3.3/collect2 --sysroot=/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot --eh-frame-hdr -export-dynamic -dynamic-linker /lib/ld-linux.so.3 -X -m armelf_linux_eabi -o cmTC_c32a0 /home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crt1.o /home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crti.o /home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/crtbegin.o -L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3 -L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc -L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/lib -L/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/lib -L/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib CMakeFiles/cmTC_c32a0.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/crtend.o /home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crtn.o]
+    arg [/home/arena/arm-unknown-linux-gnueabi/bin/../libexec/gcc/arm-unknown-linux-gnueabi/4.3.3/collect2] ==> ignore
+    arg [--sysroot=/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib/ld-linux.so.3] ==> ignore
+    arg [-X] ==> ignore
+    arg [-m] ==> ignore
+    arg [armelf_linux_eabi] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_c32a0] ==> ignore
+    arg [/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crt1.o] ==> ignore
+    arg [/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crti.o] ==> ignore
+    arg [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/crtbegin.o] ==> ignore
+    arg [-L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3] ==> dir [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3]
+    arg [-L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc] ==> dir [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc]
+    arg [-L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/lib] ==> dir [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/lib]
+    arg [-L/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/lib] ==> dir [/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/lib]
+    arg [-L/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib] ==> dir [/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib]
+    arg [CMakeFiles/cmTC_c32a0.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/crtend.o] ==> ignore
+    arg [/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crtn.o] ==> ignore
+  remove lib [gcc]
+  remove lib [gcc_s]
+  remove lib [gcc]
+  remove lib [gcc_s]
+  collapse library dir [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3] ==> [/home/arena/arm-unknown-linux-gnueabi/lib/gcc/arm-unknown-linux-gnueabi/4.3.3]
+  collapse library dir [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc] ==> [/home/arena/arm-unknown-linux-gnueabi/lib/gcc]
+  collapse library dir [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/lib] ==> [/home/arena/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/lib]
+  collapse library dir [/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/lib] ==> [/home/arena/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot/lib]
+  collapse library dir [/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib] ==> [/home/arena/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot/usr/lib]
+  implicit libs: [c]
+  implicit dirs: [/home/arena/arm-unknown-linux-gnueabi/lib/gcc/arm-unknown-linux-gnueabi/4.3.3;/home/arena/arm-unknown-linux-gnueabi/lib/gcc;/home/arena/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/lib;/home/arena/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot/lib;/home/arena/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot/usr/lib]
+  implicit fwks: []
+
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_4baea/fast"
+/usr/bin/make -f CMakeFiles/cmTC_4baea.dir/build.make CMakeFiles/cmTC_4baea.dir/build
+make[1]: Entering directory '/home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_4baea.dir/testCXXCompiler.cxx.o
+/home/arena/arm-unknown-linux-gnueabi/bin/arm-unknown-linux-gnueabi-g++     -O3 -DNDEBUG   -o CMakeFiles/cmTC_4baea.dir/testCXXCompiler.cxx.o -c /home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_4baea
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4baea.dir/link.txt --verbose=1
+/home/arena/arm-unknown-linux-gnueabi/bin/arm-unknown-linux-gnueabi-g++     -O3 -DNDEBUG    CMakeFiles/cmTC_4baea.dir/testCXXCompiler.cxx.o  -o cmTC_4baea -rdynamic 
+make[1]: Leaving directory '/home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp'
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f3ae3/fast"
+/usr/bin/make -f CMakeFiles/cmTC_f3ae3.dir/build.make CMakeFiles/cmTC_f3ae3.dir/build
+make[1]: Entering directory '/home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_f3ae3.dir/CMakeCXXCompilerABI.cpp.o
+/home/arena/arm-unknown-linux-gnueabi/bin/arm-unknown-linux-gnueabi-g++     -O3 -DNDEBUG   -o CMakeFiles/cmTC_f3ae3.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.5/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTC_f3ae3
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f3ae3.dir/link.txt --verbose=1
+/home/arena/arm-unknown-linux-gnueabi/bin/arm-unknown-linux-gnueabi-g++     -O3 -DNDEBUG   -v CMakeFiles/cmTC_f3ae3.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_f3ae3 -rdynamic  
+Using built-in specs.
+Target: arm-unknown-linux-gnueabi
+Configured with: /home/ken/armcompiler/.build/src/gcc-4.3.6/configure --build=x86_64-build_pc-linux-gnu --host=x86_64-build_pc-linux-gnu --target=arm-unknown-linux-gnueabi --prefix=/home/ken/x-tools/arm-unknown-linux-gnueabi --with-sysroot=/home/ken/x-tools/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot --enable-languages=c,c++ --with-float=soft --with-pkgversion='crosstool-NG crosstool-ng-1.22.0' --disable-sjlj-exceptions --enable-__cxa_atexit --disable-libmudflap --disable-libgomp --disable-libssp --with-gmp=/home/ken/armcompiler/.build/arm-unknown-linux-gnueabi/buildtools --with-mpfr=/home/ken/armcompiler/.build/arm-unknown-linux-gnueabi/buildtools --with-libelf=/home/ken/armcompiler/.build/arm-unknown-linux-gnueabi/buildtools --enable-lto --enable-threads=posix --enable-target-optspace --disable-nls --disable-multilib --with-local-prefix=/home/ken/x-tools/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot --enable-long-long
+Thread model: posix
+gcc version 4.3.3 (crosstool-NG crosstool-ng-1.22.0) 
+COMPILER_PATH=/home/arena/arm-unknown-linux-gnueabi/bin/../libexec/gcc/arm-unknown-linux-gnueabi/4.3.3/:/home/arena/arm-unknown-linux-gnueabi/bin/../libexec/gcc/:/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/bin/
+LIBRARY_PATH=/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/:/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/:/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/lib/:/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/lib/:/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/
+COLLECT_GCC_OPTIONS='-O3' '-DNDEBUG' '-v' '-o' 'cmTC_f3ae3' '-rdynamic' '-shared-libgcc' '-mfloat-abi=soft'
+ /home/arena/arm-unknown-linux-gnueabi/bin/../libexec/gcc/arm-unknown-linux-gnueabi/4.3.3/collect2 --sysroot=/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot --eh-frame-hdr -export-dynamic -dynamic-linker /lib/ld-linux.so.3 -X -m armelf_linux_eabi -o cmTC_f3ae3 /home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crt1.o /home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crti.o /home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/crtbegin.o -L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3 -L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc -L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/lib -L/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/lib -L/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib CMakeFiles/cmTC_f3ae3.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/crtend.o /home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crtn.o
+make[1]: Leaving directory '/home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp'
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(CMAKE_LINKER-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_f3ae3/fast"]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_f3ae3.dir/build.make CMakeFiles/cmTC_f3ae3.dir/build]
+  ignore line: [make[1]: Entering directory '/home/arena/repos/volker/blockchain-swarm-robotics/src/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_f3ae3.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/home/arena/arm-unknown-linux-gnueabi/bin/arm-unknown-linux-gnueabi-g++     -O3 -DNDEBUG   -o CMakeFiles/cmTC_f3ae3.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.5/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTC_f3ae3]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f3ae3.dir/link.txt --verbose=1]
+  ignore line: [/home/arena/arm-unknown-linux-gnueabi/bin/arm-unknown-linux-gnueabi-g++     -O3 -DNDEBUG   -v CMakeFiles/cmTC_f3ae3.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_f3ae3 -rdynamic  ]
+  ignore line: [Using built-in specs.]
+  ignore line: [Target: arm-unknown-linux-gnueabi]
+  ignore line: [Configured with: /home/ken/armcompiler/.build/src/gcc-4.3.6/configure --build=x86_64-build_pc-linux-gnu --host=x86_64-build_pc-linux-gnu --target=arm-unknown-linux-gnueabi --prefix=/home/ken/x-tools/arm-unknown-linux-gnueabi --with-sysroot=/home/ken/x-tools/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot --enable-languages=c,c++ --with-float=soft --with-pkgversion='crosstool-NG crosstool-ng-1.22.0' --disable-sjlj-exceptions --enable-__cxa_atexit --disable-libmudflap --disable-libgomp --disable-libssp --with-gmp=/home/ken/armcompiler/.build/arm-unknown-linux-gnueabi/buildtools --with-mpfr=/home/ken/armcompiler/.build/arm-unknown-linux-gnueabi/buildtools --with-libelf=/home/ken/armcompiler/.build/arm-unknown-linux-gnueabi/buildtools --enable-lto --enable-threads=posix --enable-target-optspace --disable-nls --disable-multilib --with-local-prefix=/home/ken/x-tools/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot --enable-long-long]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 4.3.3 (crosstool-NG crosstool-ng-1.22.0) ]
+  ignore line: [COMPILER_PATH=/home/arena/arm-unknown-linux-gnueabi/bin/../libexec/gcc/arm-unknown-linux-gnueabi/4.3.3/:/home/arena/arm-unknown-linux-gnueabi/bin/../libexec/gcc/:/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/bin/]
+  ignore line: [LIBRARY_PATH=/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/:/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/:/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/lib/:/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/lib/:/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-O3' '-DNDEBUG' '-v' '-o' 'cmTC_f3ae3' '-rdynamic' '-shared-libgcc' '-mfloat-abi=soft']
+  link line: [ /home/arena/arm-unknown-linux-gnueabi/bin/../libexec/gcc/arm-unknown-linux-gnueabi/4.3.3/collect2 --sysroot=/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot --eh-frame-hdr -export-dynamic -dynamic-linker /lib/ld-linux.so.3 -X -m armelf_linux_eabi -o cmTC_f3ae3 /home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crt1.o /home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crti.o /home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/crtbegin.o -L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3 -L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc -L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/lib -L/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/lib -L/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib CMakeFiles/cmTC_f3ae3.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/crtend.o /home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crtn.o]
+    arg [/home/arena/arm-unknown-linux-gnueabi/bin/../libexec/gcc/arm-unknown-linux-gnueabi/4.3.3/collect2] ==> ignore
+    arg [--sysroot=/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib/ld-linux.so.3] ==> ignore
+    arg [-X] ==> ignore
+    arg [-m] ==> ignore
+    arg [armelf_linux_eabi] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_f3ae3] ==> ignore
+    arg [/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crt1.o] ==> ignore
+    arg [/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crti.o] ==> ignore
+    arg [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/crtbegin.o] ==> ignore
+    arg [-L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3] ==> dir [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3]
+    arg [-L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc] ==> dir [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc]
+    arg [-L/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/lib] ==> dir [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/lib]
+    arg [-L/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/lib] ==> dir [/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/lib]
+    arg [-L/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib] ==> dir [/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib]
+    arg [CMakeFiles/cmTC_f3ae3.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-lm] ==> lib [m]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/crtend.o] ==> ignore
+    arg [/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib/crtn.o] ==> ignore
+  remove lib [gcc_s]
+  remove lib [gcc]
+  remove lib [gcc_s]
+  remove lib [gcc]
+  collapse library dir [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3] ==> [/home/arena/arm-unknown-linux-gnueabi/lib/gcc/arm-unknown-linux-gnueabi/4.3.3]
+  collapse library dir [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc] ==> [/home/arena/arm-unknown-linux-gnueabi/lib/gcc]
+  collapse library dir [/home/arena/arm-unknown-linux-gnueabi/bin/../lib/gcc/arm-unknown-linux-gnueabi/4.3.3/../../../../arm-unknown-linux-gnueabi/lib] ==> [/home/arena/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/lib]
+  collapse library dir [/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/lib] ==> [/home/arena/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot/lib]
+  collapse library dir [/home/arena/arm-unknown-linux-gnueabi/bin/../arm-unknown-linux-gnueabi/sysroot/usr/lib] ==> [/home/arena/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot/usr/lib]
+  implicit libs: [stdc++;m;c]
+  implicit dirs: [/home/arena/arm-unknown-linux-gnueabi/lib/gcc/arm-unknown-linux-gnueabi/4.3.3;/home/arena/arm-unknown-linux-gnueabi/lib/gcc;/home/arena/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/lib;/home/arena/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot/lib;/home/arena/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/sysroot/usr/lib]
+  implicit fwks: []
+
+
