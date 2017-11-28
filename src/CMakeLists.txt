@@ -11,30 +11,27 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 # Include path points to the base source dir
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
 
-# if(ARGOS_BUILD_FOR STREQUAL "simulator")
-# 	set (ARGOS_BUILD_FOR_SIMULATOR)
+ if(ARGOS_BUILD_FOR STREQUAL "simulator")
+ 	set (ARGOS_BUILD_FOR_SIMULATOR)
 
-# 	# Find the ARGoS package
-# 	find_package(PkgConfig)
-# 	pkg_check_modules(ARGOS REQUIRED argos3_simulator)
-# 	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ARGOS_PREFIX}/share/argos3/cmake)
-# 	message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
+ 	# Find the ARGoS package
+ 	find_package(PkgConfig)
+ 	pkg_check_modules(ARGOS REQUIRED argos3_simulator)
+ 	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ARGOS_PREFIX}/share/argos3/cmake)
+ 	message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
 
-# 	# Check whether all the necessary libs have been installed to compile the
-# 	# code that depends on Qt and OpenGL
-# 	include(ARGoSCheckQTOpenGL)
+ 	# Check whether all the necessary libs have been installed to compile the
+ 	# code that depends on Qt and OpenGL
+ 	include(ARGoSCheckQTOpenGL)
 
-# 	# Find the GSL package
-# 	find_package(GSL)
+ 	# Find the GSL package
+ 	find_package(GSL)
 
-# 	# Find Lua
-# 	find_package(Lua52)
-# else()
-# 	set (ARGOS_BUILD_FOR_EPUCK)
-# endif(ARGOS_BUILD_FOR STREQUAL "simulator")
-
-set (ARGOS_BUILD_FOR_EPUCK)
-
+ 	# Find Lua
+ 	find_package(Lua52)
+ else()
+ 	set(ARGOS_BUILD_FOR_EPUCK)
+ endif(ARGOS_BUILD_FOR STREQUAL "simulator")
 
 # Make sure we are under Unix
 if(NOT UNIX)
@@ -61,6 +58,7 @@ link_directories(${ARGOS_LIBRARY_DIRS})
 # Descend into the controllers directory
 add_subdirectory(controllers)
 
+if(ARGOS_BUILD_FOR STREQUAL "simulator")
 # Descend into the loop_functions directory
-#add_subdirectory(loop_functions)
-
+add_subdirectory(loop_functions)
+endif(ARGOS_BUILD_FOR STREQUAL "simulator")
