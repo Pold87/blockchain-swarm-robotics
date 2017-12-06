@@ -1,8 +1,8 @@
 # Usage: bash start_xyz.sh <node1> <node2> <decision_rule>
 TEMPLATE='experiments/epuck_EC_locale_template.argos'
 OUTFILE="experiments/epuck$1.argos"
-#BASEDIR='/home/volker/Documents/bc_collective/controllers/epuck_environment_classification/'
-BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
+BASEDIR='/home/volker/Documents/bc_collective/controllers/epuck_environment_classification/'
+#BASEDIR='/home/vstrobel/Documents/argdavide/controllers/epuck_environment_classification/'
 BLOCKCHAINPATH="/home/vstrobel/eth_data_para$1/data" # always without '/' at the end!!
 MINERID=$(expr 120 + $1)
 echo "MINERID is ${MINERID}"
@@ -16,7 +16,8 @@ MININGDIFF=1000000 #was 1000000 before
 # never go with the difficulty below 131072! (see https://github.com/ethereum/go-ethereum/issues/3590)
 USEMULTIPLENODES=true
 USEBACKGROUNDGETHCALLS=true
-MAPPINGPATH="/home/vstrobel/Documents/argdavide/experiments/config$1.txt"
+#MAPPINGPATH="/home/vstrobel/Documents/argdavide/experiments/config$1.txt"
+MAPPINGPATH="/home/volker/Documents/bc_collective/experiments/config$1.txt"
 CHANGEDIFFIULTY=""
 NUMRUNS=1
 THREADS=20
@@ -30,7 +31,7 @@ REGENERATEFILE="$(pwd)/regenerate${USEDNODES[0]}.sh"
 # The miner node is the first of the used nodes
 MINERNODE=${USEDNODES[0]}
 
-USECLASSICALAPPROACH=false
+USECLASSICALAPPROACH=true
 # TODO:
 #NUMBYZANTINE=(0 1 2 3 4 5 6 7 8 9)
 NUMBYZANTINE=(0)
