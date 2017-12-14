@@ -1,4 +1,5 @@
 # Usage: bash start_xyz.sh <node1> <node2> <decision_rule>
+USERNAME=`whoami`
 TEMPLATE='experiments/epuck_EC_locale_template.argos'
 OUTFILE="experiments/epuck$1.argos"
 #BASEDIR='/home/volker/Documents/bc_collective/controllers/epuck_environment_classification/'
@@ -71,7 +72,7 @@ SUBSWARMCONSENSUS=true # Determines if all N robots have to agree or
 	    if [ $GENERATEDAG ]; then
 		#if [ "$i" -gt 0 ]; then
 		rm ~/.ethash/*
-		ssh vstrobel@c3-5 "geth makedag 0 ~/.ethash"
+		ssh ${USERNAME}@c3-0 "geth makedag 0 ~/.ethash"
 		echo "" > regeneratedag.txt
 		#fi
 	    fi

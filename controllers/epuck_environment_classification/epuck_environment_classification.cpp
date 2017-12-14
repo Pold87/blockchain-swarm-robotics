@@ -21,10 +21,7 @@ using namespace std;
 map<int, string> enodes;
 map<int, string> coinbaseAddresses;
 string interface; // Smart contract interface
-int usedRack = 3;
-int numNodes = 7;
 SInt32 voteEveryXTicks = 5;
-string username = "vstrobel";
 
 /* Convert a number to a string */
 template <typename T> std::string NumberToString ( T Number )
@@ -100,7 +97,6 @@ void EPuck_Environment_Classification::registerRobot() {
   smartContractInterfaceBg(robotId, interface,
 	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
 }
-
 
 
 // Wait for the first event of the smart contract
@@ -511,7 +507,6 @@ void EPuck_Environment_Classification::WaitForDecision() {
 	  bwh.blockNumber = atoi(sBlock.c_str());      
 	  bwh.hash = "\"" + sBlockhash + "\"";
 	  opinion.actualOpinion = newOpinion;
-
 
 	  if (byzantineStyle > 0) {
 	
