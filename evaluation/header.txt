@@ -1,1 +1,0 @@
-clock	exploringRed	diffusingRed	exploringGreen	diffusingGreen	exploringBlue	diffusingBlue	

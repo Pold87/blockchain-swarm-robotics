@@ -1,6 +1,6 @@
 rack=3
 maxNode=12
-username=vstrobel
+username=`whoami`
 
 for node in `seq 0 $maxNode`;
 do

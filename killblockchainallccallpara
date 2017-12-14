@@ -1,5 +1,5 @@
 rack=3
-username=vstrobel
+username=`whoami`
 
 for node in "$@"
 do
