@@ -472,7 +472,7 @@ void geth_init(int i, int nodeInt, int basePort, string datadirBase, string gene
   
   string commandStream = fullCommandStream.str();
 
-  if (DEBUG)
+  if (true)
     cout << "geth init: " << commandStream << endl; 
   
   exec(commandStream.c_str());
@@ -587,6 +587,7 @@ void createAccount(int i) {
 void createAccount(int i, int nodeInt, int basePort, string datadirBase) {
   sleep(1);
   string cmd = "personal.newAccount(\"test\")";
+  cout << "create account: " << cmd << std::endl;
   string res = exec_geth_cmd_with_geth_restart(i, cmd, nodeInt, basePort, datadirBase);
 }
 
