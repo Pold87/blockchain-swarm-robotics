@@ -2,6 +2,8 @@
 
 # Script by Lorenzo Garattoni
 
+# Modifica
+
 USERNAME=`whoami`
 
 # Installation directory (specify a full path!)
