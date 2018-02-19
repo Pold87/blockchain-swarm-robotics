@@ -8,8 +8,8 @@ Managing Byzantine Robots via Blockchain Technology in a Swarm Robotics Collecti
 
 *To appear in Proceedings of the 17th Conference on Autonomous Agents and MultiAgent Systems. International Foundation for Autonomous Agents and Multiagent Systems (AAMAS 2018).*
 
-A pre-print is available at: 
-[http://iridia.ulb.ac.be/IridiaTrSeries/]
+A pre-print is available at:  
+http://iridia.ulb.ac.be/IridiaTrSeries/
 
 
 ## Scenario
