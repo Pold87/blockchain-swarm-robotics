@@ -1,9 +1,16 @@
 # Managing Byzantine Robots via Blockchain Technology in a Swarm Robotics Collective Decision Making Scenario
 
 
-This repository contains the code for the paper "Managing Byzantine
-Robots via Blockchain Technology in a Swarm Robotics Collective
-Decision Making Scenario."
+This repository contains the code for the paper:
+
+V.Strobel, E. Castello Ferrer, M. Dorigo. 2018.
+Managing Byzantine Robots via Blockchain Technology in a Swarm Robotics Collective Decision Making Scenario.
+
+*To appear in Proceedings of the 17th Conference on Autonomous Agents and MultiAgent Systems. International Foundation for Autonomous Agents and Multiagent Systems (AAMAS 2018).*
+
+A pre-print is available at: 
+[http://iridia.ulb.ac.be/IridiaTrSeries/]
+
 
 ## Scenario
 
