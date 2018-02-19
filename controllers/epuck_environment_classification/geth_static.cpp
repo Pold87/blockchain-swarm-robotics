@@ -29,6 +29,14 @@ const int maxtrials = 3000;
 const string rack = "3";
 bool gethStaticErrorOccurred;
 
+string getUsername() {
+  char *lgn;
+  lgn = getlogin();
+  string username(lgn);
+
+  return username;
+}
+
 
 double get_wall_time(){
   struct timeval time;
@@ -187,7 +195,7 @@ string exec_geth_cmd(int i, string command){
     string node = getNode(i);
     int nodeInt = getNodeInt(i);
     /* Run geth command on this node  */
-    string username = exec("`whoami`");
+    string username = getUsername();
     fullCommandStream << "ssh " << username << "@" << node << " \"";
 
     ReplaceStringInPlace(command, "\"", "\\\"");
@@ -225,9 +233,8 @@ string exec_geth_cmd(int i, string command){
 
 string exec_geth_cmd(int i, string command, int nodeInt, string datadirBase){
 
-
-  
   string res = exec_geth_cmd_helper(i, command, nodeInt, datadirBase);
+
   
   int trials = 20;
   // Retry to execute the command if it failed
@@ -237,18 +244,17 @@ string exec_geth_cmd(int i, string command, int nodeInt, string datadirBase){
     ostringstream fullCommandStream;
     
     /* Run geth command on this node  */
-    string username = exec("`whoami`");
+    string username = getUsername();
     fullCommandStream << "ssh " << username << "@c" << rack << "-" << nodeInt << " \"";
     
     //ReplaceStringInPlace(command, "\"", "\\\"");
     
-    fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc\"";
+    fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc\"";    
     
     std::string fullCommand = fullCommandStream.str();
 
-    
-    //cout << "exec_geth_cmd: " << fullCommand << endl;
-    //cout << "Result of exec_geth_cmd: " << res << endl;    
+    cout << "exec_geth_cmd: " << fullCommand << endl;
+    cout << "Result of exec_geth_cmd: " << res << endl;    
     
     sleep(1); // Wait for a second and retry
     res = exec_geth_cmd_helper(i, command, nodeInt, datadirBase);
@@ -284,7 +290,10 @@ string exec_geth_cmd_helper(int i, string command, int nodeInt, string datadirBa
   ostringstream fullCommandStream;
 
   /* Run geth command on this node  */
-  string username = exec("`whoami`");
+  string username = getUsername();
+
+  cout << "Username is: " << username << endl;
+  
   fullCommandStream << "ssh " << username << "@c" << rack << "-" << nodeInt << " \"";
   
   ReplaceStringInPlace(command, "\"", "\\\"");
@@ -293,7 +302,7 @@ string exec_geth_cmd_helper(int i, string command, int nodeInt, string datadirBa
   
   std::string fullCommand = fullCommandStream.str();
 
-  //cout << "Command in helper is: " << fullCommand << endl;
+  cout << "Command in helper is: " << fullCommand << endl;
   
   string res = exec(fullCommand.c_str());
 
@@ -312,7 +321,7 @@ string exec_geth_cmd_with_geth_restart(int i, string command, int nodeInt, int b
     ostringstream fullCommandStream;
     
     /* Run geth command on this node  */
-    string username = exec("`whoami`");
+    string username = getUsername();
     fullCommandStream << "ssh " << username << "@c" << rack << "-" << nodeInt << " \"";
     
     //ReplaceStringInPlace(command, "\"", "\\\"");
@@ -386,7 +395,7 @@ void exec_geth_cmd_background(int i, string command, int nodeInt, string datadir
   ostringstream fullCommandStream;
 
   /* Run geth command on this node  */
-  string username = exec("`whoami`");
+  string username = getUsername();
   fullCommandStream << "ssh " << username << "@c" << rack << "-" << nodeInt << " \"";
   
   ReplaceStringInPlace(command, "\"", "\\\"");
@@ -425,7 +434,7 @@ void geth_init(int i) {
     string node = getNode(i);
     int nodeInt = getNodeInt(i);
     /* Run geth command on this node  */
-    string username = exec("`whoami`");
+    string username = getUsername();
     fullCommandStream << "ssh " << username << "@" << node << " \"";
 
     fullCommandStream << "geth" << nodeInt << " --verbosity 3" << " --datadir " << str_datadir << " init " << genesis << "\"";
@@ -473,7 +482,7 @@ void geth_init(int i, int nodeInt, int basePort, string datadirBase, string gene
   ostringstream fullCommandStream;
 
   /* Run geth command on this node  */
-  string username = exec("`whoami`");
+  string username = getUsername();
   fullCommandStream << "ssh " << username << "@c" << rack << "-" << nodeInt << " \"";  
   fullCommandStream << "geth" << nodeInt << " --verbosity 3" << " --datadir " << str_datadir << " init " << genesisPath << "\"";
   
@@ -499,7 +508,7 @@ void start_geth(int i) {
     string node = getNode(i);
     int nodeInt = getNodeInt(i);    
     /* Run geth command on this node  */
-    string username = exec("`whoami`");
+    string username = getUsername();
     fullCommandStream << "ssh " << username << "@" << node << " \"";
     fullCommandStream << "geth" << nodeInt << " --verbosity 3 --networkid 2 --nodiscover ";
   } else {
@@ -552,7 +561,7 @@ void start_geth(int i, int nodeInt, int basePort, string datadirBase) {
   ostringstream fullCommandStream;
   
   /* Run geth command on this node  */
-  string username = exec("`whoami`");
+  string username = getUsername();
   fullCommandStream << "ssh " << username << "@c" << rack << "-" << nodeInt << " \"";
   fullCommandStream << "geth" << nodeInt << " --verbosity 3 --networkid 2 --nodiscover ";
   
@@ -912,7 +921,7 @@ std::string unlockAccount(int i, std::string pw, int nodeInt, int basePort, stri
 
 std::string kill_geth_thread(int i) { 
 
-  string username = exec("`whoami`");
+  string username = getUsername();
   int port = ipc_base_port + i;
 
   std::ostringstream fullCommandStream;
@@ -971,7 +980,7 @@ void kill_geth_thread(int i, int basePort, int nodeInt, string datadirBase) {
   std::ostringstream fullCommandStream;
 
   /* Run geth command on this node  */
-  string username = exec("`whoami`");
+  string username = getUsername();
   fullCommandStream << "ssh " << username << "@c" << rack << "-" << nodeInt << " \"";
   fullCommandStream << "ps ax | grep \\\"\\-\\-port " << port << "\\\"" << "\"";
   
@@ -1207,7 +1216,7 @@ std::string deploy_contract(int i, string interfacePath, string dataPath, string
   replace(contractTemplate, "DATA", data);
 
   // TODO: make this a parameter
-  string username = exec("`whoami`");
+  string username = getUsername();
   string tmpPath = "/home/" + username + "/Documents/argdavide/tmp.txt";
 
   std::ofstream out(tmpPath.c_str());

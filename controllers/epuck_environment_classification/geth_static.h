@@ -16,6 +16,8 @@ std::vector<std::string> split(const std::string &s, char delim);
 
 double get_wall_time();
 
+std::string getUsername();
+
 uint Id2Int(std::string id);
 
 bool replace(std::string& str, const std::string& from, const std::string& to);

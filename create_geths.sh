@@ -1,7 +1,7 @@
-NUMGETHS=4
-TEMPLATEA=/home/vstrobel/go-ethereum/circle.yml.template
-TEMPLATEB=/home/vstrobel/go-ethereum/vendor/github.com/ethereum/ethash/ethash.go.template
-TEMPLATEC=~/go-ethereum/core/block_validator.go.template
+RESERVEDNODES=(0 1)
+TEMPLATEA="$HOME/go-ethereum/circle.yml.template"
+TEMPLATEB="$HOME/go-ethereum/vendor/github.com/ethereum/ethash/ethash.go.template"
+TEMPLATEC="$HOME/go-ethereum/core/block_validator.go.template"
 
 if [ $# -eq 0 ]
   then
@@ -11,25 +11,23 @@ else
 fi
 
 
-for i in 8 9 10 13; do
+for i in $RESERVEDNODES; do
 
-    cp -r "/home/vstrobel/go-ethereum" "/home/vstrobel/go-ethereum${i}"
+    cp -r "$HOME/go-ethereum/" "$HOME/go-ethereum${i}"
 
-    OUTFILEA="/home/vstrobel/go-ethereum${i}/circle.yml"
+    OUTFILEA="$HOME/go-ethereum${i}/circle.yml"
 
     sed -e "s|MYNUMBER|$i|g" $TEMPLATEA > $OUTFILEA
 
-    OUTFILEB="/home/vstrobel/go-ethereum${i}/vendor/github.com/ethereum/ethash/ethash.go"
+    OUTFILEB="$HOME/go-ethereum${i}/vendor/github.com/ethereum/ethash/ethash.go"
     sed -e "s|MYNUMBER|$i|g" $TEMPLATEB > $OUTFILEB
 
-    OUTFILEC="/home/vstrobel/go-ethereum${i}/core/block_validator.go"
+    OUTFILEC="$HOME/go-ethereum${i}/core/block_validator.go"
 
     sed -e "s|MININGDIFF|$MININGDIFF|g" $TEMPLATEC > $OUTFILEC
     
-    make -C "/home/vstrobel/go-ethereum${i}"
-    mv "/home/vstrobel/go-ethereum${i}/build/bin/geth" "/home/vstrobel/go-ethereum${i}/build/bin/geth${i}"
-
-    #cp "/home/vstrobel/.ethash/." "/home/vstrobel/.ethash${i}/"
+    make -C "$HOME/go-ethereum${i}"
+    mv "$HOME/go-ethereum${i}/build/bin/geth" "$HOME/go-ethereum${i}/build/bin/geth${i}"
     
 done
 

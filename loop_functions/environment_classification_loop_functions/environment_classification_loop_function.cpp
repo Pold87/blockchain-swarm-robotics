@@ -1294,10 +1294,10 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 
     if (subswarmConsensus) {
       /* If the non-Byzantine robots agree on a color */
-      if ( robotsInExplorationCounter[c] + robotsInDiffusionCounter[c] == (n_robots - numByzantine) )
+      if ( (robotsInExplorationCounter[c] + robotsInDiffusionCounter[c]) == (n_robots - numByzantine) )
 	consensousReached = c;
     } else {
-      if ( robotsInExplorationCounter[c] + robotsInDiffusionCounter[c] == n_robots )
+      if ( (robotsInExplorationCounter[c] + robotsInDiffusionCounter[c] + byzantineRobotsInExplorationCounter[c] + byzantineRobotsInDiffusionCounter[c]) == n_robots )
 	consensousReached = c;
     }
   }
