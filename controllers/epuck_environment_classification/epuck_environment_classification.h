@@ -72,6 +72,7 @@ public:
 	    bool useBackgroundGethCalls;
 	    std::string radix;
 	    std::string baseDir; /* Basedir of the controller folder */
+	    std::string baseDirRaw; /* Basedir of the controller folder */
 	    std::string interfacePath;
 	    std::string mappingPath;
 	    std::string regenerateFile;
