@@ -1364,10 +1364,7 @@ int getBlockChainLength(int i, int nodeInt, string datadirBase) {
     istringstream ss(res);
     ss >> blockNumber;
   }
-
-  
   return blockNumber;
-
 }
 
 
