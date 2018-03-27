@@ -196,11 +196,10 @@ string exec_geth_cmd(int i, string command){
     int nodeInt = getNodeInt(i);
     /* Run geth command on this node  */
     string username = getUsername();
-    fullCommandStream << "ssh " << username << "@" << node << " \"";
 
     ReplaceStringInPlace(command, "\"", "\\\"");
 
-    fullCommandStream << "geth" << nodeInt << " --exec " << "'" << command << "'" << " attach " << datadir_base << i << "/" << "geth.ipc\"";
+    fullCommandStream << "geth" << nodeInt << " --exec " << "'" << command << "'" << " attach " << datadir_base << i << "/" << "geth.ipc";
   } else {
     fullCommandStream << "geth --exec " << "'" << command << "'" << " attach " << datadir_base << i << "/" << "geth.ipc";
   }
@@ -245,11 +244,10 @@ string exec_geth_cmd(int i, string command, int nodeInt, string datadirBase){
     
     /* Run geth command on this node  */
     string username = getUsername();
-    fullCommandStream << "ssh " << username << "@c" << rack << "-" << nodeInt << " \"";
     
     //ReplaceStringInPlace(command, "\"", "\\\"");
     
-    fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc\"";    
+    fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc";    
     
     std::string fullCommand = fullCommandStream.str();
 
@@ -294,11 +292,10 @@ string exec_geth_cmd_helper(int i, string command, int nodeInt, string datadirBa
 
   cout << "Username is: " << username << endl;
   
-  fullCommandStream << "ssh " << username << "@c" << rack << "-" << nodeInt << " \"";
   
   ReplaceStringInPlace(command, "\"", "\\\"");
   
-  fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc\"";
+  fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc";
   
   std::string fullCommand = fullCommandStream.str();
 
@@ -322,11 +319,10 @@ string exec_geth_cmd_with_geth_restart(int i, string command, int nodeInt, int b
     
     /* Run geth command on this node  */
     string username = getUsername();
-    fullCommandStream << "ssh " << username << "@c" << rack << "-" << nodeInt << " \"";
     
     //ReplaceStringInPlace(command, "\"", "\\\"");
     
-    fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc\"";
+    fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc";
     
     std::string fullCommand = fullCommandStream.str();
     
@@ -396,12 +392,11 @@ void exec_geth_cmd_background(int i, string command, int nodeInt, string datadir
 
   /* Run geth command on this node  */
   string username = getUsername();
-  fullCommandStream << "ssh " << username << "@c" << rack << "-" << nodeInt << " \"";
   
   ReplaceStringInPlace(command, "\"", "\\\"");
 
   /* The ampersand symol here makes the difference to the normal exec_geth_cmd function */
-  fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc\"&";
+  fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc&";
   
   std::string fullCommand = fullCommandStream.str();
 
@@ -435,9 +430,8 @@ void geth_init(int i) {
     int nodeInt = getNodeInt(i);
     /* Run geth command on this node  */
     string username = getUsername();
-    fullCommandStream << "ssh " << username << "@" << node << " \"";
 
-    fullCommandStream << "geth" << nodeInt << " --verbosity 3" << " --datadir " << str_datadir << " init " << genesis << "\"";
+    fullCommandStream << "geth" << nodeInt << " --verbosity 3" << " --datadir " << str_datadir << " init " << genesis;
 
   } else {
     fullCommandStream << "geth --verbosity 3" << " --datadir " << str_datadir << " init " << genesis;
@@ -483,8 +477,7 @@ void geth_init(int i, int nodeInt, int basePort, string datadirBase, string gene
 
   /* Run geth command on this node  */
   string username = getUsername();
-  fullCommandStream << "ssh " << username << "@c" << rack << "-" << nodeInt << " \"";  
-  fullCommandStream << "geth" << nodeInt << " --verbosity 3" << " --datadir " << str_datadir << " init " << genesisPath << "\"";
+  fullCommandStream << "geth" << nodeInt << " --verbosity 3" << " --datadir " << str_datadir << " init " << genesisPath;
   
   string commandStream = fullCommandStream.str();
 
@@ -509,7 +502,6 @@ void start_geth(int i) {
     int nodeInt = getNodeInt(i);    
     /* Run geth command on this node  */
     string username = getUsername();
-    fullCommandStream << "ssh " << username << "@" << node << " \"";
     fullCommandStream << "geth" << nodeInt << " --verbosity 3 --networkid 2 --nodiscover ";
   } else {
     fullCommandStream << "geth --verbosity 3 --networkid 2 --nodiscover ";
@@ -562,7 +554,6 @@ void start_geth(int i, int nodeInt, int basePort, string datadirBase) {
   
   /* Run geth command on this node  */
   string username = getUsername();
-  fullCommandStream << "ssh " << username << "@c" << rack << "-" << nodeInt << " \"";
   fullCommandStream << "geth" << nodeInt << " --verbosity 3 --networkid 2 --nodiscover ";
   
   std::ostringstream datadirStream;
@@ -583,7 +574,7 @@ void start_geth(int i, int nodeInt, int basePort, string datadirBase) {
 
   string ipc_path = "--ipcpath " + str_datadir + "geth.ipc";
 
-  fullCommandStream << ipc_path << " --datadir " << str_datadir << str_port << " --maxpeers 130" << "\"" << "&";
+  fullCommandStream << ipc_path << " --datadir " << str_datadir << str_port << " --maxpeers 130" << "&";
 
   cout << "Running command " << fullCommandStream.str() << endl;
   
@@ -931,8 +922,7 @@ std::string kill_geth_thread(int i) {
     /* Find out nodes of this robot  */
     node = getNode(i);
     /* Run geth command on this node  */
-    fullCommandStream << "ssh " << username << "@" << node << " \"";
-    fullCommandStream << "ps ax | grep \\\"\\-\\-port " << port << "\\\"";
+    fullCommandStream << "ps ax | grep \\\"\\-\\-port " << port << "\\";
     fullCommandStream << "\"";
     
   } else {
@@ -956,7 +946,6 @@ std::string kill_geth_thread(int i) {
   string cmd2;
   if (USE_MULTIPLE_NODES) {
     std::ostringstream fullCommandStream2;
-    fullCommandStream2 << "ssh " << username << "@" << node << " ";
     fullCommandStream2 << "kill -HUP " << pid;
     cmd2 = fullCommandStream2.str();
   } else {
@@ -981,8 +970,7 @@ void kill_geth_thread(int i, int basePort, int nodeInt, string datadirBase) {
 
   /* Run geth command on this node  */
   string username = getUsername();
-  fullCommandStream << "ssh " << username << "@c" << rack << "-" << nodeInt << " \"";
-  fullCommandStream << "ps ax | grep \\\"\\-\\-port " << port << "\\\"" << "\"";
+  fullCommandStream << "ps ax | grep \\\"\\-\\-port " << port << "\\\"";
   
   string cmd = fullCommandStream.str();
   string res = exec(cmd.c_str());
@@ -995,7 +983,6 @@ void kill_geth_thread(int i, int basePort, int nodeInt, string datadirBase) {
 
   string cmd2;
   std::ostringstream fullCommandStream2;
-  fullCommandStream2 << "ssh " << username << "@c" << rack << "-" << nodeInt << " ";
   fullCommandStream2 << "kill -HUP " << pid;
   cmd2 = fullCommandStream2.str();
 
@@ -1015,7 +1002,6 @@ void kill_geth_thread(int i, int basePort, int nodeInt, string datadirBase) {
   /* And again via SSH */
   string cmd4;
   std::ostringstream fullCommandStream4;
-  fullCommandStream4 << "ssh " << username << "@c" << rack << "-" << nodeInt << " ";
   fullCommandStream4 << "kill -HUP " << pid2;
   cmd4 = fullCommandStream4.str();
   system(cmd4.c_str());
