@@ -50,7 +50,7 @@
 			       use_background_geth_calls="USEBACKGROUNDGETHCALLS"
 			       interface_path="interface.txt"
 			       mapping_path="MAPPINGPATH"
-			       base_raw="BASERAW"
+			       base_dir_raw="BASERAW"
 			       base_port="BASEPORT"
 			       blockchain_path="BLOCKCHAINPATH"
 			       use_classical_approach="USECLASSICALAPPROACH"
@@ -66,7 +66,7 @@
 
   <cells  number_of_red_cells="0"
 	  base_dir_loop="BASEDIR"
-	  base_raw="BASERAW"
+	  base_dir_raw="BASERAW"
 	  data_dir="DATADIR"
           number_of_white_cells="0"
 	  number_of_black_cells="0"

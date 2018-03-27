@@ -42,6 +42,7 @@ std::string exec_geth_cmd(int i, std::string command, int nodeInt, std::string d
 
 std::string exec_geth_cmd_helper(int i, std::string command, int nodeInt, std::string datadirBase);
 std::string exec_geth_cmd_with_geth_restart(int i, std::string command, int nodeInt, int basePort, std::string datadirBase);
+bool exec_geth_cmd_wait(int i, std::string command, int nodeInt, int basePort, std::string datadirBase);
 
 
 void exec_geth_cmd_background(int i, std::string command, int nodeInt, std::string datadirBase);

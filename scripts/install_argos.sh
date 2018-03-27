@@ -116,7 +116,7 @@ function do_create_setup_script() {
     echo "export PKG_CONFIG_PATH=$INSTALL_DIR/lib/pkgconfig" > $SCRIPTFILE
     echo "export ARGOS_PLUGIN_PATH=$INSTALL_DIR/lib/argos3" >> $SCRIPTFILE
     echo "export LD_LIBRARY_PATH=\$ARGOS_PLUGIN_PATH:/usr/java/jdk1.6.0_43/jre/lib/amd64:/usr/java/jdk1.6.0_43/jre/lib/amd64/server:/usr/java/jdk1.6.0_43/jre/lib/amd64/xawt" >> $SCRIPTFILE
-    echo "export PATH=$PATH:$INSTALL_DIR/bin" >> $SCRIPTFILE
+    echo "export PATH=\$PATH:$INSTALL_DIR/bin" >> $SCRIPTFILE
     echo "Execute the following command to setup the environment for ARGoS3:"
     echo
     echo "  source $SCRIPTFILE"

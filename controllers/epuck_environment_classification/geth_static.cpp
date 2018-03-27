@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include <time.h>
+#include <sys/stat.h>
 #include <sys/time.h>
 
 
@@ -195,7 +196,7 @@ string exec_geth_cmd(int i, string command){
     string node = getNode(i);
     int nodeInt = getNodeInt(i);
     /* Run geth command on this node  */
-    string username = getUsername();
+    //string username = getUsername();
 
     ReplaceStringInPlace(command, "\"", "\\\"");
 
@@ -243,7 +244,7 @@ string exec_geth_cmd(int i, string command, int nodeInt, string datadirBase){
     ostringstream fullCommandStream;
     
     /* Run geth command on this node  */
-    string username = getUsername();
+    //string username = getUsername();
     
     //ReplaceStringInPlace(command, "\"", "\\\"");
     
@@ -288,12 +289,12 @@ string exec_geth_cmd_helper(int i, string command, int nodeInt, string datadirBa
   ostringstream fullCommandStream;
 
   /* Run geth command on this node  */
-  string username = getUsername();
+  //string username = getUsername();
 
-  cout << "Username is: " << username << endl;
+  //cout << "Username is: " << username << endl;
   
   
-  ReplaceStringInPlace(command, "\"", "\\\"");
+  //ReplaceStringInPlace(command, "\"", "\\\"");
   
   fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc";
   
@@ -312,13 +313,15 @@ string exec_geth_cmd_with_geth_restart(int i, string command, int nodeInt, int b
 
   int trials = 20;
   // Retry to execute the command if it failed
-  while ( (res.find("Fatal") != string::npos) || (res.find("Error") != string::npos)) {
+  while ( (res.find("Fatal") != string::npos) || (res.find("Error") != string::npos) || (res.find("ILLEGAL") != string::npos)) {
+
+    cout << res << endl;
 
     /* Reconstruct the full command stream */
     ostringstream fullCommandStream;
     
     /* Run geth command on this node  */
-    string username = getUsername();
+    //string username = getUsername();
     
     //ReplaceStringInPlace(command, "\"", "\\\"");
     
@@ -344,20 +347,32 @@ string exec_geth_cmd_with_geth_restart(int i, string command, int nodeInt, int b
     
   }
 
-  // TODO: if everything is implemented correctly and safely, I can
+    // TODO: if everything is implemented correctly and safely, I can
   //    let fatal errors occur both with Fatal error and normal
   //    errors if (res.find("Fatal") != string::npos || (res.find("Error") != string::npos)) {
   if (res.find("Fatal") != string::npos) {
-   
     cout << "Fatal error!!!" << endl;
     cout << "res was " << res << endl;
     cout << "Called exec_geth_cmd with" << i << " " << command << endl; 
+    
     sendMail(res);
+    
     gethStaticErrorOccurred = true;
   }
   
   return res;
-  
+
+}
+
+bool exec_geth_cmd_wait(int i, string command, int nodeInt, string datadirBase) {
+
+  string res = exec_geth_cmd_helper(i, command, nodeInt, datadirBase);
+
+  if (res.find("no such file") != string::npos) {
+    return false;   
+  } else {
+    return true;
+  }
 }
 
 void sendMail(string body){
@@ -391,7 +406,7 @@ void exec_geth_cmd_background(int i, string command, int nodeInt, string datadir
   ostringstream fullCommandStream;
 
   /* Run geth command on this node  */
-  string username = getUsername();
+  //string username = getUsername();
   
   ReplaceStringInPlace(command, "\"", "\\\"");
 
@@ -423,15 +438,19 @@ void geth_init(int i) {
   
   ostringstream fullCommandStream;
 
-
+  cout << "I came to here A" << endl;
   if (USE_MULTIPLE_NODES) {
+
+
     /* Find out nodes of this robot  */
     string node = getNode(i);
     int nodeInt = getNodeInt(i);
     /* Run geth command on this node  */
-    string username = getUsername();
-
+    //string username = getUsername();
+    cout << "I came to here B" << endl;
     fullCommandStream << "geth" << nodeInt << " --verbosity 3" << " --datadir " << str_datadir << " init " << genesis;
+
+    cout << "I came to here C" << endl;
 
   } else {
     fullCommandStream << "geth --verbosity 3" << " --datadir " << str_datadir << " init " << genesis;
@@ -469,14 +488,13 @@ void geth_init(int i, int nodeInt, int basePort, string datadirBase, string gene
   cout << "Calling geth_init for robot " << i << endl;
 
   std::ostringstream datadirStream;
-
   datadirStream << datadirBase << i;
   
   string str_datadir = datadirStream.str();
   ostringstream fullCommandStream;
-
   /* Run geth command on this node  */
-  string username = getUsername();
+  //  string username = getUsername();
+
   fullCommandStream << "geth" << nodeInt << " --verbosity 3" << " --datadir " << str_datadir << " init " << genesisPath;
   
   string commandStream = fullCommandStream.str();
@@ -484,9 +502,7 @@ void geth_init(int i, int nodeInt, int basePort, string datadirBase, string gene
   if (true)
     cout << "geth init: " << commandStream << endl; 
   
-  exec(commandStream.c_str());
-  sleep(1);
-    
+  exec(commandStream.c_str());  
 }
 
 void start_geth(int i) {
@@ -501,7 +517,7 @@ void start_geth(int i) {
     string node = getNode(i);
     int nodeInt = getNodeInt(i);    
     /* Run geth command on this node  */
-    string username = getUsername();
+    //string username = getUsername();
     fullCommandStream << "geth" << nodeInt << " --verbosity 3 --networkid 2 --nodiscover ";
   } else {
     fullCommandStream << "geth --verbosity 3 --networkid 2 --nodiscover ";
@@ -553,7 +569,7 @@ void start_geth(int i, int nodeInt, int basePort, string datadirBase) {
   ostringstream fullCommandStream;
   
   /* Run geth command on this node  */
-  string username = getUsername();
+  //string username = getUsername();
   fullCommandStream << "geth" << nodeInt << " --verbosity 3 --networkid 2 --nodiscover ";
   
   std::ostringstream datadirStream;
@@ -575,12 +591,19 @@ void start_geth(int i, int nodeInt, int basePort, string datadirBase) {
   string ipc_path = "--ipcpath " + str_datadir + "geth.ipc";
 
   fullCommandStream << ipc_path << " --datadir " << str_datadir << str_port << " --maxpeers 130" << "&";
+  
 
   cout << "Running command " << fullCommandStream.str() << endl;
   
   FILE* pipe = popen(fullCommandStream.str().c_str(), "r");
   pclose(pipe);
-  sleep(1);
+
+  string IPCfile = str_datadir + "geth.ipc";
+ 
+  struct stat buffer;   
+
+  sleep(1); // TODO: rather check for the IPC path instead
+  
 }
 
 
@@ -636,9 +659,9 @@ string get_enode(int i, int nodeInt, int basePort, string datadirBase) {
   string node = nodeStream.str();
   
   /* Resolve the hostname to its ip */
-  string ip = hostname2ip(node);
+  //string ip = hostname2ip(node);
   /* Replace [::] (localhost) with actual ip address */
-  replace(res, "[::]", ip);
+  //replace(res, "[::]", ip);
   
   // Print the replaced enode address
   cout << "The enode with the actual ip address is " << res << endl;
@@ -912,7 +935,7 @@ std::string unlockAccount(int i, std::string pw, int nodeInt, int basePort, stri
 
 std::string kill_geth_thread(int i) { 
 
-  string username = getUsername();
+  //string username = getUsername();
   int port = ipc_base_port + i;
 
   std::ostringstream fullCommandStream;
@@ -969,8 +992,8 @@ void kill_geth_thread(int i, int basePort, int nodeInt, string datadirBase) {
   std::ostringstream fullCommandStream;
 
   /* Run geth command on this node  */
-  string username = getUsername();
-  fullCommandStream << "ps ax | grep \\\"\\-\\-port " << port << "\\\"";
+  //string username = getUsername();
+  fullCommandStream << "ps ax | grep \"port " << port << "\"";
   
   string cmd = fullCommandStream.str();
   string res = exec(cmd.c_str());
@@ -1202,8 +1225,8 @@ std::string deploy_contract(int i, string interfacePath, string dataPath, string
   replace(contractTemplate, "DATA", data);
 
   // TODO: make this a parameter
-  string username = getUsername();
-  string tmpPath = "/home/" + username + "/Documents/argdavide/tmp.txt";
+  //string username = getUsername();
+  string tmpPath = "tmp.txt";
 
   std::ofstream out(tmpPath.c_str());
   out << contractTemplate;

@@ -301,12 +301,14 @@ void CEnvironmentClassificationLoopFunctions::PreinitMiner() {
   if (useMultipleNodes) {
     /* Initialize the miner */
     geth_init(minerId, minerNode, basePort, blockchainPath, genesisRaw);
+    cout << "Now Im here";
     sleep(1);
     start_geth(minerId, minerNode, basePort, blockchainPath);
     createAccount(minerId, minerNode, basePort, blockchainPath);
     minerAddress = getCoinbase(minerId, minerNode, basePort, blockchainPath);
     minerAddressGlobal = minerAddress;
     prepare_for_new_genesis(minerId, minerNode, basePort, blockchainPath);
+
 
   } else {
     /* Initialize the miner */
@@ -325,10 +327,12 @@ void CEnvironmentClassificationLoopFunctions::PreinitMiner() {
 /* Set up the miner, deploy the smart contract, etc. */
 void CEnvironmentClassificationLoopFunctions::InitEthereum() {
 
-  string genesisRaw = "~/genesis/genesis1.json";
+  ostringstream genesisRawStream;
+  genesisRawStream << baseDirRaw << "/genesis/genesis1.json";
+  string genesisRaw = genesisRawStream.str();
 
   ostringstream genesisPathStream;
-  genesisPathStream << "~/genesis/genesis" << basePort << ".json";
+  genesisPathStream << baseDirRaw << "/genesis/genesis" << basePort  << ".json";
   string genesisPath = genesisPathStream.str();
 
   std::ostringstream fullCommandStream;

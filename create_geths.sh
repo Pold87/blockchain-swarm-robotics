@@ -1,15 +1,19 @@
 BASE=`pwd`
 git clone https://github.com/ethereum/go-ethereum.git
 cd go-ethereum
-git checkout v1.5.9
+git checkout eee96a5b
 git checkout -b fixeddiff
 
 mv core/block_validator.go core/block_validator.go.template
+#mv consensus/ethash/consensus.go consensus/ethash/consensus.go.template 
 mv circle.yml circle.yml.template
 mv vendor/github.com/ethereum/ethash/ethash.go vendor/github.com/ethereum/ethash/ethash.go.template
 
-sed -i '267s/.*/return big.NewInt(MININGDIFF)/' core/block_validator.go.template
-sed -i '269s/.*/return big.NewInt(MININGDIFF)/' core/block_validator.go.template
+sed -i '268s/.*/return big.NewInt(MININGDIFF)/' core/block_validator.go.template
+sed -i '270s/.*/return big.NewInt(MININGDIFF)/' core/block_validator.go.template
+
+#sed -i '284s/.*/return big.NewInt(MININGDIFF)/' consensus/ethash/consensus.go.template
+#sed -i '286s/.*/return big.NewInt(MININGDIFF)/' consensus/ethash/consensus.go.template
 
 sed -i '7s/ethash/ethashMYNUMBER/' circle.yml.template
 sed -i '70s/ethash/ethashMYNUMBER/' vendor/github.com/ethereum/ethash/ethash.go.template

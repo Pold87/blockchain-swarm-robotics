@@ -1,9 +1,9 @@
 /* Include the controller definit*io*itn */
 #include "epuck_environment_classification.h"
 
-#define ALPHA_CHANNEL		     0
-#define COLOR_STRENGHT           255
-#define N_COL		         	 3
+#define ALPHA_CHANNEL 0
+#define COLOR_STRENGHT 255
+#define N_COL 3
 
 #include <iostream>
 #include <algorithm>
@@ -69,7 +69,7 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "percent_black", percentBlue);
     GetNodeAttribute(t_node, "num_pack_saved", numPackSaved);
     GetNodeAttribute(t_node, "base_dir", baseDir);
-    GetNodeAttribute(t_node, "base_raw", baseDirRaw);
+    GetNodeAttribute(t_node, "base_dir_raw", baseDirRaw);
     GetNodeAttribute(t_node, "interface_path", interfacePath);
     GetNodeAttribute(t_node, "mapping_path", mappingPath);
     GetNodeAttribute(t_node, "use_multiple_nodes", useMultipleNodes);
