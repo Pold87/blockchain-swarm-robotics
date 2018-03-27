@@ -195,6 +195,7 @@ private:
 	std::string blockchainPath;
 	std::string regenerateFile;
 	std::string baseDirLoop;
+	std::string baseDirRaw;
 	std::string dataDir;
 	std::string datadirBase;
 	bool useMultipleNodes;

@@ -69,6 +69,7 @@ void EPuck_Environment_Classification::SimulationState::Init(TConfigurationNode&
     GetNodeAttribute(t_node, "percent_black", percentBlue);
     GetNodeAttribute(t_node, "num_pack_saved", numPackSaved);
     GetNodeAttribute(t_node, "base_dir", baseDir);
+    GetNodeAttribute(t_node, "base_raw", baseDirRaw);
     GetNodeAttribute(t_node, "interface_path", interfacePath);
     GetNodeAttribute(t_node, "mapping_path", mappingPath);
     GetNodeAttribute(t_node, "use_multiple_nodes", useMultipleNodes);
@@ -1115,9 +1116,10 @@ void EPuck_Environment_Classification::fromLoopFunctionResPrepare(){
     if (simulationParams.useMultipleNodes) {
 
       ostringstream genesisPathStream;
-      genesisPathStream << "~/genesis/genesis" << simulationParams.basePort << ".json";
+      genesisPathStream << simulationParams.baseDirRaw << "/genesis/genesis" << simulationParams.basePort  << ".json";
       string genesisPath = genesisPathStream.str();
 
+ 
       geth_init(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath, genesisPath);
       start_geth(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
       createAccount(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
@@ -1144,12 +1146,12 @@ void EPuck_Environment_Classification::fromLoopFunctionResStart(){
 
   if (!simulationParams.useClassicalApproach) {
     int robotId = Id2Int(GetId());
-  
+
     ostringstream genesisPathStream;
-    genesisPathStream << "~/genesis/genesis" << simulationParams.basePort << ".json";
+    genesisPathStream << simulationParams.baseDirRaw << "/genesis/genesis" << simulationParams.basePort  << ".json";
     string genesisPath = genesisPathStream.str();
-        
-    geth_init(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath, genesisPath);
+
+        geth_init(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath, genesisPath);
     start_geth(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
     enodes[robotId] = get_enode(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
     enode = enodes[robotId];
