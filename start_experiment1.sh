@@ -10,7 +10,7 @@ BASEDIR="${BASE}/controllers/epuck_environment_classification/"
 BLOCKCHAINPATH="$HOME/eth_data_para$1/data" # always without '/' at the end!!
 MINERID=$(expr 120 + $1)
 echo "MINERID is ${MINERID}"
-NUMROBOTS=(4) 
+NUMROBOTS=(2) 
 REPETITIONS=1
 DECISIONRULE=$3
 PERCENT_BLACKS=(34)
@@ -23,7 +23,7 @@ USEBACKGROUNDGETHCALLS=true
 MAPPINGPATH="${BASE}/experiments/config$1.txt"
 CHANGEDIFFIULTY=""
 NUMRUNS=1
-THREADS=1
+THREADS=0
 NOW=`date +"%d-%m-%Y"`
 USEDNODES=($1 $2)
 echo "USEDNODES is ${USEDNODES}"

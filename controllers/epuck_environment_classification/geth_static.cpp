@@ -502,7 +502,9 @@ void geth_init(int i, int nodeInt, int basePort, string datadirBase, string gene
   if (true)
     cout << "geth init: " << commandStream << endl; 
   
-  exec(commandStream.c_str());  
+  exec(commandStream.c_str());
+
+  sleep(5);
 }
 
 void start_geth(int i) {
@@ -557,7 +559,7 @@ void start_geth(int i) {
   
   FILE* pipe = popen(fullCommandStream.str().c_str(), "r");
   pclose(pipe);
-  sleep(1);
+  sleep(13);
 	  
 }
 
@@ -602,7 +604,7 @@ void start_geth(int i, int nodeInt, int basePort, string datadirBase) {
  
   struct stat buffer;   
 
-  sleep(1); // TODO: rather check for the IPC path instead
+  sleep(5); // TODO: rather check for the IPC path instead
   
 }
 
@@ -654,9 +656,9 @@ string get_enode(int i, int nodeInt, int basePort, string datadirBase) {
   // Print the received enode
   cout << "The enode is " << res << endl;
 
-  ostringstream nodeStream;
-  nodeStream << "c" << rack << "-" << nodeInt;
-  string node = nodeStream.str();
+  //ostringstream nodeStream;
+  //nodeStream << "c" << rack << "-" << nodeInt;
+  //string node = nodeStream.str();
   
   /* Resolve the hostname to its ip */
   //string ip = hostname2ip(node);
@@ -987,6 +989,10 @@ std::string kill_geth_thread(int i) {
 
 void kill_geth_thread(int i, int basePort, int nodeInt, string datadirBase) { 
 
+  // TODO: Remove again
+  string mys = "killall geth0";
+  system(mys.c_str());
+  
   int port = basePort + i;
 
   std::ostringstream fullCommandStream;
@@ -994,6 +1000,8 @@ void kill_geth_thread(int i, int basePort, int nodeInt, string datadirBase) {
   /* Run geth command on this node  */
   //string username = getUsername();
   fullCommandStream << "ps ax | grep \"port " << port << "\"";
+
+  cout << "the full command stream for grep is: \n" << fullCommandStream.str();
   
   string cmd = fullCommandStream.str();
   string res = exec(cmd.c_str());
@@ -1009,6 +1017,8 @@ void kill_geth_thread(int i, int basePort, int nodeInt, string datadirBase) {
   fullCommandStream2 << "kill -HUP " << pid;
   cmd2 = fullCommandStream2.str();
 
+  cout << "the full command stream for kill is: \n" << fullCommandStream2.str();
+  
   system(cmd2.c_str());
   
   /* Kill again locally */
