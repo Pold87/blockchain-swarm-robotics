@@ -408,7 +408,7 @@ void exec_geth_cmd_background(int i, string command, int nodeInt, string datadir
   /* Run geth command on this node  */
   //string username = getUsername();
   
-  ReplaceStringInPlace(command, "\"", "\\\"");
+  //ReplaceStringInPlace(command, "\"", "\\\"");
 
   /* The ampersand symol here makes the difference to the normal exec_geth_cmd function */
   fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc&";
@@ -420,7 +420,7 @@ void exec_geth_cmd_background(int i, string command, int nodeInt, string datadir
      call; maybe I can come up with some error handling */
   
   //  if (DEBUG)
-  //cout << "exec_geth_cmd_background: " << fullCommand << endl;
+  cout << "exec_geth_cmd_background: " << fullCommand << endl;
   
   system(fullCommand.c_str());
 
@@ -988,13 +988,12 @@ std::string kill_geth_thread(int i) {
 
 
 void kill_geth_thread(int i, int basePort, int nodeInt, string datadirBase) { 
-
-  // TODO: Remove again
-  string mys = "killall geth0";
-  system(mys.c_str());
   
   int port = basePort + i;
 
+  string mykill = "killall geth0";
+  system(mykill.c_str());
+  
   std::ostringstream fullCommandStream;
 
   /* Run geth command on this node  */
@@ -1005,6 +1004,8 @@ void kill_geth_thread(int i, int basePort, int nodeInt, string datadirBase) {
   
   string cmd = fullCommandStream.str();
   string res = exec(cmd.c_str());
+
+  cout << "The grep results is:\n" << res << endl;
   
   /* Only get the first word, i.e., the PID from the command */
   istringstream iss(res);
@@ -1027,7 +1028,7 @@ void kill_geth_thread(int i, int basePort, int nodeInt, string datadirBase) {
   std::ostringstream fullCommandStream3;
   iss.ignore(numeric_limits<streamsize>::max(), '\n');
   iss >> pid2;
-  fullCommandStream3 << "kill -HUP " << pid2;
+  fullCommandStream3 << "kill -9 " << pid2;
   cmd3 = fullCommandStream3.str();
 
   system(cmd3.c_str());
@@ -1188,6 +1189,9 @@ void smartContractInterfaceBg(int i, string interface, string contractAddress,
   
    std::string fullCommand = fullCommandStream.str();
 
+   cout << "REGISTRATION ROBOT" << endl;
+   cout << fullCommand << endl;
+   
    exec_geth_cmd_background(i, fullCommand, nodeInt, datadirBase);
    //cout << "Result received from SC is: " << res << endl;
 

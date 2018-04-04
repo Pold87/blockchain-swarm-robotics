@@ -1,7 +1,7 @@
 # Usage: bash start_xyz.sh <node1> <node2> <decision_rule>
 
 BASE="$HOME/blockchain-swarm-robotics"
-
+SCOUT="${BASE}/contracts/Byzantine.sol"
 USERNAME=`whoami`
 mailto='volker.strobel87@gmail.com'
 TEMPLATE='experiments/epuck_EC_locale_template.argos'
@@ -39,6 +39,10 @@ BYZANTINESWARMSTYLE=0
 SUBSWARMCONSENSUS=false # Determines if all N robots have to agree or
 		       # only the beneficial subswarm.
 
+
+solc --overwrite --abi --bin -o . $SCOUT
+cp Byzantine.bin "${BASEDIR}/data.txt"
+cp Byzantine.abi "${BASEDIR}/interface.txt"
 
 if [ "$USECLASSICALAPPROACH" == "true" ]; then
     REALTIME="false"

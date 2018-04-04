@@ -1,1 +1,1 @@
-Fatal: Unable to attach to remote geth: dial unix /home/iridia/eth_data_para0/data1/geth.ipc: connect: connection refused
+Fatal: Unable to attach to remote geth: dial unix /home/iridia/eth_data_para0/data120/geth.ipc: connect: no such file or directory

@@ -93,10 +93,13 @@ void EPuck_Environment_Classification::registerRobot() {
   
   int args[1] = {(int) opinion.actualOpinion};
   int emptyArgs[0] = {};
-  
+
+  cout << "START now registrating robot " << robotId << endl; 
   // Modify state of the blockchain
   smartContractInterfaceBg(robotId, interface,
 	 contractAddress, "registerRobot", args, 1, 0, nodeInt, simulationParams.blockchainPath);
+
+  cout << "END now registrating robot " << robotId << endl; 
 }
 
 
@@ -274,7 +277,11 @@ void EPuck_Environment_Classification::ControlStep() {
 
   if (!simulationParams.useClassicalApproach) {
     if (beginning) {
+      // TODO: start_geth should be removed again; added it because of problem with kill geth
+      start_geth(robotId, nodeInt, simulationParams.basePort, simulationParams.blockchainPath);
+      unlockAccount(robotId, "test", nodeInt, simulationParams.basePort, simulationParams.blockchainPath); // TODO: Also remove again
       start_mining_bg(robotId, 1, nodeInt, simulationParams.blockchainPath);
+      registerRobot(); // TODO: remove this again, it's not in the original code but I added it due to problems with the registration
       updateRegistration();
       stop_mining_bg(robotId, nodeInt, simulationParams.blockchainPath);
       beginning = false;

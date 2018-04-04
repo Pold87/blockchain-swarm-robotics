@@ -26,7 +26,7 @@ TEMPLATEC="$BASE/go-ethereum/core/block_validator.go.template"
 
 if [ $# -eq 0 ]
   then
-    MININGDIFF=1000000
+    MININGDIFF=200000
 else
     MININGDIFF=$1
 fi
