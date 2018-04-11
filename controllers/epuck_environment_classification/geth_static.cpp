@@ -539,10 +539,7 @@ std::string kill_geth_thread(int i) {
 
   std::ostringstream fullCommandStream;
 
-  string node;
   if (USE_MULTIPLE_NODES) {
-    /* Find out nodes of this robot  */
-    node = getNode(i);
     /* Run geth command on this node  */
     fullCommandStream << "ps ax | grep \\\"\\-\\-port " << port << "\\";
     fullCommandStream << "\"";

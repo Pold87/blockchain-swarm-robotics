@@ -140,19 +140,15 @@ bool CEnvironmentClassificationLoopFunctions::CheckEtherReceived() {
     int robotNodeInt = cController.getNodeInt();
     long long balance;
 
-    //for (int t = 0; t < maxTime; ++t) {
-      if (useMultipleNodes)
-	balance = check_balance(robotId, robotNodeInt, blockchainPath);
-      else
-	balance = check_balance(robotId);
+    balance = check_balance(robotId, robotNodeInt, blockchainPath);
 
-      if (DEBUGLOOP)
+    if (DEBUGLOOP)
       	cout << "Checking account balance. It is " << balance << std::endl;
-
-      if (balance == 0) {
-      	everyoneReceivedSomething = false; /* At least one robot did not receive ether */
-	break;
-      }
+    
+    if (balance == 0) {
+      everyoneReceivedSomething = false; /* At least one robot did not receive ether */
+      break;
+    }
   }
   return everyoneReceivedSomething;
 }
@@ -172,16 +168,8 @@ void CEnvironmentClassificationLoopFunctions::setContractAddressAndDistributeEth
 
     /* Set the smart contract address for the robot */
     cController.setContractAddress(contractAddress);
-
-    /* Make sure that the robot is connected */
-    if (useMultipleNodes) {
-      //      string e = get_enode(robotId, minerNode, blockchainPath);
-      string e = cController.getEnode();
-      add_peer(minerId, e, minerNode, basePort, blockchainPath);
-    } else {
-      string e = get_enode(robotId);
-      add_peer(minerId, e);
-    }
+    string e = cController.getEnode();
+    add_peer(minerId, e, minerNode, basePort, blockchainPath);
   }
 }
 
@@ -200,16 +188,9 @@ void CEnvironmentClassificationLoopFunctions::connectMinerToEveryone() {
     int robotId = Id2Int(id);
 
     /* Make sure that the robot is connected */
-    if (useMultipleNodes) {
-      //      string e = get_enode(robotId, minerNode, blockchainPath);
-      string e = cController.getEnode();
-
-      cout << "enode in connecttominer is" << e << endl;
-      add_peer(minerId, e, minerNode, basePort, blockchainPath);
-      } else {
-      string e = get_enode(robotId);
-      add_peer(minerId, e);
-      }
+    string e = cController.getEnode();    
+    cout << "enode in connecttominer is" << e << endl;
+    add_peer(minerId, e, minerNode, basePort, blockchainPath);
   }
 
 }
@@ -222,14 +203,8 @@ void CEnvironmentClassificationLoopFunctions::connectMore(vector<int> allRobotId
     std::vector<int>::iterator it2 = it1 + 1;
 
     cout << "it1 is" << *it1 << " and it2 is " << *it2 << endl;
-    if (useMultipleNodes) {
-
-      string e = get_enode(*it2, minerNode, basePort, blockchainPath);
-      add_peer(*it1, e, minerNode, basePort, blockchainPath);
-    } else {
-      string e = get_enode(*it2);
-      add_peer(*it1, e);
-    }
+    string e = get_enode(*it2, minerNode, basePort, blockchainPath);
+    add_peer(*it1, e, minerNode, basePort, blockchainPath);
   }
 }
 
@@ -244,13 +219,8 @@ void CEnvironmentClassificationLoopFunctions::disconnectAll(vector<int> allRobot
     std::vector<int>::iterator it2 = it1 + 1;
 
     cout << "it 1 is " << *it1 << " and it2 is " << *it2 << endl;
-    if (useMultipleNodes) {
-      string e = get_enode(*it2, minerNode, basePort, blockchainPath);
-      remove_peer(*it1, e, minerNode, blockchainPath);
-    } else {
-      string e = get_enode(*it2);
-      remove_peer(*it1, e);
-    }
+    string e = get_enode(*it2, minerNode, basePort, blockchainPath);
+    remove_peer(*it1, e, minerNode, blockchainPath);
   }
 }
 
@@ -840,15 +810,9 @@ bool CEnvironmentClassificationLoopFunctions::allSameBCHeight() {
     
     /* Check one robot (the first one) */
     if (s == 0) {
-      if (useMultipleNodes)
-	a = getBlockChainLength(robotId, robotNodeInt, blockchainPath);
-      else
-	a = getBlockChainLength(robotId);
+      a = getBlockChainLength(robotId, robotNodeInt, blockchainPath);
     } else {
-      if (useMultipleNodes)
-	b = getBlockChainLength(robotId, robotNodeInt, blockchainPath);
-      else
-	b = getBlockChainLength(robotId);
+      b = getBlockChainLength(robotId, robotNodeInt, blockchainPath);
       if (abs(a - b) > 1) {
 	
 	cout << "a is " << a << " and b is " << b << endl;
@@ -870,23 +834,21 @@ void CEnvironmentClassificationLoopFunctions::Reset() {
 
   /* Clean up Ethereum stuff  */
   if (!useClassicalApproach) {
-    if (useMultipleNodes) {
 
-      // Kill all geth processes
-      string bckiller = "bash " + blockchainPath + "/bckillerccall";
-      exec(bckiller.c_str());
-
-      // Remove blockchain folders
-      string rmBlockchainData = "rm -rf " + blockchainPath + "*";
-      exec(rmBlockchainData.c_str());
-
-
-      // Regenerate blockchain folders
-      string regenerateFolders = "bash " + regenerateFile;
-      exec(regenerateFolders.c_str());
-
+    // Kill all geth processes
+    string bckiller = "bash " + blockchainPath + "/bckillerccall";
+    exec(bckiller.c_str());
+    
+    // Remove blockchain folders
+    string rmBlockchainData = "rm -rf " + blockchainPath + "*";
+    exec(rmBlockchainData.c_str());
+    
+    
+    // Regenerate blockchain folders
+    string regenerateFolders = "bash " + regenerateFile;
+    exec(regenerateFolders.c_str());
+    
     }
-  }
   InitRobots();
 }
 
@@ -1003,15 +965,10 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
       if (blockChainFile.is_open())
 	{
 
-
 	  blockChainFile << (GetSpace().GetSimulationClock()) / 10;
-	  //	  blockChainWhiteVotes << (GetSpace().GetSimulationClock()) / 10;
-	  //	  blockChainBlackVotes << (GetSpace().GetSimulationClock()) / 10;
-	  //	  blockChainLast2Votes << (GetSpace().GetSimulationClock()) / 10;
-
-
+	  
 	  string contractAddressNoSpace = contractAddress;
-
+	  
 	  contractAddressNoSpace.erase(std::remove(contractAddressNoSpace.begin(),
 						   contractAddressNoSpace.end(), '\n'),
 				       contractAddressNoSpace.end());
@@ -1032,45 +989,13 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 	    int robotNodeInt = cController.getNodeInt();
 
 	    /* Blockchain height per robot */
-	    if ((!useClassicalApproach) && useMultipleNodes) {
+	    if (!useClassicalApproach) {
 	      if (robotId == 2) {
 	      blockChainFile << "\t" << getBlockChainLength(robotId, robotNodeInt, blockchainPath);
 	      }	      
-	    } else {
-	      blockChainFile << "\t" << getBlockChainLength(robotId);
 	    }
-
-	    /* Number of white votes per robot */
-
-	    // string numWhite;
-	    // if (useMultipleNodes)
-	    //   numWhite = smartContractInterface(robotId, interface, contractAddressNoSpace, "whiteVotes", args, 0, 0,
-	    // 					robotNodeInt, blockchainPath);
-	    // else
-	    //   numWhite = smartContractInterface(robotId, interface, contractAddressNoSpace, "whiteVotes", args, 0, 0);
-
-	    // numWhite.erase(std::remove(numWhite.begin(), numWhite.end(), '\n'), numWhite.end());
-
-	    // blockChainWhiteVotes << "\t" << numWhite;
-
-	    // /* Number of black votes per robot */
-	    // string numBlack;
-	    // if (useMultipleNodes)
-	    //   numBlack = smartContractInterface(robotId, interface, contractAddressNoSpace, "blackVotes", args, 0, 0,
-	    // 					robotNodeInt, blockchainPath);
-	    // else
-	    //   numBlack = smartContractInterface(robotId, interface, contractAddressNoSpace, "blackVotes", args, 0, 0);
-
-	    // numBlack.erase(std::remove(numBlack.begin(), numBlack.end(), '\n'), numBlack.end());
-	    // blockChainBlackVotes << "\t" << numBlack;
-
 	  }
-
 	  blockChainFile << std::endl;
-	  //	  blockChainWhiteVotes << std::endl;
-	  //	  blockChainBlackVotes << std::endl;
-	  //	  blockChainLast2Votes << std::endl;
-
 	}
 
 
@@ -1172,9 +1097,6 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 	      /* Close blockchain files */
 	      if (blockChainFile.is_open()){
 		blockChainFile.close();
-		//		blockChainWhiteVotes.close();
-		//		blockChainBlackVotes.close();
-		//		blockChainLast2Votes.close();
 	      }
 	      
 	      /* globalStatFile: write the general statistics, such as counted cells,
@@ -1198,8 +1120,9 @@ bool CEnvironmentClassificationLoopFunctions::IsExperimentFinished() {
 	      Reset();
 	    }
 	  }
-	  return m_bExperimentFinished;}
-}
+	  return m_bExperimentFinished;
+	}
+  }
 
 /************************************************* DESTROY *****************************************************/
 /***************************************************************************************************************/
@@ -1207,7 +1130,6 @@ void CEnvironmentClassificationLoopFunctions::Destroy(){
 
   /* Clean up Ethereum stuff  */
   if (!useClassicalApproach) {
-    if (useMultipleNodes) {
 
       // Kill all geth processes
       string bckiller = "bash " + blockchainPath + "/bckillerccall";
@@ -1216,7 +1138,6 @@ void CEnvironmentClassificationLoopFunctions::Destroy(){
       // Remove blockchain folders
       string rmBlockchainData = "rm -rf " + blockchainPath + "*";
       exec(rmBlockchainData.c_str());
-    }
   }
 }
 
@@ -1329,21 +1250,15 @@ void CEnvironmentClassificationLoopFunctions::PreStep() {
 		int robotId = Id2Int(id);
 		int robotNodeInt = cController.getNodeInt();
 
-		if (useMultipleNodes) {
-
-		  /* Blockchain height per robot */
-		  if (robotId == 2) {
+		/* Blockchain height per robot */
+		if (robotId == 2) {
 		  blockChainFile << "\t" << getBlockChainLength(robotId, robotNodeInt, blockchainPath);
-		  }
-		    } else {
-
-		      /* Blockchain height per robot */
-		      blockChainFile << "\t" << getBlockChainLength(robotId);
-		    }
-		  }
-		  blockChainFile << std::endl;
-	    }
-	}
+		}
+		
+	      }
+	      blockChainFile << std::endl;
+      }
+  }
 }
 
 
