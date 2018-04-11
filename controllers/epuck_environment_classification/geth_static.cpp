@@ -132,105 +132,6 @@ std::string exec(const char* cmd) {
     return result;
 }
 
-
-int getNodeInt(int i) {
-
-  int res;
-
-  if (i < 5) {
-    res = 1;
-  } else if (i < 10) {
-    res = 2;
-  } else if (i < 15) {
-    res = 3;
-  } else if (i < 20) {
-    res = 4;
-  } else if (i < 25) {
-    res = 5;
-  } else if (i < 86) {
-    res = 5;
-  } else {
-    res = 5;
-  }
-
-  return res;  
-}
-
-/* Find out on which node the geth process of a robot i is executed */
-std::string getNode(int i) {
-
-  int res = getNodeInt(i);
-
-  std::ostringstream ss;
-  ss << "c3-" << res;
-  return ss.str();  
-}
-
-/* Convert the hostname of a node to its ip */
-std::string hostname2ip(std::string hostname) {
-
-  ostringstream fullCommandStream;
-
-  fullCommandStream << "host " << hostname << " | awk \'FNR>1 {printf $4}\'";
-  
-  std::string fullCommand = fullCommandStream.str();
-  
-  string res = exec(fullCommand.c_str());
-
-  if (DEBUG)
-    cout << "The resolved ip address of hostname " << hostname << " is " << res << endl;
-    
-  return res;
-}
-
-
-// Take a geth command, execute it on the selected robot, and return the result string
-string exec_geth_cmd(int i, string command){
-
-  cout << "exec_geth_cmd called !!!! Exiting... Command was " << command << endl;
-  throw;
-  ostringstream fullCommandStream;
-
-  if (USE_MULTIPLE_NODES) {
-    /* Find out nodes of this robot  */
-    string node = getNode(i);
-    int nodeInt = getNodeInt(i);
-    /* Run geth command on this node  */
-    //string username = getUsername();
-
-    ReplaceStringInPlace(command, "\"", "\\\"");
-
-    fullCommandStream << "geth" << nodeInt << " --exec " << "'" << command << "'" << " attach " << datadir_base << i << "/" << "geth.ipc";
-  } else {
-    fullCommandStream << "geth --exec " << "'" << command << "'" << " attach " << datadir_base << i << "/" << "geth.ipc";
-  }
-
-  std::string fullCommand = fullCommandStream.str();
-
-  //  if (DEBUG)
-  //cout << "exec_geth_cmd: " << fullCommand << endl;
-  
-  string res = exec(fullCommand.c_str());
-
-  cout << "res in exec_geth_cmd is " << res << endl; 
-  
-  if ( (res.find("Fatal") != string::npos) || (res.find("Error") != string::npos)) {
-    cout << "exec_geth_cmd: " << fullCommand << endl;
-    cout << "Result of exec_geth_cmd: " << res << endl;
-  }
-
-  /* If a transaction hash was generated, i.e., neither true nor false nor Error were found */
-    if (res.find("Fatal") != string::npos) {
-      cout << "Fatal error!!!" << endl;
-      exec("bash killblockchainallccall");
-      throw;
-      }
-  
-  return res;
-  
-}
-
-
 string exec_geth_cmd(int i, string command, int nodeInt, string datadirBase){
 
   string res = exec_geth_cmd_helper(i, command, nodeInt, datadirBase);
@@ -242,11 +143,6 @@ string exec_geth_cmd(int i, string command, int nodeInt, string datadirBase){
 
     /* Reconstruct the full command stream */
     ostringstream fullCommandStream;
-    
-    /* Run geth command on this node  */
-    //string username = getUsername();
-    
-    //ReplaceStringInPlace(command, "\"", "\\\"");
     
     fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc";    
     
@@ -288,14 +184,6 @@ string exec_geth_cmd_helper(int i, string command, int nodeInt, string datadirBa
 
   ostringstream fullCommandStream;
 
-  /* Run geth command on this node  */
-  //string username = getUsername();
-
-  //cout << "Username is: " << username << endl;
-  
-  
-  //ReplaceStringInPlace(command, "\"", "\\\"");
-  
   fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc";
   
   std::string fullCommand = fullCommandStream.str();
@@ -320,18 +208,10 @@ string exec_geth_cmd_with_geth_restart(int i, string command, int nodeInt, int b
     /* Reconstruct the full command stream */
     ostringstream fullCommandStream;
     
-    /* Run geth command on this node  */
-    //string username = getUsername();
-    
-    //ReplaceStringInPlace(command, "\"", "\\\"");
-    
     fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc";
     
     std::string fullCommand = fullCommandStream.str();
     
-    //cout << "exec_geth_cmd: " << fullCommand << endl;
-    //cout << "Result of exec_geth_cmd: " << res << endl;    
-
     if (res.find("no such file") != string::npos) {
       /* Init geth again */
       start_geth(i, nodeInt, basePort, datadirBase);
@@ -377,13 +257,6 @@ bool exec_geth_cmd_wait(int i, string command, int nodeInt, string datadirBase) 
 
 void sendMail(string body){
 
-  // string bodyToSend = body;
-  
-  // bodyToSend.erase(std::remove(bodyToSend.begin(), 
-  // 			 bodyToSend.end(), '\n'),
-  // 	     bodyToSend.end());
-
-
   ofstream out("mail.txt");
   out << body;
   out.close();
@@ -405,16 +278,10 @@ void exec_geth_cmd_background(int i, string command, int nodeInt, string datadir
 
   ostringstream fullCommandStream;
 
-  /* Run geth command on this node  */
-  //string username = getUsername();
-  
-  //ReplaceStringInPlace(command, "\"", "\\\"");
-
   /* The ampersand symol here makes the difference to the normal exec_geth_cmd function */
   fullCommandStream << "geth" <<  nodeInt << " --exec " << "'" << command << "'" << " attach " << datadirBase << i << "/" << "geth.ipc&";
   
   std::string fullCommand = fullCommandStream.str();
-
 
   /* TODO: I cannot check for errors here since it is a background
      call; maybe I can come up with some error handling */
@@ -424,47 +291,6 @@ void exec_geth_cmd_background(int i, string command, int nodeInt, string datadir
   
   system(fullCommand.c_str());
 
-}
-
-
-void geth_init(int i) {
-  cout << "Calling geth_init for robot " << i << endl;
-
-  std::ostringstream datadirStream;
-
-  datadirStream << "~/Documents/eth_data/data" << i;
-  
-  string str_datadir = datadirStream.str();
-  
-  ostringstream fullCommandStream;
-
-  cout << "I came to here A" << endl;
-  if (USE_MULTIPLE_NODES) {
-
-
-    /* Find out nodes of this robot  */
-    string node = getNode(i);
-    int nodeInt = getNodeInt(i);
-    /* Run geth command on this node  */
-    //string username = getUsername();
-    cout << "I came to here B" << endl;
-    fullCommandStream << "geth" << nodeInt << " --verbosity 3" << " --datadir " << str_datadir << " init " << genesis;
-
-    cout << "I came to here C" << endl;
-
-  } else {
-    fullCommandStream << "geth --verbosity 3" << " --datadir " << str_datadir << " init " << genesis;
-  }
-    
-
-  string commandStream = fullCommandStream.str();
-
-  if (DEBUG)
-    cout << "geth init: " << commandStream << endl; 
-  
-  exec(commandStream.c_str());
-  sleep(1);
-    
 }
 
 template<typename Out>
@@ -492,8 +318,6 @@ void geth_init(int i, int nodeInt, int basePort, string datadirBase, string gene
   
   string str_datadir = datadirStream.str();
   ostringstream fullCommandStream;
-  /* Run geth command on this node  */
-  //  string username = getUsername();
 
   fullCommandStream << "geth" << nodeInt << " --verbosity 3" << " --datadir " << str_datadir << " init " << genesisPath;
   
@@ -505,62 +329,6 @@ void geth_init(int i, int nodeInt, int basePort, string datadirBase, string gene
   exec(commandStream.c_str());
 
   sleep(5);
-}
-
-void start_geth(int i) {
-  sleep(1);
-
-  cout << "Starting geth for robot " << i << endl;
-
-  ostringstream fullCommandStream;
-  
-  if (USE_MULTIPLE_NODES) {
-    /* Find out nodes of this robot  */
-    string node = getNode(i);
-    int nodeInt = getNodeInt(i);    
-    /* Run geth command on this node  */
-    //string username = getUsername();
-    fullCommandStream << "geth" << nodeInt << " --verbosity 3 --networkid 2 --nodiscover ";
-  } else {
-    fullCommandStream << "geth --verbosity 3 --networkid 2 --nodiscover ";
-  }
-  
-  std::ostringstream datadirStream;
-  datadirStream << datadir_base << i << + "/";
-  
-  string str_datadir = datadirStream.str();
-  ostringstream portStream;
-
-  portStream << " --port " << (ipc_base_port + i);
-  string str_port = portStream.str();
-
-  // Make folders
-  string mk_folders = "mkdir -p " + str_datadir;
-  
-  system(mk_folders.c_str());
-
-  // Compose geth command
-
-  string ipc_path = "--ipcpath " + str_datadir + "geth.ipc";
-
-  fullCommandStream << ipc_path << " --datadir " << str_datadir << str_port << " --maxpeers 130";
-
-  //if (USE_MULTIPLE_NODES)
-  //  ReplaceStringInPlace(geth_command, "\"", "\\\"");
-  
-  //fullCommandStream << geth_command;  
-
-  if (USE_MULTIPLE_NODES)
-    fullCommandStream << "\"";
-
-  fullCommandStream << "&";
-  
-  cout << "Running command " << fullCommandStream.str() << endl;
-  
-  FILE* pipe = popen(fullCommandStream.str().c_str(), "r");
-  pclose(pipe);
-  sleep(13);
-	  
 }
 
 void start_geth(int i, int nodeInt, int basePort, string datadirBase) {
@@ -608,44 +376,11 @@ void start_geth(int i, int nodeInt, int basePort, string datadirBase) {
   
 }
 
-
-void createAccount(int i) {
-    sleep(1);
-  std::ostringstream fullCommandStream;
-  fullCommandStream << "personal.newAccount(\"test\")";
-  string cmd = fullCommandStream.str();
-  string res = exec_geth_cmd(i, cmd);
-
-}
-
 void createAccount(int i, int nodeInt, int basePort, string datadirBase) {
   sleep(1);
   string cmd = "personal.newAccount(\"test\")";
   cout << "create account: " << cmd << std::endl;
   string res = exec_geth_cmd_with_geth_restart(i, cmd, nodeInt, basePort, datadirBase);
-}
-
-
-string get_enode(int i) {
-
-  string cmd = "admin.nodeInfo.enode";
-  string res = exec_geth_cmd(i, cmd);
-
-  // Print the received enode
-  cout << "The enode is " << res << endl;
-  
-  /* Find out on which cluster node this robot's geth process should be executed */
-  string node = getNode(i);
-  /* Resolve the hostname to its ip */
-  string ip = hostname2ip(node);
-  /* Replace [::] (localhost) with actual ip address */
-  replace(res, "[::]", ip);
-  
-  // Print the replaced enode address
-  cout << "The enode with the actual ip address is " << res << endl;
-  
-  return res;
-  
 }
 
 string get_enode(int i, int nodeInt, int basePort, string datadirBase) {
@@ -656,31 +391,7 @@ string get_enode(int i, int nodeInt, int basePort, string datadirBase) {
   // Print the received enode
   cout << "The enode is " << res << endl;
 
-  //ostringstream nodeStream;
-  //nodeStream << "c" << rack << "-" << nodeInt;
-  //string node = nodeStream.str();
-  
-  /* Resolve the hostname to its ip */
-  //string ip = hostname2ip(node);
-  /* Replace [::] (localhost) with actual ip address */
-  //replace(res, "[::]", ip);
-  
-  // Print the replaced enode address
-  cout << "The enode with the actual ip address is " << res << endl;
-  
   return res;  
-}
-
-
-/* Start the mining process for robot i using t threads */
-string start_mining(int i, int t) {
-
-  std::ostringstream fullCommandStream;
-  fullCommandStream << "miner.start(" << t << ")";
-  string cmd = fullCommandStream.str();
-  string res = exec_geth_cmd(i, cmd);
-
-  return res;
 }
 
 
@@ -706,14 +417,6 @@ void start_mining_bg(int i, int t, int nodeInt, std::string datadirBase) {
 
 }
 
-
-/* Stop the mining process for robot i */
-string stop_mining(int i) {
-  string cmd = "miner.stop()";
-  string res = exec_geth_cmd(i, cmd);
-  return res;
-}
-
 /* Stop the mining process for robot i */
 string stop_mining(int i, int nodeInt, std::string datadirBase) {
   string cmd = "miner.stop()";
@@ -727,21 +430,6 @@ void stop_mining_bg(int i, int nodeInt, std::string datadirBase) {
   exec_geth_cmd_background(i, cmd, nodeInt, datadirBase);
 }
 
-
-// Add enode to robot i
-string add_peer(int i, string enode) {
-
-  std::ostringstream fullCommandStream;
-  fullCommandStream << "admin.addPeer(" << enode << ")";
-  string cmd = fullCommandStream.str();
-  string res = exec_geth_cmd(i, cmd);
-
-  //if (DEBUG)
-  //  cout << "add_peer: enode is " << enode << "result is" << res << endl;
-
-  return res;
-}
-
 // Add enode to robot i
 string add_peer(int i, string enode, int nodeInt, int basePort, string datadirBase) {
 
@@ -749,9 +437,6 @@ string add_peer(int i, string enode, int nodeInt, int basePort, string datadirBa
   fullCommandStream << "admin.addPeer(" << enode << ")";
   string cmd = fullCommandStream.str();
   string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);
-
-  //if (DEBUG)
-  //  cout << "add_peer: enode is " << enode << "result is" << res << endl;
 
   return res;
 }
@@ -766,18 +451,6 @@ void add_peer_bg(int i, string enode, int nodeInt, string datadirBase) {
   exec_geth_cmd_background(i, cmd, nodeInt, datadirBase);
 }
 
-
-// Remove enode from robot i
-string remove_peer(int i, string enode) {
-
-  std::ostringstream fullCommandStream;
-  fullCommandStream << "admin.removePeer(" << enode << ")";
-  string cmd = fullCommandStream.str();
-  string res = exec_geth_cmd(i, cmd);
-
-  return res;
-}
-
 // Remove enode from robot i
 string remove_peer(int i, string enode, int nodeInt, string datadirBase) {
 
@@ -790,7 +463,6 @@ string remove_peer(int i, string enode, int nodeInt, string datadirBase) {
 }
 
 
-
 // Remove enode from robot i
 void remove_peer_bg(int i, string enode, int nodeInt, string datadirBase) {
 
@@ -798,21 +470,6 @@ void remove_peer_bg(int i, string enode, int nodeInt, string datadirBase) {
   fullCommandStream << "admin.removePeer(" << enode << ")";
   string cmd = fullCommandStream.str();
   exec_geth_cmd_background(i, cmd, nodeInt, datadirBase);
-}
-
-
-
-// Get coinbase address of robot i
-std::string getCoinbase(int i){
-  std::ostringstream fullCommandStream;
-  fullCommandStream << "eth.coinbase";
-  string cmd = fullCommandStream.str();
-  string res = exec_geth_cmd(i, cmd);
-
-    if (DEBUG)
-      cout << "DEBUG  -- getCoinbase " << "(robot " << i << "): " << res << endl;
-  
-  return res;
 }
 
 // Get coinbase address of robot i
@@ -825,20 +482,6 @@ std::string getCoinbase(int i, int nodeInt, int basePort, string datadirBase){
     if (DEBUG)
       cout << "DEBUG  -- getCoinbase " << "(robot " << i << "): " << res << endl;
   
-  return res;
-}
-
-
-// Send v ether from robot i to address to
-std::string sendEther(int i, std::string from, std::string to, int v) {
-  std::ostringstream fullCommandStream;
-  fullCommandStream << "eth.sendTransaction({from:"  << from << ",to:" << to << ", value: web3.toWei(" << v << ", \"ether\")})";
-  string cmd = fullCommandStream.str();
-  string res = exec_geth_cmd(i, cmd);
-
-  if (DEBUG)
-    cout << "DEBUG -- sendEther (from " << i << " to " << to << "): " << res << endl;
-    
   return res;
 }
 
@@ -855,36 +498,6 @@ std::string sendEther(int i, std::string from, std::string to, int v, int nodeIn
   return res;
 }
 
-
-// Get contract address from transaction receipt
-std::string getContractAddress(int i, std::string txHash) {
-  std::ostringstream fullCommandStream;
-
-  cout << "txHash is: " << txHash << endl;
-  
-  fullCommandStream << "eth.getTransactionReceipt(\"" << txHash << "\").contractAddress";
-  
-  string cmd = fullCommandStream.str();
-  string res = exec_geth_cmd(i, cmd);
-
-  if (DEBUG)
-    cout << "DEBUG -- getContractAddress: " << res << endl;
-    
-  if (res.find("undefined") != string::npos) {
-    cout << "Contract address not specified! Exiting" << endl;
-    gethStaticErrorOccurred = true;
-    //if (USE_MULTIPLE_NODES) {
-    //  exec("bash killallgeths");
-    //} else { 
-    //  exec("killall geth");
-    //}
-    //throw;
-  }
-
-  return res;
-}
-
-
 // Get contract address from transaction receipt
 std::string getContractAddress(int i, std::string txHash, int nodeInt, string datadirBase) {
   std::ostringstream fullCommandStream;
@@ -898,22 +511,6 @@ std::string getContractAddress(int i, std::string txHash, int nodeInt, string da
 
   //  if (DEBUG)
   //  cout << "DEBUG -- getContractAddress: " << res << endl;
-    
-  return res;
-}
-
-
-/* Unlock account */
-std::string unlockAccount(int i, std::string pw) {
-  std::ostringstream fullCommandStream;
-
-  fullCommandStream << "personal.unlockAccount(eth.coinbase, \"" << pw << "\", 0)";
-  
-  string cmd = fullCommandStream.str();
-  string res = exec_geth_cmd(i, cmd);
-
-  if (DEBUG)
-    cout << "DEBUG -- unlockAccount: " << res << endl;
     
   return res;
 }
@@ -1042,39 +639,6 @@ void kill_geth_thread(int i, int basePort, int nodeInt, string datadirBase) {
   
 }
 
-
-// Interact with a function of a smart contract
-// v: Amount of wei to send
-std::string smartContractInterface(int i, string interface, string contractAddress,
-				   string func, int args[], int argc, int v) {
-  
-  
-   ostringstream fullCommandStream;
-
-   fullCommandStream << "var cC = web3.eth.contract(" << interface << ");var c = cC.at(" << contractAddress << ");c." << func << "(";
-
-
-   for(int k = 0; k < argc; k++) {
-     fullCommandStream << args[k] << ",";  
-   }
-
-   fullCommandStream << "{" << "value: " << v << ", from: eth.coinbase, gas: '3000000'});";
-   
-  
-   std::string fullCommand = fullCommandStream.str();
-
-   //cout << fullCommand << std::endl;
-
-
-   string res = exec_geth_cmd(i, fullCommand);
-   cout << "Result received from SC is: " << res << endl;
-
-
-   return res;
-
-
- }
-
 // Interact with a function of a smart contract
 // v: Amount of wei to send
 std::string smartContractInterface(int i, string interface, string contractAddress,
@@ -1119,6 +683,7 @@ std::string eventInterface(int i, std::string interface, std::string contractAdd
 
 // Interact with a function of a smart contract
 // v: Amount of wei to send
+/* Calls are just executed locally but no transactions are send to the blockchain  */
 std::string smartContractInterfaceCall(int i, string interface, string contractAddress,
 				   string func, int args[], int argc, int v, int nodeInt, string datadirBase) {
   
@@ -1144,6 +709,7 @@ std::string smartContractInterfaceCall(int i, string interface, string contractA
  }
 
 
+/* Calls are just executed locally but no transactions are send to the blockchain  */
 std::string smartContractInterfaceStringCall(int i, std::string interface, std::string contractAddress, std::string func, std::string args[], int argc, int v, int nodeInt, std::string datadirBase) {
 
 
@@ -1167,7 +733,6 @@ std::string smartContractInterfaceStringCall(int i, std::string interface, std::
    return res;
   
 }
-
 
 // Interact with a function of a smart contract
 // v: Amount of wei to send
@@ -1197,7 +762,6 @@ void smartContractInterfaceBg(int i, string interface, string contractAddress,
 
  }
 
-
 // Interact with a function of a smart contract
 // v: Amount of wei to send
 void smartContractInterfaceStringBg(int i, string interface, string contractAddress,
@@ -1224,59 +788,6 @@ void smartContractInterfaceStringBg(int i, string interface, string contractAddr
    //cout << "Result received from SC is: " << res << endl;
 
  }
-
-
-/* Deploy contract using robot number i and return the transaction hash */
-std::string deploy_contract(int i, string interfacePath, string dataPath, string templatePath) {
-
-  // Get smart contract interface
-  string interface = readStringFromFile(interfacePath);
-  string data = readStringFromFile(dataPath);
-  data = "0x" + data; // Make data hexadecimal
-  string contractTemplate = readStringFromFile(templatePath);
-
-  replace(contractTemplate, "INTERFACE", interface);
-  replace(contractTemplate, "DATA", data);
-
-  // TODO: make this a parameter
-  //string username = getUsername();
-  string tmpPath = "tmp.txt";
-
-  std::ofstream out(tmpPath.c_str());
-  out << contractTemplate;
-  out.close();
-
-  cout << contractTemplate << std::endl;
-
-  for (int trials = 0; trials < maxtrials; ++trials) {
-
-    if (DEBUG)
-      cout << "Trials is: " << trials << endl;
-
-    string txHashRaw = exec_geth_cmd(i, "loadScript(\"" + tmpPath + "\")");
-    cout << "txHashRaw: " << txHashRaw << endl; 
-    string txHash;
-    std::istringstream f(txHashRaw);
-    std::getline(f, txHash);
-
-    cout << "txHash: " << txHash << endl; 
-
-    /* If a transaction hash was generated, i.e., neither true nor false nor Error were found */
-    if (txHash.find("true") == string::npos && txHash.find("false") == string::npos && txHash.find("Error") == string::npos && txHash.find("Fatal") == string::npos) {
-	return txHash;
-      }
-    }  
-
-  /* If the maximum number of trials is reached */
-  cout << "Maximum number of trials is reached!" << endl;
-  //if (USE_MULTIPLE_NODES)
-  //  exec("bash killallgeths");
-  //else
-  //  exec("killall geth");
-  //throw;
-  gethStaticErrorOccurred = true;
-
-}
 
 /* Deploy contract using robot number i and return the transaction hash */
 std::string deploy_contract(int i, string interfacePath, string dataPath, string templatePath, int nodeInt, string datadirBase) {
@@ -1327,19 +838,6 @@ std::string deploy_contract(int i, string interfacePath, string dataPath, string
   gethStaticErrorOccurred = true;
 }
 
-
-/* Check account balance of robot i (in wei)*/
-int check_balance(int i) {
-  string cmd = "eth.getBalance(eth.coinbase)";
-  string res = exec_geth_cmd(i, cmd);
-  long balance;
-  istringstream ss(res);
-  ss >> balance;
-
-  return balance;
-}
-
-
 /* Check account balance of robot i (in wei) */
 long long check_balance(int i, int nodeInt, string datadirBase) {
   string cmd = "eth.getBalance(eth.coinbase)";
@@ -1354,21 +852,6 @@ long long check_balance(int i, int nodeInt, string datadirBase) {
   }
   
   return balance;
-}
-
-
-// Get blockchain length of robot i
-int getBlockChainLength(int i) {
-  
-  string cmd = "eth.blockNumber";
-  string res = exec_geth_cmd(i, cmd);  
-  int blockNumber;// = atoi(res.c_str());
-  istringstream ss(res);
-  ss >> blockNumber;
-  
-
-  return blockNumber;
-
 }
 
 // Get blockchain length of robot i
@@ -1392,16 +875,6 @@ int getBlockChainLength(int i, int nodeInt, string datadirBase) {
 
 
 /* Get the raw transaction based on the tx hash */
-std::string getRawTransaction(int i, std::string txHash) {
-
-  string cmd = "eth.getRawTransaction(" + txHash + ")";  
-  string rawTx = exec_geth_cmd(i, cmd);
-  
-  return rawTx;
-}
-
-
-/* Get the raw transaction based on the tx hash */
 std::string getRawTransaction(int i, std::string txHash, int nodeInt, std::string datadirBase) {
 
   string cmd = "eth.getRawTransaction(" + txHash + ")";  
@@ -1409,18 +882,6 @@ std::string getRawTransaction(int i, std::string txHash, int nodeInt, std::strin
   
   return rawTx;
 }
-
-
-
-/* Send raw transaction and include it in the tx pool */
-std::string sendRawTransaction(int i, std::string rawTx) {
-
-  string cmd = "eth.sendRawTransaction(" + rawTx + ")";
-  string txHash = exec_geth_cmd(i, cmd);
-  
-  return txHash;
-}
-
 
 /* Send raw transaction and include it in the tx pool */
 std::string sendRawTransaction(int i, std::string rawTx, int nodeInt, std::string datadirBase) {
@@ -1431,84 +892,6 @@ std::string sendRawTransaction(int i, std::string rawTx, int nodeInt, std::strin
   return txHash;
 }
 
-
-
-// Get number of white votes
-int getWhiteVotes(int i){
-  string cmd = "whiteVotes()";
-  string res = exec_geth_cmd(i, cmd);
-  
-  int blockNumber;// = atoi(res.c_str());
-  istringstream ss(res);
-  ss >> blockNumber;
-
-
-  return blockNumber;
-
-}
-
-
-// Get number of white votes
-int getWhiteVotes(int i, int nodeInt, string datadirBase){
-  string cmd = "whiteVotes()";
-  string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);  
-  int blockNumber;// = atoi(res.c_str());
-  istringstream ss(res);
-  ss >> blockNumber;
-
-
-  return blockNumber;
-
-}
-
-
-// Get number of black votes
-int getBlackVotes(int i) {
-  string cmd = "blackVotes()";
-  string res = exec_geth_cmd(i, cmd);
-
-  int resInt;// = atoi(res.c_str());
-  istringstream ss(res);
-  ss >> resInt;
-
-
-  return resInt;
-}
-
-// Get number of black votes
-int getBlackVotes(int i, int nodeInt, string datadirBase) {
-  string cmd = "blackVotes()";
-  string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);
-  istringstream ss(res);  
-  int resInt;// = atoi(res.c_str());
-  ss >> resInt;  
-
-  return resInt;
-}
-
-// Get last 2 votes
-int getLast2Votes(int i) {
-  string cmd = "last2Votes()";
-  string res = exec_geth_cmd(i, cmd);
-  int resInt;// = atoi(res.c_str());
-  istringstream ss(res);
-  ss >> resInt;
-
-  return resInt;
-}
-
-
-// Get last 2 votes
-int getLast2Votes(int i, int nodeInt, string datadirBase) {
-  string cmd = "last2Votes()";
-  string res = exec_geth_cmd(i, cmd, nodeInt, datadirBase);
-  int resInt;// = atoi(res.c_str());
-  istringstream ss(res);
-  ss >> resInt;
-
-
-  return resInt;
-}
 
 /* Measure time and print it */
 double measure_time(double ref_time, string part_name) {
@@ -1543,6 +926,7 @@ void generate_genesis(std::string address, int basePort) {
 }
 
 
+/* Prepare a robot for a new genesis block, i.e., remove all files except for the keystore */
 void prepare_for_new_genesis(int i, int nodeInt, int basePort, string blockchainPath) {
 
   /* Kill miner geth thread to replace genesis block */

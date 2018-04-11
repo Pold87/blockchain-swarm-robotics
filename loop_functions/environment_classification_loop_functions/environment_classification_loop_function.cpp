@@ -298,7 +298,6 @@ void CEnvironmentClassificationLoopFunctions::PreinitMiner() {
 
   std::ostringstream fullCommandStream;
   std::string minerAddress;
-  if (useMultipleNodes) {
     /* Initialize the miner */
     geth_init(minerId, minerNode, basePort, blockchainPath, genesisRaw);
     cout << "Now Im here";
@@ -308,20 +307,6 @@ void CEnvironmentClassificationLoopFunctions::PreinitMiner() {
     minerAddress = getCoinbase(minerId, minerNode, basePort, blockchainPath);
     minerAddressGlobal = minerAddress;
     prepare_for_new_genesis(minerId, minerNode, basePort, blockchainPath);
-
-
-  } else {
-    /* Initialize the miner */
-    geth_init(minerId);
-    sleep(1);
-    start_geth(minerId);
-    createAccount(minerId);
-    unlockAccount(minerId, "test");
-    start_mining(minerId, 4);
-    minerAddress = getCoinbase(minerId);
-  }
-
-
 }
 
 /* Set up the miner, deploy the smart contract, etc. */
@@ -355,18 +340,11 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
   string dataPath = baseDirLoop + "data.txt";
   string templatePath = baseDirLoop + "contractTemplate.txt";
   string txHash;
-  if (useMultipleNodes)
-    txHash = deploy_contract(minerId, interfacePath, dataPath, templatePath, minerNode, blockchainPath);
-  else
-    txHash = deploy_contract(minerId, interfacePath, dataPath, templatePath);
-
+  txHash = deploy_contract(minerId, interfacePath, dataPath, templatePath, minerNode, blockchainPath);
   int u = 0;
 
   do {
-    if (useMultipleNodes)
-      contractAddress = getContractAddress(minerId, txHash, minerNode, blockchainPath);
-    else
-      contractAddress = getContractAddress(minerId, txHash);
+    contractAddress = getContractAddress(minerId, txHash, minerNode, blockchainPath);
     if (DEBUGLOOP) {
       if (contractAddress.find("TypeError") == 0)
 	cout << "Contract address not yet available. Number of trials is " << u << endl;
@@ -455,18 +433,14 @@ void CEnvironmentClassificationLoopFunctions::InitEthereum() {
   }
 
   cout << "Disconnecting everyone by killing mining thread" << endl;
-  if (useMultipleNodes) {
-    kill_geth_thread(minerId, basePort, minerNode, blockchainPath);
-    /* And a second time (since ssh creates two processes) */
-    kill_geth_thread(minerId, basePort, minerNode, blockchainPath);
-    /* Remove folder (to be really sure) */
-    std::ostringstream rmMinerStream;
-    rmMinerStream << "rm -rf " << blockchainPath << minerId;
-    std::string rmMinerCmd = rmMinerStream.str();
-    system(rmMinerCmd.c_str());
-  }  else {
-    kill_geth_thread(minerId);
-  }
+  kill_geth_thread(minerId, basePort, minerNode, blockchainPath);
+  /* And a second time (since ssh creates two processes) */
+  kill_geth_thread(minerId, basePort, minerNode, blockchainPath);
+  /* Remove folder (to be really sure) */
+  std::ostringstream rmMinerStream;
+  rmMinerStream << "rm -rf " << blockchainPath << minerId;
+  std::string rmMinerCmd = rmMinerStream.str();
+  system(rmMinerCmd.c_str());
 }
 
 bool CEnvironmentClassificationLoopFunctions::InitRobots() {
