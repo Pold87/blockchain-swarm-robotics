@@ -11,6 +11,45 @@ Managing Byzantine Robots via Blockchain Technology in a Swarm Robotics Collecti
 A pre-print is available at:  
 http://iridia.ulb.ac.be/IridiaTrSeries/
 
+## Instructions
+
+Please note that we are currently working on a platform-independent
+version of this repository (currently, it contains the code for our
+architecture but there is a more versatile version in the branch
+'local'). 
+Some hints for the installation (more will follow soon):
+
+There is a .ova virtual machine file that contains a runnable version of this repository.
+The link to the VM image is https://drive.google.com/file/d/1QGTEAIyoeGffcfBEzSbq4xbTcq8bLe7S/view?usp=sharing (the files are in `~/blockchain-swarm-robotics/`).
+User: Iridia
+pw: Iridia
+
+Execute Experiment 1 with:
+
+`bash start_experiment1.sh 0 0 1`
+
+### Requirements:
+- ARGoS 3
+- ARGoS-epuck
+- git
+- cmake
+- golang (tested with version 1.7.3)
+- optional: sendmail
+
+The easiest way to install ARGoS and the epuck plugin is via the
+script `install_argos.sh` (install the dependencies mentioned at https://github.com/ilpincy/argos3 first.
+
+Then, execute `create_geths.sh` and add the created geths (default is
+just `geth0`) to your PATH (incl. export).
+
+Install the solidity compiler `solc`.
+
+Edit the file `start_experiment1.sh` (change the variable BASE etc.).
+
+Compile the code (mkdir build; cd build; cmake ..; make).
+
+Run an experiment: `bash start_experiment1.sh 0 0 1`
+
 
 ## Scenario
 
