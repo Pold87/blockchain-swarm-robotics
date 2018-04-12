@@ -23,8 +23,8 @@ Execute Experiment 1 with:
 
 `bash start_experiment1.sh 0 0 1`
 
-Please note that we are currenltly working on a clean-up and more verstaile version of this code. 
-Below are some hints for the installation (more will follow soon). It's maybe also a good idea to check out the virtual machine file (see above) to see how everything is set up:
+Please note that we are currenltly working on a cleaned-up and more versatile version of this code. 
+Below are some hints for the installation (more will follow soon). It's maybe also a good idea to check out the virtual machine file (see above) to see how the dependencies are set up.
 
 ### Requirements:
 - ARGoS 3
