@@ -13,20 +13,23 @@ http://iridia.ulb.ac.be/IridiaTrSeries/
 
 ## Instructions
 
+There is a .ova virtual machine file that contains a runnable version of this repository.
+The link to the VM image is https://drive.google.com/file/d/1QGTEAIyoeGffcfBEzSbq4xbTcq8bLe7S/view?usp=sharing (the files are in `~/blockchain-swarm-robotics/`).
+
+User: Iridia  
+pw: Iridia
+
+Execute Experiment 1 with:
+
+`bash start_experiment1.sh 0 0 1`
+
 Please note that we are currently working on a platform-independent
 version of this repository (currently, it contains the code for our
 architecture but there is a more versatile version in the branch
 'local'). 
 Some hints for the installation (more will follow soon):
 
-There is a .ova virtual machine file that contains a runnable version of this repository.
-The link to the VM image is https://drive.google.com/file/d/1QGTEAIyoeGffcfBEzSbq4xbTcq8bLe7S/view?usp=sharing (the files are in `~/blockchain-swarm-robotics/`).
-User: Iridia
-pw: Iridia
 
-Execute Experiment 1 with:
-
-`bash start_experiment1.sh 0 0 1`
 
 ### Requirements:
 - ARGoS 3
