@@ -44,7 +44,7 @@ Install the solidity compiler `solc`.
 
 Edit the file `start_experiment1.sh` (change the variables BASE, mailto, etc.).
 
-Compile the code (mkdir build; cd build; cmake ..; make).
+Compile the code (`mkdir build`; `cd build`; `cmake ..`; `make`).
 
 Run an experiment: `bash start_experiment1.sh 0 0 1`
 
