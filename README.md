@@ -42,7 +42,7 @@ just `geth0`) to your PATH (incl. export).
 
 Install the solidity compiler `solc`.
 
-Edit the file `start_experiment1.sh` (change the variable BASE etc.).
+Edit the file `start_experiment1.sh` (change the variables BASE, mailto, etc.).
 
 Compile the code (mkdir build; cd build; cmake ..; make).
 
