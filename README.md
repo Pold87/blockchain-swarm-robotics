@@ -35,7 +35,7 @@ Below are some hints for the installation (more will follow soon). It's maybe al
 - optional: sendmail
 
 The easiest way to install ARGoS and the epuck plugin is via the
-script `install_argos.sh` (install the dependencies mentioned at https://github.com/ilpincy/argos3 first.
+script `install_argos.sh` (install the dependencies mentioned at https://github.com/ilpincy/argos3 first).
 
 Then, execute `create_geths.sh` and add the created geths (default is
 just `geth0`) to your PATH (incl. export).
