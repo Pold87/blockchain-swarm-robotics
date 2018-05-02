@@ -14,7 +14,7 @@ http://iridia.ulb.ac.be/IridiaTrSeries/
 ## Instructions
 
 There is a .ova virtual machine file that contains a runnable version of this repository.
-The link to the VM image is https://drive.google.com/file/d/1QGTEAIyoeGffcfBEzSbq4xbTcq8bLe7S/view?usp=sharing (the files are in `~/blockchain-swarm-robotics/`).
+The link to the VM image is https://drive.google.com/open?id=1aDJcWafd-GziCL12MOfWdgTizpACPAb4  (the files are in `~/blockchain-swarm-robotics/`).
 
 User: Iridia  
 pw: Iridia
