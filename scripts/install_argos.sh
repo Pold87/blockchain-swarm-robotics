@@ -11,13 +11,13 @@ INSTALL_DIR=/home/${USERNAME}/argos3-dist
 
 # ARGoS3 repository
 ARGOS3_REPOSITORY=https://github.com/ilpincy/argos3.git
-ARGOS3_BRANCH=master
+ARGOS3_BRANCH=3.0.0-beta48
 ARGOS3_DIR=argos3
 
 # IRIDIA e-puck repository
 #EPUCK_REPOSITORY=https://garattonilorenzo:prova@iridia-dev.ulb.ac.be/projects/argos3-epuck.git
-EPUCK_REPOSITORY=https://github.com/lgarattoni/argos3-epuck.git
-EPUCK_BRANCH=master
+EPUCK_REPOSITORY=https://github.com/demiurge-project/argos3-epuck.git
+EPUCK_BRANCH=v48
 EPUCK_DIR=argos3-epuck
 
 # TAM repository
