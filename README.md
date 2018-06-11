@@ -49,6 +49,9 @@ Compile the code (`mkdir build`; `cd build`; `cmake ..`; `make`).
 
 Run an experiment: `bash start_experiment1.sh 0 0 1`
 
+## Video tutorial
+
+There is a video tutorial on how to install the framework at https://www.youtube.com/watch?v=0hEZGHlqdJ8
 
 ## Scenario
 
